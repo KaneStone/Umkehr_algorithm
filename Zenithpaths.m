@@ -2,10 +2,11 @@ function [zs atmos] = Zenithpaths(atmos,lambda,test)
 
 % This needs to be generalised
  
-a = atmos.initial_SZA(test,:);
+a = atmos.initial_SZA(test).SZA;
 a (isnan(a)) = [];
-mx = ceil(max(a));
-mn = floor(min(a));
+%Two lines below may cause problems
+mx = ceil(max(a(:)));
+mn = floor(min(a(:)));
 Apparent = mn:1:mx;
 al = length(Apparent);
 Apparent_Final = zeros(length(lambda), atmos.nlayers-1, length(a));
@@ -13,46 +14,49 @@ zs = ones(length(lambda), length(a), atmos.nlayers-1, atmos.nlayers-1)*1000;
 True.Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 Apparent_Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 
+
 for iteration = 1:2;
-for i = 1:length(lambda)
-    gamma = (atmos.r/atmos.N(i,:))*(atmos.dndz(i,:));
-    for iscat = 1:atmos.nlayers-1
-        if iteration == 2            
-            True.actual = atmos.initial_SZA(test,:); %just picked one from random
-            True.actual (isnan(True.actual)) = [];
-            True_I = reshape(True.Initial(i,iscat,:),1,al);
-            True_I (True_I == 0) = [];
-            Apparent = interp1(squeeze(True_I)...
-                ,squeeze(Apparent_Initial(i,iscat,1:length(True_I))),True.actual,'linear','extrap');
-            
-        end        
-        for j = 1:length(Apparent) 
-            if Apparent(j) > 90                 
-                [True Apparent_Initial Apparent_Final zs atmos] =...
-                    zenithpaths_tangent(atmos,i,j,True,Apparent_Initial...
-                    ,Apparent_Final,Apparent,iscat,gamma,zs,iteration);  
-            else [True Apparent_Initial Apparent_Final zs] =...
-                    zenithpaths_down(atmos,i,j,True,Apparent_Initial...
-                    ,Apparent_Final,Apparent,iscat,gamma,zs,iteration);  
+    for i = 1:length(lambda)  
+        cwlp = ceil(.5*i);
+        gamma = (atmos.r/atmos.N(i,:))*(atmos.dndz(i,:));
+        for iscat = 1:atmos.nlayers-1
+            if iteration == 2            
+                True.actual = a; %just picked one from random
+                True.actual (isnan(True.actual)) = [];
+                True_I = reshape(True.Initial(i,iscat,:),1,al);
+                True_I (True_I == 0) = [];
+                Apparent = interp1(squeeze(True_I)...
+                    ,squeeze(Apparent_Initial(i,iscat,1:length(True_I))),True.actual(cwlp,:),'linear','extrap');
+
+            end        
+            for j = 1:length(Apparent) 
+                if Apparent(j) > 90                 
+                    [True Apparent_Initial Apparent_Final zs atmos] =...
+                        zenithpaths_tangent(atmos,i,j,True,Apparent_Initial...
+                        ,Apparent_Final,Apparent,iscat,gamma,zs,iteration);  
+                else [True Apparent_Initial Apparent_Final zs] =...
+                        zenithpaths_down(atmos,i,j,True,Apparent_Initial...
+                        ,Apparent_Final,Apparent,iscat,gamma,zs,iteration);  
+                end
             end
-        end
-    end 
+        end 
+    end
 end
-end
+
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
 end
 
 function [True Apparent_Initial Apparent_Final zs atmos] = zenithpaths_tangent(atmos,i,j,True...
-    ,Apparent_Initial,Apparent_Final,Apparent,iscat,gamma,zs,iteration)
-                    
-%INTITIALISATION ONLY NEEDS TO BE CALCULATED ONCE. AS INITIAL APPARENT ANGLES ARE
-%ALWAYS THE SAME.
+    ,Apparent_Initial,Apparent_Final,Apparent,iscat,gamma,zs,iteration)                    
 
 Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j)); %(Meant to be 180-Apparent)
 atmos.ztan = interp1(atmos.Nr(i,:),atmos.r,Rg(iscat),'linear','extrap');
 tanlayer = ceil(((atmos.ztan-atmos.r(1))/atmos.dz));
+
+%if tanlayer is less than one shouldn't the zenith path be zero not 1000
 if tanlayer < 1
+    %zs(i,j,iscat,:) = 0;
     return
 end    
 

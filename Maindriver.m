@@ -1,5 +1,5 @@
 tic;
-test = 29;
+test =1;
 a = 1;
 for i = 1:1
     extra = extrasetup(test);
@@ -10,10 +10,10 @@ for i = 1:1
         extra.atmos.ozone=log10(extra.atmos.ozone);        
     end
     
-    [yhat,K,N] = ForwardModel(extra.atmos.ozone, Kflg, extra);
+    [K,N] = ForwardModel(extra.atmos.ozone, Kflg, extra);
     sz = size(extra.atmos.Apparent);
 
-    Ki = K(sz(3)+1:2*sz(3),:);
+    %Ki = K(sz(3)+1:2*sz(3),:);
     %yhat = yhat(sz(3)+1:2*sz(3),:);
     %plotWfunc(K, extra.atmos.Apparent);
     %plotNvalues(extra.atmos.true_actual, N.zs);
@@ -25,11 +25,11 @@ for i = 1:1
     %    Sa = Sa*a;
     %end
     
-    y = extra.atmos.N_values(test,:);
+    y = extra.atmos.N_values(test).N;
  
     y (isnan(y)) = [];
-    [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs(2,:),Se,extra.atmos.ozone,Sa,Ki,extra,'Opt');
-    [RMS(i) rms1(i)] = createRMS(N.zs(2,:),yhat);
+    [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
+    [RMS(i) rms1(i)] = createRMS(N.zs,yhat);
     [A] = AveragingKernel(S,Sa,Se,extra,K);
     plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1);
     

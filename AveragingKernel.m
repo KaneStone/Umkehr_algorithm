@@ -14,7 +14,7 @@ Dof=sum(diag(A));
 
 %Information content - 3D reduction in the error covariance volumes - how
 %much information from measurements versus a priori
-H;
+%H;
 
 %
 %Ss - smoothing error component from the a priori error smoothing error

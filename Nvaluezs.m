@@ -5,7 +5,7 @@ function [N] = Nvaluezs(atmos,lambda,zs,theta,ozonexs,bandpass)
 sz = size(zs);
 intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 intenstar = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
-rayphase = zeros(6,sz(2));
+rayphase = zeros(length(lambda),sz(2));
 atmos.Apparent (atmos.Apparent == 0) = NaN;
 
 %solar*bandpasses

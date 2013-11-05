@@ -51,6 +51,8 @@ if strcmp(method,'Opt')
         %hat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));
         
         %5.10
+        %y = reshape(y,1,93);
+        %yhat = reshape(yhat,1,93);
         xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
        
         xi = xhat;
@@ -59,10 +61,10 @@ if strcmp(method,'Opt')
         %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 
         %means calcualte K)
         Kflg=1;
-        [yhat,K,N]=ForwardModel(xhat,Kflg,extra);
-        yhat = N.zs(2,:);
+        [K,N]=ForwardModel(xhat,Kflg,extra);
+        yhat = N.zs;
         yhat1(i+1).a = yhat;
-        K = K(sz(3)+1:2*sz(3),:);
+        
         
     %Decide whether the solution has converged (we can discuss different ways
     %of working this out - but not such a big issue as at least to start with

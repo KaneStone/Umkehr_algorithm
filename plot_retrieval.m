@@ -8,7 +8,7 @@ hold on
 addpath('/Users/stonek/work/Dobson/data_code');
 herrorbar(extra.atmos.ozone,1:61,(diag(Sa)).^.5);
 plot(extra.atmos.ozone,1:61,'LineWidth',2);
-set(1,'color','white');
+set(fig,'color','white');
 ylabel('Altitude','fontsize',20);
 xlabel('number density','fontsize',20);
 title('Macquarie Ozone Profile','fontsize',24);
@@ -17,7 +17,7 @@ legend('retrieval','A prioir','location','NorthWest');
 set(fig, 'PaperPositionMode','auto');
 print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_profile_',num2str(test),'.png'));
 
-N_val = extra.atmos.N_values(test,:);
+N_val = extra.atmos.N_values(test).N;
 %N_val = load('Ret_as_Meas');
 N_val (isnan(N_val)) = [];
 

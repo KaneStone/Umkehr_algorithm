@@ -1,4 +1,4 @@
-function [yhat,K,N]=ForwardModel(x,Kflg,extra)	
+function [K,N]=ForwardModel(x,Kflg,extra)	
 %yhat Ns and K, the weighting functions are returned given x the 
 %state vector. K is only calculated if Kflg is 1.
 %Extras contains all other information needed that i.e. SZAs, cross

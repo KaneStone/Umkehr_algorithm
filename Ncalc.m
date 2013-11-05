@@ -18,7 +18,8 @@ atmos.ozonemid = interp1(atmos.Z,atmos.ozone,atmos.Zmid,'linear','extrap');
 %[intensity.ds N.ds] = Nvalueds(atmos,lambda,ds,theta,ozonexs);
 [N.zs] = Nvaluezs(atmos,lambda,zs,theta,ozonexs,bandpass);
 
-yhat = reshape(N.zs',3*length(N.zs),1);
+sz = size(N.zs);
+yhat = reshape(N.zs',sz(1)*sz(2),1);
 
 %plotNvalues(theta,N);
 end

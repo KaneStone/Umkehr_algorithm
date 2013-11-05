@@ -11,8 +11,8 @@ function [atmos date] = profilereader(Rvaluefilename,ozonefilename,temperaturefi
 
 %reading in R-values, N-values, Time and trueSZA?
 fid = fopen(Rvaluefilename,'r');
-for i = 1:8;
-    if i ~= 8;
+for i = 1:6;
+    if i ~= 6;
         line = fgets(fid);
     else  headers = textscan(fid, '%s %s %s %s %s %s %s %s %s %s %s %s %s',1 );       
     end
@@ -22,38 +22,84 @@ data = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %c %f %f',[13,inf]);
 sz = size(data);
 
 for j = 1:sz(2);
-    if strcmp(headers{1,j},'YEAR')
-        date = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1},...
+    if strcmp(headers{1,j},'YYYY')
+        date_of_meas = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1},...
            char(headers{1,j+2}), data{1,j+2}, char(headers{1,j+3}), data{1,j+3},...
            char(headers{1,j+4}), data{1,j+4},char(headers{1,j+5}), data{1,j+5});
     elseif strcmp(headers{1,j},'Solar_zenith_angle')
         angles = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1});
-    elseif strcmp(headers{1,j},'Wavelength_pair')
-        atmos.wavelength_pair = struct(char(headers{1,j}), data{1,j});
+    elseif strcmp(headers{1,j},'Wavelength_Pair')
+        wavelength_pair = struct(char(headers{1,j}), data{1,j});
     elseif strcmp(headers{1,j},'R_value');
         intensity_values = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1});
     end
 end
 fclose(fid);
 
+%need to separate diffeerent measurments that are on same day
+% count = 1;
+% for j = 1:12;
+%     for i = 1:31;   
+%         location = find(date_of_meas.DD == i & date_of_meas.MM == j); 
+%         hour = date_of_meas.HH(location);        
+%         if isempty(location) == 0                              
+%             atmos.WLP(count,1:length(location)) = wavelength_pair.Wavelength_Pair(min(location):max(location));                       
+%             what_WLP.a = strfind(atmos.WLP(count,:),'A');
+%             what_WLP.c = strfind(atmos.WLP(count,:),'C');
+%             what_WLP.d = strfind(atmos.WLP(count,:),'D');
+%             atmos.initial_SZA(count,1:length(location)) = angles.Solar_zenith_angle(min(location):max(location));
+%             atmos.N_values(count,1:length(location)) = intensity_values.N_value(min(location):max(location));
+%             atmos.R_values(count,1:length(location)) = intensity_values.R_value(min(location):max(location));
+%             atmos.date(count,1:2) = horzcat(j,i);
+%             count = count+1;
+%         end
+%     end
+% end
 
+position_handle = 1;
 count = 1;
 for j = 1:12;
     for i = 1:31;   
-        location = find(date.DAY == i & date.MONTH == j); 
-        if isempty(location) == 0            
-            atmos.initial_SZA(count,1:length(location)) = angles.Solar_zenith_angle(min(location):max(location));
-            atmos.N_values(count,1:length(location)) = intensity_values.N_Value(min(location):max(location));
-            atmos.R_values(count,1:length(location)) = intensity_values.R_value(min(location):max(location));
-            atmos.date(count,1:2) = horzcat(j,i);
-            count = count+1;
+        location = find(date_of_meas.DD == i & date_of_meas.MM == j); 
+        hour = date_of_meas.HH(location);        
+        if isempty(location) == 0                              
+            atmos.WLP(count,1:length(location)) = wavelength_pair.Wavelength_Pair(min(location):max(location));                       
+            what_WLP.a = strfind(atmos.WLP(count,:),'A');
+            what_WLP.c = strfind(atmos.WLP(count,:),'C');
+            what_WLP.d = strfind(atmos.WLP(count,:),'D');
+            atmos.date(count).date = horzcat(i,j,date_of_meas.YYYY(1));
+            
+            if isempty(what_WLP.a) == 0
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(what_WLP.a(1):what_WLP.a(end));
+                atmos.N_values(count).WLP(position_handle) = 'A';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(what_WLP.a(1):what_WLP.a(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(what_WLP.a(1):what_WLP.a(end));
+                position_handle = position_handle+1;                
+            end            
+            if isempty(what_WLP.c) == 0
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.c)) = angles.Solar_zenith_angle(what_WLP.c(1):what_WLP.c(end));
+                atmos.N_values(count).WLP(position_handle) = 'C';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(what_WLP.c(1):what_WLP.c(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(what_WLP.c(1):what_WLP.c(end));
+                position_handle = position_handle+1;                
+            end
+            if isempty(what_WLP.d) == 0
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.d)) = angles.Solar_zenith_angle(what_WLP.d(1):what_WLP.d(end));
+                atmos.N_values(count).WLP(position_handle) = 'D';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(what_WLP.d(1):what_WLP.d(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(what_WLP.d(1):what_WLP.d(end));                
+            end
+
+            count = count+1;            
         end
     end
 end
-atmos.N_values (atmos.N_values == 0) = NaN;
-atmos.initial_SZA (atmos.initial_SZA == 0) = NaN;
 
-date_to_use = atmos.date(test,1);
+
+%atmos.N_values (atmos.N_values == 0) = [];
+%atmos.initial_SZA(1).SZA (atmos.initial_SZA(1).SZA == 0) = [];
+
+date_to_use = atmos.date(test).date(2);
 
 %reading in ozone profile
 fid = fopen(ozonefilename);
@@ -111,6 +157,7 @@ end
 atmos.solar = horzcat(solar.s)';
 atmos.quarter = quarter;
 
+        
 end
 
 

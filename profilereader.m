@@ -56,6 +56,9 @@ fclose(fid);
 %     end
 % end
 
+
+%If I want to create one large vector for all three wavelength pairs. This
+%is where I need to change it. Below.
 position_handle = 1;
 count = 1;
 for j = 1:12;
@@ -90,7 +93,8 @@ for j = 1:12;
                 atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(what_WLP.d(1):what_WLP.d(end));                
             end
 
-            count = count+1;            
+            count = count+1; 
+            position_handle = 1;
         end
     end
 end

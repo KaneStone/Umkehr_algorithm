@@ -29,8 +29,8 @@ for i = 1:1
  
     y (isnan(y)) = [];
     [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
-    [RMS(i) rms1(i)] = createRMS(N.zs,yhat);
-    [A] = AveragingKernel(S,Sa,Se,extra,K);
+    %[RMS(i) rms1(i)] = createRMS(N.zs,yhat);
+    %[A] = AveragingKernel(S,Sa,Se,extra,K);
     plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1);
     
     

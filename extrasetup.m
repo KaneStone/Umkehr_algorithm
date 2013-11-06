@@ -27,8 +27,8 @@ atmos.nlayers = length(atmos.Z);
 atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1:atmos.nlayers-1);
 
 %defining profile paths
-%profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
-profilepath.Rvalue = strcat(inputpath,'Umkehr/','Melbourne/', 'Melbourne_1994.txt');
+profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
+%profilepath.Rvalue = strcat(inputpath,'Umkehr/','Melbourne/', 'Melbourne_1994.txt');
 profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/','Macquarie.dat');
 profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/','Macquarie_temperature.dat');
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/','Macquarie_pressure.dat');

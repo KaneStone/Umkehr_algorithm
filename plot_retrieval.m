@@ -21,23 +21,26 @@ N_val = extra.atmos.N_values(test).N;
 %N_val = load('Ret_as_Meas');
 N_val (isnan(N_val)) = [];
 
+error = (diag(Se)).^.5;
+%error = vertcat(error(1:31)',error(32:62)',error(63:end)');
+
 figure;
 fig = gcf;
 set(fig,'color','white','Position',[100 100 1000 700]);
-plot(extra.atmos.true_actual,yhat,'r','LineWidth',2);
+plot(extra.atmos.true_actual',yhat','r','LineWidth',2);
 hold on
-errorbar(extra.atmos.true_actual,N_val,(diag(Se)).^.5,'LineWidth',2);
+%plot(extra.atmos.true_actual',N_val','LineWidth',2);
+errorbar(extra.atmos.true_actual',N_val',error','LineWidth',2);
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
 title('Macquarie N-values','fontsize',24);
 legend('retrieval','measurement','location','NorthWest');
 
 yhat2 = vertcat(yhat1.a)';
-
 figure;
 fig = gcf;
 set(fig,'color','white','Position',[100 100 1000 700]);
-plot(extra.atmos.true_actual,yhat2,'LineWidth',2);
+plot(extra.atmos.true_actual,yhat2','LineWidth',2);
 hold on
 errorbar(extra.atmos.true_actual,N_val,(diag(Se)).^.5,'LineWidth',2,'color','black','LineStyle','--');
 ylabel('N-Value','fontsize',20);

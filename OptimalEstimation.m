@@ -40,7 +40,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:1;
+    for i = 1:4;
 
         K1(i).a = K;
         
@@ -59,7 +59,7 @@ if strcmp(method,'Opt')
         xhat = xhat';
         %xhat1 = xhat*1e11;
         %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 
-        %means calcualte K)
+        %means calculate K)
         Kflg=1;
         [K,N]=ForwardModel(xhat,Kflg,extra);
         yhat = N.zs;

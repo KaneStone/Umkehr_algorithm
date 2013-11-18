@@ -56,9 +56,6 @@ fclose(fid);
 %     end
 % end
 
-
-%If I want to create one large vector for all three wavelength pairs. This
-%is where I need to change it. Below.
 position_handle = 1;
 count = 1;
 for j = 1:12;
@@ -73,26 +70,25 @@ for j = 1:12;
             atmos.date(count).date = horzcat(i,j,date_of_meas.YYYY(1));
             
             if isempty(what_WLP.a) == 0
-                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(what_WLP.a(1):what_WLP.a(end));
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(location(1):location(1)-1+what_WLP.a(end));
                 atmos.N_values(count).WLP(position_handle) = 'A';
-                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(what_WLP.a(1):what_WLP.a(end));
-                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(what_WLP.a(1):what_WLP.a(end));
-                position_handle = position_handle+1;                
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(location(1):location(1)-1+what_WLP.a(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(location(1):location(1)-1+what_WLP.a(end));
+                position_handle = position_handle+1;              
             end            
             if isempty(what_WLP.c) == 0
-                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.c)) = angles.Solar_zenith_angle(what_WLP.c(1):what_WLP.c(end));
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.c)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
                 atmos.N_values(count).WLP(position_handle) = 'C';
-                atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(what_WLP.c(1):what_WLP.c(end));
-                atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(what_WLP.c(1):what_WLP.c(end));
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.R_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
                 position_handle = position_handle+1;                
             end
             if isempty(what_WLP.d) == 0
-                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.d)) = angles.Solar_zenith_angle(what_WLP.d(1):what_WLP.d(end));
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.d)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
                 atmos.N_values(count).WLP(position_handle) = 'D';
-                atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(what_WLP.d(1):what_WLP.d(end));
-                atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(what_WLP.d(1):what_WLP.d(end));                
-            end
-
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.N_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));             
+            end                     
             count = count+1; 
             position_handle = 1;
         end

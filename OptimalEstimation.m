@@ -40,7 +40,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:1;
+    for i = 1:3;
 
         K1(i).a = K;
         
@@ -51,8 +51,10 @@ if strcmp(method,'Opt')
         %hat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));
         
         %5.10
-        %y = reshape(y,1,93);
-        %yhat = reshape(yhat,1,93);
+        %reshaping into one vector for all wavelengths
+        y = reshape(y',1,numel(y));
+        yhat = reshape(yhat',1,numel(yhat));
+        
         xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
        
         xi = xhat;

@@ -1,5 +1,5 @@
 tic;
-test =10;
+test =5;
 a = 1;
 for i = 1:1
     extra = extrasetup(test);

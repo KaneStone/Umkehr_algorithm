@@ -27,11 +27,11 @@ atmos.nlayers = length(atmos.Z);
 atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1:atmos.nlayers-1);
 
 %defining profile paths
-profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
-%profilepath.Rvalue = strcat(inputpath,'Umkehr/','Melbourne/', 'Melbourne_1994.txt');
-profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/','Hobart.dat');
-profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/','Hobart_temperature.dat');
-profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/','Hobart_pressure.dat');
+%profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
+profilepath.Rvalue = strcat(inputpath,'Umkehr/','Melbourne/', 'Melbourne_1994.txt');
+profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/','Melbourne.dat');
+profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/','Melbourne_temperature.dat');
+profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/','Melbourne_pressure.dat');
 %profilepath.TaP = strcat(inputpath,'TP23_9Ant.dat');
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/l*'); %excluding hidden files
 

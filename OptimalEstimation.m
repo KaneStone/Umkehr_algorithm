@@ -40,7 +40,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:4;
+    for i = 1:1;
 
         K1(i).a = K;
         

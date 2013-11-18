@@ -8,6 +8,6 @@ function Se = createSe(Apparent)
     %Apparent = horzcat(Apparent(1,:),Apparent(2,:),Apparent(3,:));
     Se = interp1(Init_SZA,Init_Var,Apparent,'linear','extrap');
     Se (Apparent <= 74) = .15;
-    Se = diag(Se).*10;
+    Se = diag(Se);
     
 end

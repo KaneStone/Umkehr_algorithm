@@ -27,28 +27,41 @@ error = reshape(error,fliplr(size(N_val)));
 figure;
 fig = gcf;
 set(fig,'color','white','Position',[100 100 1000 700]);
-plot(extra.atmos.true_actual',yhat','r','LineWidth',2);
+plot(extra.atmos.true_actual',yhat','LineWidth',2);
 hold on
 %plot(extra.atmos.true_actual',N_val','LineWidth',2);
-errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',2);
+errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1.5,'LineStyle','--','color','black');
+plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
 title('Macquarie N-values','fontsize',24);
-legend('retrieval','measurement','location','NorthWest');
+%legend('retrieval','measurement','location','NorthWest');
+if strcmp(extra.atmos.N_values(test).WLP,'ACD')
+    legend('Retrieval - A pair','Retrieval - C pair','Retrieval - D pair',...
+        'Measurement - A pair','Measurement - C pair','Measurement - D pair',...
+        'y-yhat','y-yhat','y-yhat','location','NorthWest');
+elseif strcmp(extra.atmos.N_values(test).WLP,'C')
+    legend('Retrieval - C pair','measurement','y-yhat','location','NorthWest');
+end
 
-yhat2 = vertcat(yhat1.a)';
-sz = size(yhat1);
-figure;
-fig = gcf;
-set(fig,'color','white','Position',[100 100 1000 700]);
-plot(repmat(extra.atmos.true_actual,sz(2),1)',yhat2,'LineWidth',2);
-hold on
-errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',2,'color','black','LineStyle','--');
-ylabel('N-Value','fontsize',20);
-xlabel('SZA','fontsize',20);
-title('Macquarie N-values','fontsize',24);
-sz = size(yhat2);
-% plot(extra.atmos.true_actual',N_val-yhat);
+% yhat2 = vertcat(yhat1.a)';
+% sz_yhat1 = size(yhat1);
+% figure;
+% fig = gcf;
+% set(fig,'color','white','Position',[100 100 1000 700]);
+% plot(repmat(extra.atmos.true_actual,sz_yhat1(2),1)',yhat2,'LineWidth',2);
+% hold on
+% errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',2,'color','black','LineStyle','--');
+% ylabel('N-Value','fontsize',20);
+% xlabel('SZA','fontsize',20);
+% title('Macquarie N-values','fontsize',24);
+% sz = size(yhat2);
+% if strcmp(extra.atmos.N_values(test).WLP,'ACD')
+%     h = get(gca,'children');
+%     iterations = num2str(2:length(h)/3-2);
+%     measurements = {'Measurements - A pair','Measurements - D pair','Measurements - D pair'};
+%     legend(h,'initial',iterations,'final',measurements);
+% end
 % if sz(2) == 2
 %     legend('initial','final','measurement','location','NorthWest');
 % elseif sz(2) == 3

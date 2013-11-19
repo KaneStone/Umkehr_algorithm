@@ -1,13 +1,18 @@
 tic;
 test =5;
 a = 1;
+
+station = 'Hobart';
+year = '1982';
+
 for i = 1:1
-    extra = extrasetup(test);
-    extra.pert = .5e11;
+    extra = extrasetup(test,station,year);
     Kflg=1;
     
     if extra.logswitch
         extra.atmos.ozone=log10(extra.atmos.ozone);        
+        extra.pert = log10(.5e11);
+    else extra.pert = .5e11;
     end
     
     [K,N] = ForwardModel(extra.atmos.ozone, Kflg, extra);

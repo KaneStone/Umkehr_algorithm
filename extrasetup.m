@@ -3,7 +3,7 @@ function extra = extrasetup(test,station,year)
 inputpath = '/Users/stonek/work/Dobson/input/';
 
 %logswitch
-extra.logswitch = 1;
+extra.logswitch = 0;
 
 %choose cross section study to use - BP,BDM or S
 study = 'BDM';
@@ -28,7 +28,7 @@ atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1
 
 %defining profile paths
 %profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
-profilepath.Rvalue = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
+profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
 profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/',station,'.dat');
 profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/',station,'_temperature.dat');
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pressure.dat');
@@ -36,7 +36,7 @@ profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pr
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/l*'); %excluding hidden files
 
 %reading in profiles
-atmos = profilereader(profilepath.Rvalue,profilepath.ozone,profilepath.Temp,profilepath.Pres,profilepath.solar,atmos,test);
+atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,profilepath.Pres,profilepath.solar,atmos,test);
 
 if strcmp(atmos.N_values(test).WLP(1),'A')
     lambda = [wl.a(1);wl.a(2);wl.c(1);wl.c(2);wl.d(1);wl.d(2)];    

@@ -1,6 +1,6 @@
-function [RMS rms1] = createRMS(y,yhat)
+function [RMS] = createRMS(y,yhat)
 
 a = y-yhat;
-RMS = rms(a);
-rms1 = sum((a).^2);
+RMS = sqrt(sum(a.^2)/length(a));
+
 end

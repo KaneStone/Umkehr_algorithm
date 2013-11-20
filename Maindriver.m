@@ -1,9 +1,9 @@
 tic;
-test =5;
+test =4;
 a = 1;
 
-station = 'Hobart';
-year = '1982';
+station = 'melbourne';
+year = '1994';
 
 for i = 1:1
     extra = extrasetup(test,station,year);
@@ -25,24 +25,32 @@ for i = 1:1
 
     Se = createSe(extra.atmos.true_actual);
     Sa = createSa(extra.atmos.quarter,i);
-    %a = a*.5e1;
-    %if i ~= 1
-    %    Sa = Sa*a;
-    %end
+%     a = a*.2e1;
+%     if i ~= 1
+%         Sa = Sa*a;
+%     end
     
     y = extra.atmos.N_values(test).N;
  
     y (isnan(y)) = [];
     [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
-    %[RMS(i) rms1(i)] = createRMS(N.zs,yhat);
+    %RMS(i) = createRMS(y,yhat);
     %[A] = AveragingKernel(S,Sa,Se,extra,K);
     plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1);
     
     
     %test = test+1;
-   % clearvars -except test RMS a rms1
+    %clearvars -except test RMS a rms1 station year
 end
 time = toc;
 display(time);
 
+% figure;
+% h = gcf; 
+% set(h,'color','white','position',[100 100 900 700]);
+% plot(RMS,'linewidth',2);
+% set(gca,'xticklabel',{'Sa/2^5' 'Sa/2^4' 'Sa/2^3' 'Sa/2^2' 'Sa/2^1)' 'Sa' 'Sa*2^1' 'Sa*2^2' 'Sa*2^3' 'Sa*2^4'},'fontsize',16);;
+% xlabel('Sa','fontsize',18);
+% ylabel('RMS','fontsize',18);
+% title('RMS of retrievals for different error covariance matrices (Se = Se*20)');
 

@@ -40,7 +40,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:2;
+    for i = 1:1;
 
         K1(i).a = K;
         
@@ -48,7 +48,7 @@ if strcmp(method,'Opt')
         %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
         
         %5.9
-        %hat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));
+        %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));
         
         %5.10
         %reshaping into one vector for all wavelengths
@@ -59,7 +59,6 @@ if strcmp(method,'Opt')
        
         xi = xhat;
         xhat = xhat';
-        %xhat1 = xhat*1e11;
         %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 
         %means calculate K)
         Kflg=1;

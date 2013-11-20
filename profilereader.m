@@ -1,16 +1,14 @@
-function [atmos date] = profilereader(Rvaluefilename,ozonefilename,temperaturefilename,pressurefilename,solarfilename,atmos,test)
+function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,pressurefilename,solarfilename,atmos,test)
 
-%reads in atmospheric profiles to be put in atmos
+%reads in measurements and atmospheric profiles.
 %currently reading in
+% - measurments
 % - ozone
+% - temperature and pressure
 % - solar spectrum
-% - temperature and pressure 
-
-%for future inclusion
-% -humidity
 
 %reading in R-values, N-values, Time and trueSZA?
-fid = fopen(Rvaluefilename,'r');
+fid = fopen(measurementfilename,'r');
 for i = 1:6;
     if i ~= 6;
         line = fgets(fid);
@@ -35,26 +33,6 @@ for j = 1:sz(2);
     end
 end
 fclose(fid);
-
-%need to separate diffeerent measurments that are on same day
-% count = 1;
-% for j = 1:12;
-%     for i = 1:31;   
-%         location = find(date_of_meas.DD == i & date_of_meas.MM == j); 
-%         hour = date_of_meas.HH(location);        
-%         if isempty(location) == 0                              
-%             atmos.WLP(count,1:length(location)) = wavelength_pair.Wavelength_Pair(min(location):max(location));                       
-%             what_WLP.a = strfind(atmos.WLP(count,:),'A');
-%             what_WLP.c = strfind(atmos.WLP(count,:),'C');
-%             what_WLP.d = strfind(atmos.WLP(count,:),'D');
-%             atmos.initial_SZA(count,1:length(location)) = angles.Solar_zenith_angle(min(location):max(location));
-%             atmos.N_values(count,1:length(location)) = intensity_values.N_value(min(location):max(location));
-%             atmos.R_values(count,1:length(location)) = intensity_values.R_value(min(location):max(location));
-%             atmos.date(count,1:2) = horzcat(j,i);
-%             count = count+1;
-%         end
-%     end
-% end
 
 position_handle = 1;
 count = 1;
@@ -95,10 +73,6 @@ for j = 1:12;
     end
 end
 
-
-%atmos.N_values (atmos.N_values == 0) = [];
-%atmos.initial_SZA(1).SZA (atmos.initial_SZA(1).SZA == 0) = [];
-
 date_to_use = atmos.date(test).date(2);
 
 %reading in ozone profile
@@ -133,15 +107,6 @@ atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','e
 atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
 fclose (fid);
 
-% %reading in Temperature and Pressure
-% fid = fopen(temppresfilename);
-% tp = fscanf(fid,'%f',[3,numlayers])';
-% atmos.T = tp(1:61,2)';
-% atmos.P = tp(1:61,3)';
-% atmos.Tmid = interp1(tp(:,1)*1000,tp(:,2),atmos.Zmid,'linear','extrap');
-% atmos.Pmid = interp1(tp(:,1)*1000,tp(:,3),atmos.Zmid,'linear','extrap');
-% fclose (fid);
-
 %reading in solar spectrum
 % micro-watts/(cm^2*nm)
 files = dir(solarfilename);
@@ -155,10 +120,5 @@ for i = 1:NF;
 end
 
 atmos.solar = horzcat(solar.s)';
-atmos.quarter = quarter;
-
-        
+atmos.quarter = quarter;     
 end
-
-
- 

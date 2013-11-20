@@ -1,4 +1,4 @@
-function [] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1)
+function [] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station)
 
 figure;
 fig = gcf;
@@ -11,11 +11,11 @@ plot(extra.atmos.ozone,1:61,'LineWidth',2);
 set(fig,'color','white');
 ylabel('Altitude','fontsize',20);
 xlabel('number density','fontsize',20);
-title('Macquarie Ozone Profile','fontsize',24);
+title(strcat(station,'{ }','Ozone Profile'),'fontsize',24);
 legend('retrieval','A prioir','location','NorthWest');
 
 set(fig, 'PaperPositionMode','auto');
-print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_profile_',num2str(test),'.png'));
+%print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_profile_',num2str(test),'.png'));
 
 N_val = extra.atmos.N_values(test).N;
 %N_val = load('Ret_as_Meas');
@@ -34,7 +34,7 @@ errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1.5,'LineStyle','--',
 plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
-title('Macquarie N-values','fontsize',24);
+title(strcat(station,'{ }','N Values'),'fontsize',24);
 %legend('retrieval','measurement','location','NorthWest');
 if strcmp(extra.atmos.N_values(test).WLP,'ACD')
     legend('Retrieval - A pair','Retrieval - C pair','Retrieval - D pair',...

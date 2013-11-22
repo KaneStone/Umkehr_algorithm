@@ -11,25 +11,29 @@ function [atmos date] = profilereader(measurementfilename,ozonefilename,temperat
 fid = fopen(measurementfilename,'r');
 for i = 1:6;
     if i ~= 6;
-        line = fgets(fid);
-    else  headers = textscan(fid, '%s %s %s %s %s %s %s %s %s %s %s %s %s',1 );       
+        information{i} = fgets(fid);
+    else  headers = textscan(fid, '%s %s %s %s %s %s %s %s %s %s %s %s %s',1 );                   
     end
 end
 
-data = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %c %f %f',[13,inf]);
+data = fscanf(fid,'%f %f %f %f %f %f %f %f %f %f %c %f %f',[13,inf])';
+%removing missing data
+data (data == -9999) = NaN;
+data = data(~any(isnan(data),2),:); 
+
 sz = size(data);
 
 for j = 1:sz(2);
     if strcmp(headers{1,j},'YYYY')
-        date_of_meas = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1},...
-           char(headers{1,j+2}), data{1,j+2}, char(headers{1,j+3}), data{1,j+3},...
-           char(headers{1,j+4}), data{1,j+4},char(headers{1,j+5}), data{1,j+5});
+        date_of_meas = struct(char(headers{1,j}), data(:,j), char(headers{1,j+1}), data(:,j+1),...
+           char(headers{1,j+2}), data(:,j+2), char(headers{1,j+3}), data(:,j+3),...
+           char(headers{1,j+4}), data(:,j+4),char(headers{1,j+5}), data(:,j+5));
     elseif strcmp(headers{1,j},'Solar_zenith_angle')
-        angles = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1});
+        angles = struct(char(headers{1,j}), data(:,j), char(headers{1,j+1}), data(:,j+1));
     elseif strcmp(headers{1,j},'Wavelength_Pair')
-        wavelength_pair = struct(char(headers{1,j}), data{1,j});
+        wavelength_pair = struct(char(headers{1,j}), data(:,j));
     elseif strcmp(headers{1,j},'R_value');
-        intensity_values = struct(char(headers{1,j}), data{1,j}, char(headers{1,j+1}), data{1,j+1});
+        intensity_values = struct(char(headers{1,j}), data(:,j), char(headers{1,j+1}), data(:,j+1));
     end
 end
 fclose(fid);

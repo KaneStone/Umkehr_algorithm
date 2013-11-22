@@ -1,8 +1,8 @@
 tic;
-test =4;
+test =1;
 a = 1;
 
-station = 'melbourne';
+station = 'Melbourne';
 year = '1994';
 
 for i = 1:1
@@ -35,10 +35,9 @@ for i = 1:1
     y (isnan(y)) = [];
     [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
     %RMS(i) = createRMS(y,yhat);
-    %[A] = AveragingKernel(S,Sa,Se,extra,K);
-    plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1);
-    
-    
+    [A] = AveragingKernel(S,Sa,Se,extra,K);
+    plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station);
+     
     %test = test+1;
     %clearvars -except test RMS a rms1 station year
 end

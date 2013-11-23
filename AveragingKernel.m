@@ -1,16 +1,16 @@
-function [A] = AveragingKernel(S,Sa,Se,extra,K)
+function [AK] = AveragingKernel(S,Sa,Se,extra,K)
 
-A = S*(K'/Se*K);
+AK.AK = S*(K'/Se*K);
 %Area of the AK is a measure of the amount of information coming from the
 %measurements relative to the a priori information, ideally = 1.0
-area=sum(A,1);
+AK.area=sum(AK.AK,1);
 
 %How many retrieval points required for each independent piece of
 %information (degree of freedom)
-resolution=1./diag(A);
+AK.resolution=1./diag(AK.AK);
 
 %Degrees of Freedom for signal
-Dof=sum(diag(A));
+AK.dof=sum(diag(AK.AK));
 
 %Information content - 3D reduction in the error covariance volumes - how
 %much information from measurements versus a priori

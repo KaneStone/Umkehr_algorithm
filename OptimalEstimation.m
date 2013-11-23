@@ -40,23 +40,27 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:1;
+    for i = 1:3;
 
         K1(i).a = K;
         
-        %5.8
-        %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
-        
-        %5.9
-        %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));
-        
-        %5.10
         %reshaping into one vector for all wavelengths
         y = reshape(y',1,numel(y));
         yhat = reshape(yhat',1,numel(yhat));
         
+        %5.8
+        %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
+        
+        %5.9 - N-form
+        %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
+        
+        %5.10 - M-form              
         xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
-       
+        % testing for slow convergence
+        %Sdayy = Se*(K*Sa*K'+Se)\Se;
+        %S = (K'*(Se^-1)*K +Sa^-1)^-1;
+        %di2(i) = (yhat' - y')'/Sdayy*(yhat'-y');        
+        
         xi = xhat;
         xhat = xhat';
         %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 

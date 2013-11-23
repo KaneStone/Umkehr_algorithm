@@ -1,20 +1,23 @@
-function [] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station)
+function [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station,date)
+
+
 
 figure;
-fig = gcf;
-set(fig,'color','white','Position',[100 100 1000 700]);
+fig1 = gcf;
+set(fig1,'color','white','Position',[100 100 1000 700]);
 plot(xhat,1:61,'r','LineWidth',2)
 hold on
 addpath('/Users/stonek/work/Dobson/data_code');
-herrorbar(extra.atmos.ozone,1:61,(diag(Sa)).^.5);
+herrorbar(extra.atmos.ozone,1:61,(diag(Sa)./5e3).^.5);
 plot(extra.atmos.ozone,1:61,'LineWidth',2);
-set(fig,'color','white');
+set(fig1,'color','white');
 ylabel('Altitude','fontsize',20);
 xlabel('number density','fontsize',20);
-title(strcat(station,'{ }','Ozone Profile'),'fontsize',24);
+title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+    ,'{ }','Ozone Profile'),'fontsize',24);
 legend('retrieval','A prioir','location','NorthWest');
 
-set(fig, 'PaperPositionMode','auto');
+%set(fig1, 'PaperPositionMode','auto');
 %print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_profile_',num2str(test),'.png'));
 
 N_val = extra.atmos.N_values(test).N;
@@ -25,8 +28,8 @@ error = (diag(Se)).^.5;
 error = reshape(error,fliplr(size(N_val)));
 
 figure;
-fig = gcf;
-set(fig,'color','white','Position',[100 100 1000 700]);
+fig2 = gcf;
+set(fig2,'color','white','Position',[100 100 1000 700]);
 plot(extra.atmos.true_actual',yhat','LineWidth',2);
 hold on
 %plot(extra.atmos.true_actual',N_val','LineWidth',2);
@@ -34,7 +37,8 @@ errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1.5,'LineStyle','--',
 plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
-title(strcat(station,'{ }','N Values'),'fontsize',24);
+title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+    ,'{ }','N Values'),'fontsize',24);
 %legend('retrieval','measurement','location','NorthWest');
 if strcmp(extra.atmos.N_values(test).WLP,'ACD')
     legend('Retrieval - A pair','Retrieval - C pair','Retrieval - D pair',...

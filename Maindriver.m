@@ -2,8 +2,8 @@ tic;
 test =1;
 a = 1;
 
-station = 'Melbourne';
-year = '1994';
+station = 'Perth';
+year = '1982';
 
 for i = 1:1
     extra = extrasetup(test,station,year);
@@ -34,9 +34,12 @@ for i = 1:1
  
     y (isnan(y)) = [];
     [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
+    
+    [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station,extra.atmos.date(test).date);
     %RMS(i) = createRMS(y,yhat);
-    [A] = AveragingKernel(S,Sa,Se,extra,K);
-    plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station);
+    [AK] = AveragingKernel(S,Sa,Se,extra,K);
+ 
+    print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
      
     %test = test+1;
     %clearvars -except test RMS a rms1 station year

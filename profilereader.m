@@ -31,7 +31,7 @@ for j = 1:sz(2);
     elseif strcmp(headers{1,j},'Solar_zenith_angle')
         angles = struct(char(headers{1,j}), data(:,j), char(headers{1,j+1}), data(:,j+1));
     elseif strcmp(headers{1,j},'Wavelength_Pair')
-        wavelength_pair = struct(char(headers{1,j}), data(:,j));
+        Wavelength_pair = struct(char(headers{1,j}), data(:,j));
     elseif strcmp(headers{1,j},'R_value');
         intensity_values = struct(char(headers{1,j}), data(:,j), char(headers{1,j+1}), data(:,j+1));
     end
@@ -45,7 +45,7 @@ for j = 1:12;
         location = find(date_of_meas.DD == i & date_of_meas.MM == j); 
         hour = date_of_meas.HH(location);        
         if isempty(location) == 0                              
-            atmos.WLP(count,1:length(location)) = wavelength_pair.Wavelength_Pair(min(location):max(location));                       
+            atmos.WLP(count,1:length(location)) = Wavelength_pair.Wavelength_Pair(min(location):max(location));                       
             what_WLP.a = strfind(atmos.WLP(count,:),'A');
             what_WLP.c = strfind(atmos.WLP(count,:),'C');
             what_WLP.d = strfind(atmos.WLP(count,:),'D');

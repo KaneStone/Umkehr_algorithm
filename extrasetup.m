@@ -11,6 +11,7 @@ study = 'BDM';
 refraction=1; %turns refraction on and off.
 %dobson wavelength pairs
 wl = struct('a',[305.5,325.4],'c',[311.4,332.4],'d',[317.6,339.8]);
+%wl = struct('a',[305.5,325.4],'c',[313,330],'d',[317.6,339.8]);
 %wl = struct('a',[440,300],'c',[360,330],'d',[343,345]);
 %lambda = [wl.a(1);wl.a(2);wl.c(1);wl.c(2);wl.d(1);wl.d(2)];
 bandpass = [1.4,3.2,1.4,3.2,1.4,3.2]; %3.2 from Petropavlovskikh

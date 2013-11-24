@@ -1,4 +1,5 @@
-function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,pressurefilename,solarfilename,atmos,test)
+function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
+    pressurefilename,solarfilename,aerosolfilename,atmos,test)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -109,6 +110,16 @@ fid = fopen(pressurefilename);
 pressure = fscanf(fid,'%f',[5,inf])';
 atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
 atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+fclose (fid);
+
+%Reading in aerosols
+%These aerosols are for extinction at 500nm. To calculate extinction at
+%otehr wavenegths: *(500/lambda)^1.2
+fid = fopen(aerosolfilename);
+aerosol = fscanf(fid,'%f',[2,inf])';
+aerosol = aerosol(2:71,:);
+atmos.Aer = interp1(aerosol(:,1),aerosol(:,quarter),atmos.Z,'linear','extrap');
+atmos.Aermid = interp1(aerosol(:,1),aerosol(:,quarter),atmos.Zmid,'linear','extrap');
 fclose (fid);
 
 %reading in solar spectrum

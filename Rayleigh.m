@@ -53,4 +53,10 @@ GAM = [2.326e-2,2.241e-2,2.156e-2,2.1e-2,2.043e-2,1.986e-2,1.93e-2,1.872e-2,1.81
 
 %gamma value for rayleigh phase function calculation
 atmos.pgamma = interp1(WLGTH,GAM,lambda*1000);
+
+%Calculating Mie extinction. Taking into account the scale factor for
+%different wavelengths.
+atmos.bMiept = (500./wavelength).^-1.2*atmos.Aer;
+atmos.bMie = (500./wavelength).^-1.2*atmos.Aermid;
+
 end

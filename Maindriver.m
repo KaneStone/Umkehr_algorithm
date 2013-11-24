@@ -39,7 +39,7 @@ for i = 1:1
     %RMS(i) = createRMS(y,yhat);
     [AK] = AveragingKernel(S,Sa,Se,extra,K);
  
-    print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
+    %print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
      
     %test = test+1;
     %clearvars -except test RMS a rms1 station year

@@ -1,6 +1,9 @@
-function [N] = Nvaluezs(atmos,lambda,zs,theta,ozonexs,bandpass)
+function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
+
+%g is the assymetry factor and = .86 for assumed radius of .86 micrometers
+g = .86;
 
 sz = size(zs);
 intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
@@ -19,22 +22,34 @@ for j = 1:length(lambda);
         rayphase = reshape(3./(4.*(1+2.*atmos.pgamma(j))).*...
         ((1+3.*atmos.pgamma(j))+(1-atmos.pgamma(j)).*((cosd(atmos.Apparent(j,iscat,:))).^2)),1,sz(2));
     
+        miephase = reshape((1-g^2)./(1+g^2-2.*g.*cosd(atmos.Apparent(j,iscat,:)).^(3/2)),1,sz(2));                
+        
+        if mieswitch
         intensity(j,:,iscat) = (intensity(j,:,iscat).*...
+            (atmos.bRay(j,iscat).*rayphase).*...
+            (atmos.bMie(j,iscat).*miephase))./(4.*pi);   
+        
+        intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
+            (atmos.bRay(j,iscat).*rayphase).*...
+            (atmos.bMie(j,iscat).*miephase))./(4.*pi);    
+        
+        else intensity(j,:,iscat) = (intensity(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase))./(4.*pi);   
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase))./(4.*pi);    
         
-         for i = 1:atmos.nlayers-1;
+        end
+            
+        
+        for i = 1:atmos.nlayers-1;
 
-             intensity(j,:,iscat) = intensity(j,:,iscat).*...
-                 exp(-1.*(atmos.bRay(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
-                 zs(j,:,iscat,i).*100);            
-             
-             intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
-                 exp(-1.*atmos.bRay(j,i).*zs(j,:,iscat,i).*100);
-             
-             
+            intensity(j,:,iscat) = intensity(j,:,iscat).*...
+                exp(-1.*(atmos.bRay(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
+                zs(j,:,iscat,i).*100);            
+            
+            intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
+                exp(-1.*atmos.bRay(j,i).*zs(j,:,iscat,i).*100);                          
          end 
     end
 end

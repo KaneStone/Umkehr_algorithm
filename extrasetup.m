@@ -4,6 +4,7 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 
 %logswitch
 extra.logswitch = 0;
+extra.mieswitch = 1;
 
 %choose cross section study to use - BP,BDM or S
 study = 'BDM';
@@ -35,9 +36,11 @@ profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/',station,'
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pressure.dat');
 %profilepath.TaP = strcat(inputpath,'TP23_9Ant.dat');
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/l*'); %excluding hidden files
+profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.dat');
 
 %reading in profiles
-atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,profilepath.Pres,profilepath.solar,atmos,test);
+atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
+    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test);
 
 if strcmp(atmos.N_values(test).WLP(1),'A')
     lambda = [wl.a(1);wl.a(2);wl.c(1);wl.c(2);wl.d(1);wl.d(2)];    

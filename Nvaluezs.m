@@ -6,7 +6,7 @@ function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch)
 g = .86;
 
 sz = size(zs);
-intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
+intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7; %This might need to be the actual solar radiance outside atmosphere
 intenstar = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 rayphase = zeros(length(lambda),sz(2));
 atmos.Apparent (atmos.Apparent == 0) = NaN;
@@ -26,12 +26,10 @@ for j = 1:length(lambda);
         
         if mieswitch
         intensity(j,:,iscat) = (intensity(j,:,iscat).*...
-            (atmos.bRay(j,iscat).*rayphase).*...
-            (atmos.bMie(j,iscat).*miephase))./(4.*pi);   
+            ((atmos.bRay(j,iscat).*rayphase)+(atmos.bMie(j,iscat).*miephase)))./(4.*pi);   
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
-            (atmos.bRay(j,iscat).*rayphase).*...
-            (atmos.bMie(j,iscat).*miephase))./(4.*pi);    
+            ((atmos.bRay(j,iscat).*rayphase)+(atmos.bMie(j,iscat).*miephase)))./(4.*pi);    
         
         else intensity(j,:,iscat) = (intensity(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase))./(4.*pi);   
@@ -43,13 +41,22 @@ for j = 1:length(lambda);
             
         
         for i = 1:atmos.nlayers-1;
-
+%Need to put in Mie here aswell
+            if mieswitch
             intensity(j,:,iscat) = intensity(j,:,iscat).*...
+                exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
+                zs(j,:,iscat,i).*100);            
+            
+            intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
+                exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)).*zs(j,:,iscat,i).*100);    
+            
+            else intensity(j,:,iscat) = intensity(j,:,iscat).*...
                 exp(-1.*(atmos.bRay(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
                 zs(j,:,iscat,i).*100);            
             
             intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
-                exp(-1.*atmos.bRay(j,i).*zs(j,:,iscat,i).*100);                          
+                exp(-1.*atmos.bRay(j,i).*zs(j,:,iscat,i).*100);      
+            end
          end 
     end
 end

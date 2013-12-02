@@ -4,12 +4,12 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 
 %logswitch
 extra.logswitch = 0;
-extra.mieswitch = 1;
-
+extra.mieswitch = 0;
+extra.refraction = 1;
+extra.WLP_to_retrieve = 'C'; %all permutations possible.
 %choose cross section study to use - BP,BDM or S
 study = 'BDM';
 
-refraction=1; %turns refraction on and off.
 %dobson wavelength pairs
 wl = struct('a',[305.5,325.4],'c',[311.4,332.4],'d',[317.6,339.8]);
 %wl = struct('a',[305.5,325.4],'c',[313,330],'d',[317.6,339.8]);
@@ -40,16 +40,14 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 
 %reading in profiles
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
-    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test);
+    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test,extra.WLP_to_retrieve);
 
-if strcmp(atmos.N_values(test).WLP(1),'A')
-    lambda = [wl.a(1);wl.a(2);wl.c(1);wl.c(2);wl.d(1);wl.d(2)];    
-elseif strcmp(atmos.N_values(test).WLP(1),'C') 
-    lambda = [wl.c(1);wl.c(2)];
-end
+atmos = readmeasurements(profile.path.measurements,atmos,test,extra.WLP_to_retrieve);
+
+lambda = definelambda(wl,test,atmos);
 
 %calculates refractive index using pres and temp files.
-atmos = refractiveindex(atmos,lambda,bandpass,refraction);
+atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 %ds = Directpaths(atmos,lambda,instralt,theta);
 [zs atmos] = Zenithpaths(atmos,lambda,test);
 

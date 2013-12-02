@@ -1,4 +1,4 @@
-function [xhat,yhat,K,yhat1, K1, S]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat,yhat,K,yhat1, K1, S, d2]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -39,9 +39,10 @@ yhat1(1).a = yhat;
 %xa = xa'/1e11;
 xa = xa';
 xi = xa;
+d2(1) = length(yhat);
 if strcmp(method,'Opt')
     for i = 1:1;
-
+        
         K1(i).a = K;
         
         %reshaping into one vector for all wavelengths
@@ -68,9 +69,14 @@ if strcmp(method,'Opt')
         Kflg=1;
         [K,N]=ForwardModel(xhat,Kflg,extra);
         yhat = N.zs;
-        yhat1(i+1).a = yhat;
+        yhat1(i).a = reshape(yhat',1,numel(yhat));
         
-        
+        %testing for convergence
+        Sdayy = Se*(K*Sa*K'+Se)\Se;
+%         if i > 1;
+%             d2(i-1) = (yhat1(i).a - yhat1(i-1).a)/Sdayy*(yhat1(i).a-yhat1(i-1).a)';  
+%         end
+    
     %Decide whether the solution has converged (we can discuss different ways
     %of working this out - but not such a big issue as at least to start with
     %your problem will be with a weak absorber and a linear problem...

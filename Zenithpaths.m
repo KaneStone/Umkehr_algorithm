@@ -1,12 +1,25 @@
 function [zs atmos] = Zenithpaths(atmos,lambda,test)
  
 a = atmos.initial_SZA(test).SZA;
-a (isnan(a)) = [];
+%a (isnan(a)) = [];
 %Two lines below may cause problems
+
+%setting up initial apparent SZA.
 mx = ceil(max(a(:)));
 mn = floor(min(a(:)));
-Apparent = mn:1:mx;
+
+Apparent = mn:1:mx; 
 al = length(Apparent);
+
+% mx = ceil(max(a(:,:),[],2));
+% mn = floor(min(a(:,:),[],2));
+% 
+% for k = 1:length(mn);
+%      Apparent(k).a = mn(k):1:mx(k); 
+%      al(k).a = length(Apparent);
+% end
+
+%predefining array sizes
 Apparent_Final = zeros(length(lambda), atmos.nlayers-1, length(a));
 zs = ones(length(lambda), length(a), atmos.nlayers-1, atmos.nlayers-1)*1000; 
 True.Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));

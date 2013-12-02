@@ -8,17 +8,18 @@ set(fig1,'color','white','Position',[100 100 1000 700]);
 plot(xhat,1:61,'r','LineWidth',2)
 hold on
 addpath('/Users/stonek/work/Dobson/data_code');
-herrorbar(extra.atmos.ozone,1:61,(diag(Sa)./5e3).^.5);
+herrorbar(extra.atmos.ozone,1:61,(diag(Sa)).^.5);
 plot(extra.atmos.ozone,1:61,'LineWidth',2);
 set(fig1,'color','white');
 ylabel('Altitude','fontsize',20);
 xlabel('number density','fontsize',20);
+set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Ozone Profile'),'fontsize',24);
-legend('retrieval','A prioir','location','NorthWest');
+legend('retrieval','A priori','location','NorthWest');
 
 %set(fig1, 'PaperPositionMode','auto');
-%print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_profile_',num2str(test),'.png'));
+%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_profile_',num2str(test),'.eps'));
 
 N_val = extra.atmos.N_values(test).N;
 %N_val = load('Ret_as_Meas');
@@ -37,6 +38,7 @@ errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1.5,'LineStyle','--',
 plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
+set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','N Values'),'fontsize',24);
 %legend('retrieval','measurement','location','NorthWest');
@@ -48,17 +50,19 @@ elseif strcmp(extra.atmos.N_values(test).WLP,'C')
     legend('Retrieval - C pair','measurement','y-yhat','location','NorthWest');
 end
 
-% yhat2 = vertcat(yhat1.a)';
+% yhat2 = vertcat(N.zs,yhat1.a)';
 % sz_yhat1 = size(yhat1);
 % figure;
 % fig = gcf;
 % set(fig,'color','white','Position',[100 100 1000 700]);
-% plot(repmat(extra.atmos.true_actual,sz_yhat1(2),1)',yhat2,'LineWidth',2);
+% plot(repmat(extra.atmos.true_actual,sz_yhat1(2)+1,1)',yhat2,'LineWidth',2.5);
 % hold on
-% errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',2,'color','black','LineStyle','--');
+% errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1,'color','black','LineStyle','--');
 % ylabel('N-Value','fontsize',20);
 % xlabel('SZA','fontsize',20);
-% title('Macquarie N-values','fontsize',24);
+% set(gca,'fontsize',18);
+% title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+% ,'{ }','N-values'),'fontsize',24);
 % sz = size(yhat2);
 % if strcmp(extra.atmos.N_values(test).WLP,'ACD')
 %     h = get(gca,'children');
@@ -85,10 +89,10 @@ end
 % elseif sz(2) == 10
 %     legend('initial','2','3','4','5','6','7','8','9','final','measurement','location','NorthWest');
 % end
-
-% set(fig, 'PaperPositionMode','auto');
-% print('-dpng','-r0', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Macquarie_Nvalue_',num2str(test),'.png'));
-% delete(1); delete(3);
+% 
+% %set(fig, 'PaperPositionMode','auto');
+% %print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(test),'.eps'));
+% %delete(1); delete(3);
 end
 
 

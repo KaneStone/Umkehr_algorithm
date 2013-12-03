@@ -1,14 +1,15 @@
 function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
-    pressurefilename,solarfilename,aerosolfilename,atmos,test,WLP)
+    pressurefilename,solarfilename,aerosolfilename,atmos,test,WLP,morn_or_even)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
 % - measurments
 % - ozone
 % - temperature and pressure
+% - aerosols
 % - solar spectrum
 
-%reading in R-values, N-values, Time and trueSZA?
+%reading in R-values, N-values, Time and trueSZA
 fid = fopen(measurementfilename,'r');
 for i = 1:6;
     if i ~= 6;
@@ -43,10 +44,26 @@ position_handle = 1;
 count = 1;
 for j = 1:12;
     for i = 1:31;   
-        location = find(date_of_meas.DD == i & date_of_meas.MM == j); 
-        hour = date_of_meas.HH(location);        
-        if isempty(location) == 0                              
-            atmos.WLP(count,1:length(location)) = Wavelength_pair.Wavelength_Pair(min(location):max(location));                       
+        location = find(date_of_meas.DD == i & date_of_meas.MM == j);       
+        if isempty(location) == 0                
+            atmos.date(count).date = horzcat(i,j,date_of_meas.YYYY(1));                                   
+            hour = date_of_meas.HH(location);
+            
+            %separating measurements morning and evening measuremnets -
+            %maybe not infallable.
+            if max(hour) - min(hour) >=6 
+                disp(strcat('Both morning and evening measurements were taken at date: ',...
+                    num2str(atmos.date(count).date(1))...
+                    ,'-',num2str(atmos.date(count).date(2))...
+                    ,'-',num2str(atmos.date(count).date(3)),', continuing with specified case.'));                                                 
+                if strcmp(morn_or_even,'evening');
+                    location (hour <= 12) = [];
+                elseif strcmp(morn_or_even,'morning');
+                    location (hour >= 12) = [];
+                end
+            end            
+            atmos.WLP(count,1:length(location)) =...
+                Wavelength_pair.Wavelength_Pair(min(location):max(location));            
             if find(WLP == 'A')                
                 what_WLP.a = strfind(atmos.WLP(count,:),'A');
                 if isempty(what_WLP.a) == 0     
@@ -75,8 +92,7 @@ for j = 1:12;
                     atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.N_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
                     atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end)); 
                 end
-            end
-            atmos.date(count).date = horzcat(i,j,date_of_meas.YYYY(1));                                
+            end                                            
             count = count+1; 
             position_handle = 1;
         end
@@ -88,19 +104,38 @@ disp(strcat({'Current date being retrieved: '},num2str(atmos.date(test).date(1))
     ,'-',num2str(atmos.date(test).date(3))));
 No_WLP = length(WLP);
 
+existing_WLP = atmos.WLP(test,:);
+A = ' '; C = ' '; D = ' ';
+if strfind(existing_WLP,'A');
+    A = 'A';
+elseif strfind(existing_WLP,'C');
+    C = 'C';
+elseif strfind(existing_WLP,'D');
+    D = 'D';
+end
+
 if isempty(atmos.N_values(test).WLP);
-    error(strcat('no measurements for the wavelengths specified exist for date:',...
+    error(strcat('No measurements for the wavelengths specified exist for date:',...
     num2str(atmos.date(test).date(1)),'-',num2str(atmos.date(test).date(2))...
-    ,'-',num2str(atmos.date(test).date(3)),'. wavelength pairs that exist are ...'));
+    ,'-',num2str(atmos.date(test).date(3)),'. wavelength pairs that exist are-',A,C,D));
 end
 
 for k = 1:No_WLP
     if (WLP(k) == atmos.N_values(test).WLP) == 0
-    display(strcat(WLP(k),{' pair measurement does not exist at this date.'},...
-        {' Continuing with other wavelength pairs specified'}));
+    display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
+        {' Continuing with other wavelength pairs specified'}))
     end
 end
     
+%checking whether vector lengths are the same
+no_zeros = nonzeros(atmos.initial_SZA(test).SZA');
+sz_SZA = size(atmos.initial_SZA(test).SZA);
+if length(no_zeros) ~= length(reshape(atmos.initial_SZA(test).SZA,1,sz_SZA(1)*sz_SZA(2)))
+    disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
+        num2str(atmos.date(test).date(1)),'-',num2str(atmos.date(test).date(2))...
+        ,'-',num2str(atmos.date(test).date(3))));
+end
+
 %removing padded zeros if wavelength pair data sizes are different.
 atmos.N_values(test).N (atmos.N_values(test).N(:,:) == 0) = NaN;
 atmos.initial_SZA(test).SZA (atmos.initial_SZA(test).SZA(:,:) == 0) = NaN;

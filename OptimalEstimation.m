@@ -41,7 +41,7 @@ xa = xa';
 xi = xa;
 d2(1) = length(yhat);
 if strcmp(method,'Opt')
-    for i = 1:1;
+    for i = 1:4;
         
         K1(i).a = K;
         

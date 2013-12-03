@@ -2,19 +2,19 @@ function extra = extrasetup(test,station,year)
 %path for input files
 inputpath = '/Users/stonek/work/Dobson/input/';
 
-%logswitch
+%switches
 extra.logswitch = 0;
 extra.mieswitch = 0;
 extra.refraction = 1;
 extra.WLP_to_retrieve = 'C'; %all permutations possible.
+extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
+
 %choose cross section study to use - BP,BDM or S
 study = 'BDM';
 
 %dobson wavelength pairs
 wl = struct('a',[305.5,325.4],'c',[311.4,332.4],'d',[317.6,339.8]);
-%wl = struct('a',[305.5,325.4],'c',[313,330],'d',[317.6,339.8]);
 %wl = struct('a',[440,300],'c',[360,330],'d',[343,345]);
-%lambda = [wl.a(1);wl.a(2);wl.c(1);wl.c(2);wl.d(1);wl.d(2)];
 bandpass = [1.4,3.2,1.4,3.2,1.4,3.2]; %3.2 from Petropavlovskikh
 
 %dobson SZA values
@@ -29,7 +29,6 @@ atmos.nlayers = length(atmos.Z);
 atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1:atmos.nlayers-1);
 
 %defining profile paths
-%profilepath.Rvalue = strcat(inputpath,'Umkehr/','Hobart/', 'Hobart_1982.txt');
 profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
 profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/',station,'.dat');
 profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/',station,'_temperature.dat');
@@ -40,14 +39,15 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 
 %reading in profiles
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
-    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test,extra.WLP_to_retrieve);
+    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test,...
+    extra.WLP_to_retrieve,extra.morn_or_even);
 
-atmos = readmeasurements(profile.path.measurements,atmos,test,extra.WLP_to_retrieve);
-
+%defining wavelengths
 lambda = definelambda(wl,test,atmos);
 
 %calculates refractive index using pres and temp files.
 atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
+
 %ds = Directpaths(atmos,lambda,instralt,theta);
 [zs atmos] = Zenithpaths(atmos,lambda,test);
 

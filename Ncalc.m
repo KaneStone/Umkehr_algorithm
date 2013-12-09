@@ -6,11 +6,9 @@ zs = extra.zs;
 theta = extra.theta;
 ozonexs = extra.ozonexs;
 bandpass = extra.bandpass;
-
 atmos.ozone = ozoneprofile;
-
-%figure(2);
 atmos.ozonemid = interp1(atmos.Z,atmos.ozone,atmos.Zmid,'linear','extrap');
+
 %plot(atmos.ozone,1:61);
 %hold on
 

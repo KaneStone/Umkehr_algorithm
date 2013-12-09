@@ -57,7 +57,7 @@ for j = 1:12;
                     ,'-',num2str(atmos.date(count).date(2))...
                     ,'-',num2str(atmos.date(count).date(3)),', continuing with specified case.'));                                                 
                 if strcmp(morn_or_even,'evening');
-                    location (hour <= 12) = [];
+                    location (hour <= 12) = []; %This is not infallable 
                 elseif strcmp(morn_or_even,'morning');
                     location (hour >= 12) = [];
                 end

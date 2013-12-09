@@ -41,7 +41,7 @@ xa = xa';
 xi = xa;
 d2(1) = length(yhat);
 if strcmp(method,'Opt')
-    for i = 1:4;
+    for i = 1:2;
         
         K1(i).a = K;
         
@@ -66,8 +66,9 @@ if strcmp(method,'Opt')
         xhat = xhat';
         %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 
         %means calculate K)
-        Kflg=1;
-        [K,N]=ForwardModel(xhat,Kflg,extra);
+        Kflg = 1;
+        AeroKflg = 0;
+        [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
         yhat = N.zs;
         yhat1(i).a = reshape(yhat',1,numel(yhat));
         

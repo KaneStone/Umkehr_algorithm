@@ -25,20 +25,26 @@ zs = ones(length(lambda), length(a), atmos.nlayers-1, atmos.nlayers-1)*1000;
 True.Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 Apparent_Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 
+sz_a = size(a);
+
+for p = 1:sz_a(1)
+    values = find(isnan(a(p,:))==0);
+    lth(p) = length(values);
+end
 
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma = (atmos.r/atmos.N(i,:))*(atmos.dndz(i,:));
+        %gamma = (atmos.r/atmos.N(i,:))*(atmos.dndz(i,:));
+        gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:));
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
-                True.actual (isnan(True.actual)) = []; % This causes problems when SZA dimensions are inconsistent between wavelength pairs
+                True.actual (isnan(True.actual)) = []; % This causes problems when SZA dimensions are inconsistent between wavelength pairs                
                 True_I = reshape(True.Initial(i,iscat,:),1,al);
                 True_I (True_I == 0) = [];
                 Apparent = interp1(squeeze(True_I)...
                     ,squeeze(Apparent_Initial(i,iscat,1:length(True_I))),True.actual(cwlp,:),'linear','extrap');
-
             end        
             for j = 1:length(Apparent) 
                 if Apparent(j) > 90                 
@@ -56,6 +62,15 @@ end
 
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
+
+% removes excess zenoth paths from SZAs that do not exist in cases where
+% wavelength pair vectors are uneven.
+% p_count = 1;
+% for p = 1:sz_a(1)
+%     zs(p_count:p_count+1,lth(p)+1:end,:,:) = 0;
+%     p_count = p_count+2;
+% end
+
 end
 
 function [True Apparent_Initial Apparent_Final zs atmos] = zenithpaths_tangent(atmos,i,j,True...
@@ -175,5 +190,5 @@ if iteration == 1
     True.Initial(i,iscat,j) = AngleTOA+phi(end);
 else
     Apparent_Final(i,iscat,j) = Apparent(j);
-end
+end    
 end            

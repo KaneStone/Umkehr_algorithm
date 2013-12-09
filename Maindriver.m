@@ -1,14 +1,15 @@
 tic;
-test =11;
+test = 13;
 a = 1;
 
 station = 'Melbourne';
-year = '1970';
+year = '1974';
 mf = 0;
 
 for i = 1:1
     extra = extrasetup(test,station,year);
     Kflg=1;
+    AeroKflg=1;
     
     if extra.logswitch
         extra.atmos.ozone=log10(extra.atmos.ozone);        
@@ -16,7 +17,9 @@ for i = 1:1
     else extra.pert = .5e11;
     end
     
-    [K,N] = ForwardModel(extra.atmos.ozone, Kflg, extra);
+    Aero_Weighting_Functions(AeroKflg,extra);
+    
+    [K,N] = ForwardModel(extra.atmos.ozone, Kflg, AeroKflg, extra);
     sz = size(extra.atmos.Apparent);
 
     %Ki = K(sz(3)+1:2*sz(3),:);
@@ -25,7 +28,7 @@ for i = 1:1
     %plotNvalues(extra.atmos.true_actual, N.zs);
     
     Se = createSe(extra.atmos.true_actual);
-    Sa = createSa(extra.atmos.quarter);
+    Sa = createSa(extra.atmos.quarter,extra.logswitch);
     
     %mf = mf+2;
     
@@ -34,7 +37,7 @@ for i = 1:1
     y (isnan(y)) = [];
     [xhat yhat K yhat1 K1 S d2] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
     
-    [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,test,yhat1,station,extra.atmos.date(test).date);
+    [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,test,yhat1,station,extra.atmos.date(test).date);
     %RMS(i) = createRMS(y,yhat);
     [AK] = AveragingKernel(S,Sa,Se,extra,K);
  

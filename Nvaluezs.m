@@ -87,9 +87,13 @@ intenstar (isnan(intenstar)) = 0;
 % hold on
 % plot(atmos.true_actual,squeeze(maxb),'r');
 
+ratio = zeros(sz(1),sz(2));
 
 for j = 1:length(lambda);
-    for k = 1:sz(2)
+    %for different wavelength pair vector length functionality
+    find_nan = find(~isnan(atmos.true_actual(ceil(j/2),:)));
+    sz_ind = length(find_nan);
+    for k = 1:sz_ind
         ratio(j,k)=sum(intensity(j,:,k)/intenstar(j,:,k));
     end
 end

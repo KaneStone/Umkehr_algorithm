@@ -6,7 +6,7 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
-extra.WLP_to_retrieve = 'C'; %all permutations possible.
+extra.WLP_to_retrieve = 'DCA'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S

@@ -31,6 +31,12 @@ function [xhat,yhat,K,yhat1, K1, S, d2]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extr
 %Gy=Sa*(K/(K'*Sa*K+Se));
 %y_xa=K'*xa;
 %xhat=xa+Gy*(y-y_xa);
+
+%for different wavelength pair vector length functionality
+%INCORRECT
+yhat = reshape(yhat',1,numel(yhat));
+yhat (isnan(yhat)) = [];
+
 sz = size(extra.atmos.Apparent);
 yhat1(1).a = yhat;
 %xa = xa';
@@ -41,21 +47,20 @@ xa = xa';
 xi = xa;
 d2(1) = length(yhat);
 if strcmp(method,'Opt')
-    for i = 1:2;
+    for i = 1:4;
         
         K1(i).a = K;
         
         %reshaping into one vector for all wavelengths
         y = reshape(y',1,numel(y));
         yhat = reshape(yhat',1,numel(yhat));
-        
         %5.8
         %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
         
         %5.9 - N-form
         %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
         
-        %5.10 - M-form              
+        %5.10 - M-form  
         xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
         % testing for slow convergence
         %Sdayy = Se*(K*Sa*K'+Se)\Se;
@@ -70,7 +75,8 @@ if strcmp(method,'Opt')
         AeroKflg = 0;
         [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
         yhat = N.zs;
-        yhat1(i).a = reshape(yhat',1,numel(yhat));
+        %yhat1(i).a = reshape(yhat',1,numel(yhat));
+        yhat1(i).a = yhat;
         
         %testing for convergence
         Sdayy = Se*(K*Sa*K'+Se)\Se;

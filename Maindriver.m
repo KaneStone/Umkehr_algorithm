@@ -1,15 +1,15 @@
 tic;
-test = 13;
+test = 1;
 a = 1;
 
 station = 'Melbourne';
-year = '1974';
+year = '1994';
 mf = 0;
 
 for i = 1:1
     extra = extrasetup(test,station,year);
     Kflg=1;
-    AeroKflg=1;
+    AeroKflg=0;
     
     if extra.logswitch
         extra.atmos.ozone=log10(extra.atmos.ozone);        
@@ -17,11 +17,13 @@ for i = 1:1
     else extra.pert = .5e11;
     end
     
-    Aero_Weighting_Functions(AeroKflg,extra);
+    if AeroKflg
+        Aero_Weighting_Functions(AeroKflg,extra);
+    end
     
     [K,N] = ForwardModel(extra.atmos.ozone, Kflg, AeroKflg, extra);
     sz = size(extra.atmos.Apparent);
-
+    
     %Ki = K(sz(3)+1:2*sz(3),:);
     %yhat = yhat(sz(3)+1:2*sz(3),:);
     %plotWfunc(K, extra.atmos.Apparent);

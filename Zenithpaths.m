@@ -40,7 +40,7 @@ for iteration = 1:2;
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
-                True.actual (isnan(True.actual)) = []; % This causes problems when SZA dimensions are inconsistent between wavelength pairs                
+                %True.actual (isnan(True.actual)) = []; % This causes problems when SZA dimensions are inconsistent between wavelength pairs                
                 True_I = reshape(True.Initial(i,iscat,:),1,al);
                 True_I (True_I == 0) = [];
                 Apparent = interp1(squeeze(True_I)...

@@ -50,45 +50,58 @@ elseif strcmp(extra.atmos.N_values(test).WLP,'C')
     legend('Retrieval - C pair','measurement','y-yhat','location','NorthWest');
 end
 
+%yhat1.a = reshape(yhat1.a',fliplr(size(N.zs)))';
+
 yhat2 = vertcat(N.zs,yhat1.a)';
 sz_yhat1 = size(yhat1);
 figure;
 fig = gcf;
 set(fig,'color','white','Position',[100 100 1000 700]);
-plot(repmat(extra.atmos.true_actual,sz_yhat1(2)+1,1)',yhat2,'LineWidth',2.5);
-hold on
-errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1,'color','black','LineStyle','--');
+%plot(repmat(extra.atmos.true_actual,sz_yhat1(2)/3+1,1)'
+
+color = 'b';
+for i = 1:sz_yhat1(2)+1
+    if i == 1
+        pl(i).p = plot(extra.atmos.true_actual',N.zs',color,'LineWidth',2.5);
+    else pl(i).p = plot(extra.atmos.true_actual',yhat1(i-1).a',color,'LineWidth',2.5);
+    end
+    if color == 'b'
+        color = 'r';        
+    elseif color == 'r'
+        color = 'g';
+    elseif color == 'g'
+        color = 'k';
+    elseif color == 'k'
+        color = 'c';
+    elseif color == 'c'
+        color = 'm';
+    elseif color == 'm'
+        color = 'y';
+    end
+    
+    legendhandle(i) = pl(i).p(1); 
+    if i == 1;
+        legendnames{i} = 'initial';
+    elseif i >1 && i < sz_yhat1(2)+1
+        legendnames{i} = num2str(i);
+    elseif i == sz_yhat1(2)+1
+        legendnames{i} = 'final';        
+    end    
+    hold on
+end
+    
+err = errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1,'LineStyle','--','color','k');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
 set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
 ,'{ }','N-values'),'fontsize',24);
 sz = size(yhat2);
-if strcmp(extra.atmos.N_values(test).WLP,'ACD')
-    h = get(gca,'children');
-    iterations = num2str(2:length(h)/3-2);
-    measurements = {'Measurements - A pair','Measurements - D pair','Measurements - D pair'};
-    legend(h,'initial',iterations,'final',measurements);
-end
-if sz(2) == 2
-    legend('initial','final','measurement','location','NorthWest');
-elseif sz(2) == 3
-    legend('initial','2','final','measurement','location','NorthWest');
-elseif sz(2) == 4
-    legend('initial','2','3','final','measurement','location','NorthWest');
-elseif sz(2) == 5
-    legend('initial','2','3','4','final','measurement','location','NorthWest');
-elseif sz(2) == 6
-    legend('initial','2','3','4','5','final','measurement','location','NorthWest');
-elseif sz(2) == 7
-    legend('initial','2','3','4','5','6','final','measurement','location','NorthWest');
-elseif sz(2) == 8
-    legend('initial','2','3','4','5','6','7','final','measurement','location','NorthWest');
-elseif sz(2) == 9
-    legend('initial','2','3','4','5','6','7','8','final','measurement','location','NorthWest');
-elseif sz(2) == 10
-    legend('initial','2','3','4','5','6','7','8','9','final','measurement','location','NorthWest');
-end
+
+legendhandle = [legendhandle,err(1)];
+legendnames{i+1} = 'measurements';
+
+legend(legendhandle,legendnames)
 
 %set(fig, 'PaperPositionMode','auto');
 %print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(test),'.eps'));

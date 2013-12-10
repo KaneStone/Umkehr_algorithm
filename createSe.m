@@ -1,5 +1,9 @@
 function Se = createSe(Apparent)
-
+    
+%INCORRECT
+    Apparent = reshape(Apparent',1,numel(Apparent));
+    Apparent(isnan(Apparent)) = [];
+    
     Init_SZA = [65,70,74,77,80,83,85,86.5,88,89,90,91,92,93,94,95];
     %TRY WITH CONSTANT VALUES
     %Init_Var = [.15,.15,.15,.20,.25,.3,.35,.4,.7,1.4,2.8,4.6,9.2,18.4,36.8,73.6];

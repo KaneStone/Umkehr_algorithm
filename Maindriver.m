@@ -30,7 +30,7 @@ for i = 1:1
     %plotNvalues(extra.atmos.true_actual, N.zs);
     
     Se = createSe(extra.atmos.true_actual);
-    Sa = createSa(extra.atmos.quarter,extra.logswitch);
+    Sa = createSa(extra.atmos.quarter,extra.logswitch,extra);
     
     %mf = mf+2;
     

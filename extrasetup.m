@@ -6,7 +6,7 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
-extra.WLP_to_retrieve = 'DCA'; %all permutations possible.
+extra.WLP_to_retrieve = 'ADC'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S
@@ -22,7 +22,7 @@ theta = [60,65,70,74,77,80,83,84,85,86.5,88,89,90];
 instralt = 0;
 
 %defining layer structure
-maxalt = 60000; 
+maxalt = 80000; 
 atmos.dz = (1000);
 atmos.Z = 0:atmos.dz:maxalt;
 atmos.nlayers = length(atmos.Z);
@@ -34,7 +34,7 @@ profilepath.ozone = strcat(inputpath,'station_climatology/Ozone/',station,'.dat'
 profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/',station,'_temperature.dat');
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pressure.dat');
 %profilepath.TaP = strcat(inputpath,'TP23_9Ant.dat');
-profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/l*'); %excluding hidden files
+profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/M*'); %excluding hidden files
 profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.dat');
 
 %reading in profiles
@@ -45,6 +45,7 @@ atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Tem
 %defining wavelengths
 lambda = definelambda(wl,test,atmos);
 
+atmos = read_solar(atmos,profilepath.solar,lambda);
 %calculates refractive index using pres and temp files.
 atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 

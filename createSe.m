@@ -17,6 +17,6 @@ function Se = createSe(Apparent)
     end
     Se = interp1(Init_SZA,Init_Var,Apparent,'linear','extrap');
     Se (Apparent <= 74) = .15;
-    Se = diag(Se)*50;
+    Se = diag(Se)*300;
     
 end

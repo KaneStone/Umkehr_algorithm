@@ -51,7 +51,7 @@ for j = 1:12;
             
             %separating measurements morning and evening measuremnets -
             %maybe not infallable.
-            if max(hour) - min(hour) >=6 
+            if max(hour) - min(hour) >=9 
                 disp(strcat('Both morning and evening measurements were taken at date: ',...
                     num2str(atmos.date(count).date(1))...
                     ,'-',num2str(atmos.date(count).date(2))...
@@ -184,18 +184,5 @@ atmos.Aer = interp1(aerosol(:,1),aerosol(:,2),atmos.Z,'linear','extrap');
 atmos.Aermid = interp1(aerosol(:,1),aerosol(:,2),atmos.Zmid,'linear','extrap');
 fclose (fid);
 
-%reading in solar spectrum
-% micro-watts/(cm^2*nm)
-files = dir(solarfilename);
-NF = length(files);
-solar(:,:).s = [];
-
-for i = 1:NF;
-    fid = fopen(strcat(solarfilename(1:51),files(i,1).name));
-    solar(i).s = fscanf(fid,'%f',[3,inf]);
-    fclose(fid);
-end
-
-atmos.solar = horzcat(solar.s)';
 atmos.quarter = quarter;     
 end

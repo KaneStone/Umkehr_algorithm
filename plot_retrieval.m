@@ -5,11 +5,11 @@ addpath('/Users/stonek/work/Dobson/data_code');
 figure;
 fig1 = gcf;
 set(fig1,'color','white','Position',[100 100 1000 700]);
-herrorbar(xhat,1:61,(diag(S)).^.5,'r');
+herrorbar(xhat,1:extra.atmos.nlayers,(diag(S)).^.5,'r');
 hold on
-p1 = plot(xhat,1:61,'r','LineWidth',2);
-herrorbar(extra.atmos.ozone,1:61,(diag(Sa)).^.5);
-p2 = plot(extra.atmos.ozone,1:61,'LineWidth',2);
+p1 = plot(xhat,1:extra.atmos.nlayers,'r','LineWidth',2);
+herrorbar(extra.atmos.ozone,1:extra.atmos.nlayers,(diag(Sa)).^.5);
+p2 = plot(extra.atmos.ozone,1:extra.atmos.nlayers,'LineWidth',2);
 set(fig1,'color','white');
 ylabel('Altitude','fontsize',20);
 xlabel('number density','fontsize',20);

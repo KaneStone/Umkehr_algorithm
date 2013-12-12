@@ -1,5 +1,5 @@
 tic;
-test = 1;
+test =2;
 a = 1;
 
 station = 'Melbourne';

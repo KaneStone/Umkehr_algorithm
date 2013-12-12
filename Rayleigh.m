@@ -56,7 +56,7 @@ atmos.pgamma = interp1(WLGTH,GAM,lambda*1000);
 
 %Calculating Mie extinction. Taking into account the scale factor for
 %different wavelengths.
-atmos.bMiept = (500./wavelength).^-1.2*atmos.Aer;
-atmos.bMie = (500./wavelength).^-1.2*atmos.Aermid;
+atmos.bMiept = (500./wavelength).^1.2*atmos.Aer;
+atmos.bMie = (500./wavelength).^1.2*atmos.Aermid;
 
 end

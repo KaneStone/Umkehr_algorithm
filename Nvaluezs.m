@@ -1,4 +1,4 @@
-function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch)
+function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,norm_switch)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
 
@@ -108,11 +108,21 @@ N=zeros(length(lambda)/2,sz(2));
 wn = 1;
 for k = 1:length(lambda)/2;
     ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),lambda(wn:wn+1),'linear','extrap');
-    ETSF_ratio = ETSF(2)/ETSF(1);
-    
-    N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
+    ETSF_ratio = ETSF(2)/ETSF(1);    
+    %ETSF_ratio = 1;
+        N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
     %N(k,:) = 100*(log10(ratio(wn+1,:)./ratio(wn,:))-log10(ratio(wn+1,1)./ratio(wn,1)));
     wn = wn+2;
+end
+
+%normalising
+
+if norm_switch
+    [~, SZA_min_location] = min(atmos.true_actual,[],2);
+    for j = 1:length(SZA_min_location);
+         N_min = N(j,SZA_min_location(j));
+        N(j,:) = N(j,:) - repmat(N_min,1,sz(2));   
+    end
 end
 end
 

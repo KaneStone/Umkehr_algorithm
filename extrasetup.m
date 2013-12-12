@@ -6,7 +6,8 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
-extra.WLP_to_retrieve = 'ADC'; %all permutations possible.
+extra.normalise_to_LSZA =0;
+extra.WLP_to_retrieve = 'C'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S
@@ -22,7 +23,7 @@ theta = [60,65,70,74,77,80,83,84,85,86.5,88,89,90];
 instralt = 0;
 
 %defining layer structure
-maxalt = 80000; 
+maxalt = 100000; 
 atmos.dz = (1000);
 atmos.Z = 0:atmos.dz:maxalt;
 atmos.nlayers = length(atmos.Z);
@@ -41,6 +42,10 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
     profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test,...
     extra.WLP_to_retrieve,extra.morn_or_even);
+
+if extra.normalise_to_LSZA
+    atmos = normalising_measurements(atmos);
+end
 
 %defining wavelengths
 lambda = definelambda(wl,test,atmos);

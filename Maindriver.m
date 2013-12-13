@@ -1,5 +1,5 @@
 tic;
-test =2;
+test =1;
 a = 1;
 
 station = 'Melbourne';
@@ -30,9 +30,9 @@ for i = 1:1
     %plotNvalues(extra.atmos.true_actual, N.zs);
     
     Se = createSe(extra.atmos.true_actual);
-    Sa = createSa(extra.atmos.quarter,extra.logswitch,extra);
+    Sa = createSa(extra.atmos.quarter,extra.logswitch,extra,i,mf);
     
-    %mf = mf+2;
+    mf = mf+4;
     
     y = extra.atmos.N_values(test).N;
  
@@ -43,10 +43,10 @@ for i = 1:1
     %RMS(i) = createRMS(y,yhat);
     [AK] = AveragingKernel(S,Sa,Se,extra,K);
  
-    %print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
+    print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
      
-    test = test+1;
-    clearvars -except test a station year i
+    %test = test+1;
+   % clearvars -except test a station year i
 end
 time = toc;
 display(time);

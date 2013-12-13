@@ -31,11 +31,11 @@ for j = 1:length(lambda);
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase))./(4.*pi);   
         
-        end
-            
+        end   
         
         for i = 1:atmos.nlayers-1;
-%Need to put in Mie here aswell
+            %majority of time is spent here!!! Try to think of a better
+            %more streamlined way of doing this!!!
             if mieswitch
             intensity(j,:,iscat) = intensity(j,:,iscat).*...
                 exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...

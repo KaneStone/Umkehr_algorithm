@@ -6,8 +6,8 @@ inputpath = '/Users/stonek/work/Dobson/input/';
 extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
-extra.normalise_to_LSZA =0;
-extra.WLP_to_retrieve = 'C'; %all permutations possible.
+extra.normalise_to_LSZA =1;
+extra.WLP_to_retrieve = 'AC'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S
@@ -23,7 +23,7 @@ theta = [60,65,70,74,77,80,83,84,85,86.5,88,89,90];
 instralt = 0;
 
 %defining layer structure
-maxalt = 100000; 
+maxalt = 80000; 
 atmos.dz = (1000);
 atmos.Z = 0:atmos.dz:maxalt;
 atmos.nlayers = length(atmos.Z);

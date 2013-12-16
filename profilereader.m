@@ -1,5 +1,5 @@
 function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
-    pressurefilename,solarfilename,aerosolfilename,atmos,test,WLP,morn_or_even)
+    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,WLP,morn_or_even)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -99,12 +99,12 @@ for j = 1:12;
     end
 end
 
-disp(strcat({'Current date being retrieved: '},num2str(atmos.date(test).date(1))...
-    ,'-',num2str(atmos.date(test).date(2))...
-    ,'-',num2str(atmos.date(test).date(3))));
+disp(strcat({'Current date being retrieved: '},num2str(atmos.date(measurement_number).date(1))...
+    ,'-',num2str(atmos.date(measurement_number).date(2))...
+    ,'-',num2str(atmos.date(measurement_number).date(3))));
 No_WLP = length(WLP);
 
-existing_WLP = atmos.WLP(test,:);
+existing_WLP = atmos.WLP(measurement_number,:);
 A = ' '; C = ' '; D = ' ';
 if strfind(existing_WLP,'A');
     A = 'A';
@@ -114,33 +114,33 @@ elseif strfind(existing_WLP,'D');
     D = 'D';
 end
 
-if isempty(atmos.N_values(test).WLP);
+if isempty(atmos.N_values(measurement_number).WLP);
     error(strcat('No measurements for the wavelengths specified exist for date:',...
-    num2str(atmos.date(test).date(1)),'-',num2str(atmos.date(test).date(2))...
-    ,'-',num2str(atmos.date(test).date(3)),'. wavelength pairs that exist are-',A,C,D));
+    num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
+    ,'-',num2str(atmos.date(measurement_number).date(3)),'. wavelength pairs that exist are-',A,C,D));
 end
 
 for k = 1:No_WLP
-    if (WLP(k) == atmos.N_values(test).WLP) == 0
+    if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
     display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
         {' Continuing with other wavelength pairs specified'}))
     end
 end
     
 %checking whether vector lengths are the same
-no_zeros = nonzeros(atmos.initial_SZA(test).SZA');
-sz_SZA = size(atmos.initial_SZA(test).SZA);
-if length(no_zeros) ~= length(reshape(atmos.initial_SZA(test).SZA,1,sz_SZA(1)*sz_SZA(2)))
+no_zeros = nonzeros(atmos.initial_SZA(measurement_number).SZA');
+sz_SZA = size(atmos.initial_SZA(measurement_number).SZA);
+if length(no_zeros) ~= length(reshape(atmos.initial_SZA(measurement_number).SZA,1,sz_SZA(1)*sz_SZA(2)))
     disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
-        num2str(atmos.date(test).date(1)),'-',num2str(atmos.date(test).date(2))...
-        ,'-',num2str(atmos.date(test).date(3))));
+        num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
+        ,'-',num2str(atmos.date(measurement_number).date(3))));
 end
 
 %removing padded zeros if wavelength pair data sizes are different.
-atmos.N_values(test).N (atmos.N_values(test).N(:,:) == 0) = NaN;
-atmos.initial_SZA(test).SZA (atmos.initial_SZA(test).SZA(:,:) == 0) = NaN;
+atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
+atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
 
-date_to_use = atmos.date(test).date(2);
+date_to_use = atmos.date(measurement_number).date(2);
 
 %reading in ozone profile
 fid = fopen(ozonefilename);

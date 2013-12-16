@@ -1,15 +1,15 @@
 tic;
-test =1;
-a = 1;
-
+measurement_number = 15;
 station = 'Melbourne';
-year = '1994';
-mf = 0;
+year = '1970';
+sf = 0;
+L_curve_diag = 0;
+number_of_measurements = 11;
 
-for i = 1:1
-    extra = extrasetup(test,station,year);
-    Kflg=1;
-    AeroKflg=0;
+for i = 1:1;%number_of_measurements;
+    extra = extrasetup(measurement_number,station,year);
+    Kflg = 1;
+    AeroKflg = 0;
     
     if extra.logswitch
         extra.atmos.ozone=log10(extra.atmos.ozone);        
@@ -29,24 +29,32 @@ for i = 1:1
     %plotWfunc(K, extra.atmos.Apparent);
     %plotNvalues(extra.atmos.true_actual, N.zs);
     
-    Se = createSe(extra.atmos.true_actual);
-    Sa = createSa(extra.atmos.quarter,extra.logswitch,extra,i,mf);
+    [Se Se_for_errors] = createSe(extra.atmos.true_actual);
+    Sa = createSa(extra.atmos.quarter,extra.logswitch,extra,i,sf,L_curve_diag);
+    sf = sf+4;
     
-    mf = mf+4;
+    y = extra.atmos.N_values(measurement_number).N;
     
-    y = extra.atmos.N_values(test).N;
- 
-    y (isnan(y)) = [];
-    [xhat yhat K yhat1 K1 S d2] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
+    %Optimal estimation
+    %y (isnan(y)) = [];
+    [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
     
-    [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,test,yhat1,station,extra.atmos.date(test).date);
-    %RMS(i) = createRMS(y,yhat);
+    %printing diagnostics
+    [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,measurement_number,...
+        yhat1,station,extra.atmos.date(measurement_number).date,Se_for_errors);
+    if L_curve_diag
+        RMS(i) = createRMS(y,yhat);
+    end
     [AK] = AveragingKernel(S,Sa,Se,extra,K);
- 
-    print_diagnostics(fig1,fig2,AK,station,extra.atmos.date(test).date);
-     
-    %test = test+1;
-   % clearvars -except test a station year i
+    print_diagnostics(fig1,fig2,AK,station,extra,measurement_number);
+    
+    measurement_number = measurement_number+1;
+    if i == 1;
+        number_of_measurements = length(extra.atmos.N_values);
+    end
+    close all hidden
+    pause(1);
+    clearvars -except measurement_number station year i sf L_curve_diag number_of_measurements
 end
 time = toc;
 display(time);

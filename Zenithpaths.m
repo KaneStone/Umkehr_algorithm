@@ -1,6 +1,6 @@
-function [zs atmos] = Zenithpaths(atmos,lambda,test)
+function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number)
  
-a = atmos.initial_SZA(test).SZA;
+a = atmos.initial_SZA(measurement_number).SZA;
 %a (isnan(a)) = [];
 %Two lines below may cause problems
 

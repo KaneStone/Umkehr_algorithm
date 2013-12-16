@@ -1,4 +1,4 @@
-function [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,test,yhat1,station,date)
+function [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,measurement_number,yhat1,station,date,Se_for_errors)
 
 
 addpath('/Users/stonek/work/Dobson/data_code');
@@ -19,14 +19,12 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 legend([p1 p2],'retrieval','A priori','location','NorthWest');
 
 %set(fig1, 'PaperPositionMode','auto');
-%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_profile_',num2str(test),'.eps'));
+%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_profile_',num2str(measurement_number),'.eps'));
 
-N_val = extra.atmos.N_values(test).N;
-%N_val = load('Ret_as_Meas');
-N_val (isnan(N_val)) = [];
+N_val = extra.atmos.N_values(measurement_number).N;
 
-error = (diag(Se)).^.5;
-error = reshape(error,fliplr(size(N_val)));
+N_val_error = Se_for_errors;
+N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
 
 figure;
 fig2 = gcf;
@@ -34,7 +32,7 @@ set(fig2,'color','white','Position',[100 100 1000 700]);
 plot(extra.atmos.true_actual',yhat','LineWidth',2);
 hold on
 %plot(extra.atmos.true_actual',N_val','LineWidth',2);
-errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1.5,'LineStyle','--','color','black');
+errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1.5,'LineStyle','--','color','black');
 plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
@@ -42,11 +40,11 @@ set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','N Values'),'fontsize',24);
 %legend('retrieval','measurement','location','NorthWest');
-if strcmp(extra.atmos.N_values(test).WLP,'ACD')
+if strcmp(extra.atmos.N_values(measurement_number).WLP,'ACD')
     legend('Retrieval - A pair','Retrieval - C pair','Retrieval - D pair',...
         'Measurement - A pair','Measurement - C pair','Measurement - D pair',...
         'y-yhat','y-yhat','y-yhat','location','NorthWest');
-elseif strcmp(extra.atmos.N_values(test).WLP,'C')
+elseif strcmp(extra.atmos.N_values(measurement_number).WLP,'C')
     legend('Retrieval - C pair','measurement','y-yhat','location','NorthWest');
 end
 
@@ -90,7 +88,7 @@ for i = 1:sz_yhat1(2)+1
     hold on
 end
     
-err = errorbar(extra.atmos.true_actual',N_val',error,'LineWidth',1,'LineStyle','--','color','k');
+err = errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1,'LineStyle','--','color','k');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
 set(gca,'fontsize',18);
@@ -104,7 +102,7 @@ legendnames{i+1} = 'measurements';
 legend(legendhandle,legendnames)
 
 %set(fig, 'PaperPositionMode','auto');
-%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(test),'.eps'));
+%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(measurement_number),'.eps'));
 %delete(1); delete(3);
 end
 

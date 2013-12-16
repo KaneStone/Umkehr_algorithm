@@ -1,4 +1,4 @@
-function [xhat,yhat,K,yhat1, K1, S, d2]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat,yhat,K,yhat1, K1, S]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -33,27 +33,24 @@ function [xhat,yhat,K,yhat1, K1, S, d2]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extr
 %xhat=xa+Gy*(y-y_xa);
 
 %for different wavelength pair vector length functionality
-%INCORRECT
 yhat = reshape(yhat',1,numel(yhat));
 yhat (isnan(yhat)) = [];
+y = reshape(y',1,numel(y));
+y (isnan(y)) = [];
 
 sz = size(extra.atmos.Apparent);
 yhat1(1).a = yhat;
-%xa = xa';
-%load('xa1');
-%xa = xa1*10;
-%xa = xa'/1e11;
 xa = xa';
 xi = xa;
-d2(1) = length(yhat);
 if strcmp(method,'Opt')
-    for i = 1:5;
+    for i = 1:2;
         
         K1(i).a = K;
         
         %reshaping into one vector for all wavelengths
         y = reshape(y',1,numel(y));
         yhat = reshape(yhat',1,numel(yhat));
+        yhat (isnan(yhat)) = [];
         %5.8
         %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
         

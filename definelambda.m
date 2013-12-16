@@ -1,8 +1,8 @@
-function [lambda] = definelambda(wl,test,atmos)
+function [lambda] = definelambda(wl,measurement_number,atmos)
     %This function defines lambda based of what WLP are used and what is
     %available.
 
-existing_WLP = atmos.N_values(test).WLP;
+existing_WLP = atmos.N_values(measurement_number).WLP;
 count = 1;
 for i = 1:length(existing_WLP);
     if (existing_WLP(i) == 'A')

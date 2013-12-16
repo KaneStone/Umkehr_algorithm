@@ -1,10 +1,13 @@
-function [] = print_diagnostics(x,y,AK,station,date)%,AK,station,year,test)
+function [] = print_diagnostics(x,y,AK,station,extra,measurement_number)%,AK,station,year,test)
+
+date = extra.atmos.date(measurement_number).date;
+WLP = extra.atmos.N_values(measurement_number).WLP;
 
 print(x,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'));
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'));
 
 print(y,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 figure;
 fig3 = gcf;
@@ -21,7 +24,7 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 %station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 print(fig3,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 figure;
 fig4 = gcf;
@@ -33,7 +36,7 @@ xlabel('Area of AK','fontsize',20);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Area of AK'),'fontsize',24);
 print(fig4,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 AK.resolution (AK.resolution > 100) = 100;
 
@@ -57,6 +60,6 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 %station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 print(fig5,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
 end

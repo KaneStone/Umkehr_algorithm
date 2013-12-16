@@ -1,4 +1,4 @@
-function extra = extrasetup(test,station,year)
+function extra = extrasetup(measurement_number,station,year)
 %path for input files
 inputpath = '/Users/stonek/work/Dobson/input/';
 
@@ -7,7 +7,7 @@ extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
 extra.normalise_to_LSZA =1;
-extra.WLP_to_retrieve = 'AC'; %all permutations possible.
+extra.WLP_to_retrieve = 'ACD'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S
@@ -40,7 +40,7 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 
 %reading in profiles
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
-    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,test,...
+    profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,measurement_number,...
     extra.WLP_to_retrieve,extra.morn_or_even);
 
 if extra.normalise_to_LSZA
@@ -48,14 +48,14 @@ if extra.normalise_to_LSZA
 end
 
 %defining wavelengths
-lambda = definelambda(wl,test,atmos);
+lambda = definelambda(wl,measurement_number,atmos);
 
 atmos = read_solar(atmos,profilepath.solar,lambda);
 %calculates refractive index using pres and temp files.
 atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 
 %ds = Directpaths(atmos,lambda,instralt,theta);
-[zs atmos] = Zenithpaths(atmos,lambda,test);
+[zs atmos] = Zenithpaths(atmos,lambda,measurement_number);
 
 %reading in cross sections
 xs = xsectreader(strcat(inputpath,'ozonexs/'));

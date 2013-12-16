@@ -1,4 +1,4 @@
-function Sa = createSa(quarter,logswitch,extra,i,mf)
+function Sa = createSa(quarter,logswitch,extra,i,mf,L_curve_diag)
 
 folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone/Standard_Deviation/';
 fid = fopen(strcat(folder,'Hobart_SD.dat'));
@@ -11,9 +11,12 @@ end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
 
 %For testing optimal Sa (L-curve)
-if i == 1
-    Sa_temp = Sa_temp*12;
-else Sa_temp = Sa_temp.*mf;
+if L_curve_diag
+    if i == 1
+        Sa_temp = Sa_temp*12;
+    else Sa_temp = Sa_temp.*mf;
+    end
+else Sa_temp = Sa_temp*12;
 end
 
 Sa_temp = Sa_temp.^2;

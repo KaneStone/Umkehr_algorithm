@@ -1,5 +1,5 @@
 function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
-    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,WLP,morn_or_even)
+    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,WLP,morn_or_even,seasonal)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -155,10 +155,22 @@ elseif date_to_use == 6 || date_to_use == 7 || date_to_use == 8
 elseif date_to_use == 9 || date_to_use == 10 || date_to_use == 11
     quarter = 5;
 end
-prof = fscanf(fid,'%f',[5,inf])';
-atmos.ozone = interp1(prof(:,1),prof(:,quarter),atmos.Z,'linear','extrap');
-atmos.ozonemid = interp1(prof(:,1),prof(:,quarter),atmos.Zmid,'linear','extrap');
-fclose (fid);
+
+if seasonal
+    prof = fscanf(fid,'%f',[5,inf])';
+    atmos.ozone = interp1(prof(:,1),prof(:,quarter),atmos.Z,'linear','extrap');
+    atmos.ozone (atmos.ozone < 1e8) = 1e8;
+    atmos.ozonemid = interp1(prof(:,1),prof(:,quarter),atmos.Zmid,'linear','extrap');
+    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
+    fclose (fid);
+else
+    prof = fscanf(fid,'%f',[13,inf])';
+    atmos.ozone = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Z,'linear','extrap');
+    atmos.ozone (atmos.ozone < 1e8) = 1e8;
+    atmos.ozonemid = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Zmid,'linear','extrap');
+    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
+    fclose (fid);
+end
 
 %Reading in temperature.
 fid = fopen(temperaturefilename);
@@ -184,5 +196,6 @@ atmos.Aer = interp1(aerosol(:,1),aerosol(:,2),atmos.Z,'linear','extrap');
 atmos.Aermid = interp1(aerosol(:,1),aerosol(:,2),atmos.Zmid,'linear','extrap');
 fclose (fid);
 
-atmos.quarter = quarter;     
+atmos.quarter = quarter;  
+atmos.date_to_use = date_to_use;
 end

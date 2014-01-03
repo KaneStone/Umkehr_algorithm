@@ -19,5 +19,4 @@ atmos.ozonemid = interp1(atmos.Z,atmos.ozone,atmos.Zmid,'linear','extrap');
 sz = size(N.zs);
 yhat = reshape(N.zs',sz(1)*sz(2),1);
 yhat (isnan(yhat)) = [];
-%plotNvalues(theta,N);
 end

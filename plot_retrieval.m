@@ -1,4 +1,4 @@
-function [fig1 fig2] = plot_retrieval(N,yhat,extra,xhat,Se,Sa,S,measurement_number,yhat1,station,date,Se_for_errors)
+function [fig1 fig2 fig3] = plot_retrieval(N,yhat,extra,xhat,Sa,S,measurement_number,yhat1,station,date,Se_for_errors,L_Ozone)
 
 
 addpath('/Users/stonek/work/Dobson/data_code');
@@ -8,14 +8,18 @@ set(fig1,'color','white','Position',[100 100 1000 700]);
 herrorbar(xhat,1:extra.atmos.nlayers,(diag(S)).^.5,'r');
 hold on
 p1 = plot(xhat,1:extra.atmos.nlayers,'r','LineWidth',2);
-herrorbar(extra.atmos.ozone,1:extra.atmos.nlayers,(diag(Sa)).^.5);
-p2 = plot(extra.atmos.ozone,1:extra.atmos.nlayers,'LineWidth',2);
+if L_Ozone
+    herrorbar(extra.atmos.ozone,1:extra.atmos.nlayers,(diag(Sa)).^.5);
+    p2 = plot(extra.atmos.ozone,1:extra.atmos.nlayers,'LineWidth',2);
+else herrorbar(extra.atmos.Aer,1:extra.atmos.nlayers,(diag(Sa)).^.5);
+    p2 = plot(extra.atmos.Aer,1:extra.atmos.nlayers,'LineWidth',2);
+end
 set(fig1,'color','white');
-ylabel('Altitude','fontsize',20);
-xlabel('number density','fontsize',20);
-set(gca,'fontsize',18);
+ylabel('Altitude','fontsize',16);
+xlabel('number density','fontsize',16);
+set(gca,'fontsize',14);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
-    ,'{ }','Ozone Profile'),'fontsize',24);
+    ,'{ }','Ozone Profile'),'fontsize',20);
 legend([p1 p2],'retrieval','A priori','location','NorthWest');
 
 %set(fig1, 'PaperPositionMode','auto');
@@ -34,11 +38,11 @@ hold on
 %plot(extra.atmos.true_actual',N_val','LineWidth',2);
 errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1.5,'LineStyle','--','color','black');
 plot(extra.atmos.true_actual',(N_val-yhat)');
-ylabel('N-Value','fontsize',20);
-xlabel('SZA','fontsize',20);
-set(gca,'fontsize',18);
+ylabel('N-Value','fontsize',16);
+xlabel('SZA','fontsize',16);
+set(gca,'fontsize',14);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
-    ,'{ }','N Values'),'fontsize',24);
+    ,'{ }','N Values'),'fontsize',20);
 %legend('retrieval','measurement','location','NorthWest');
 if strcmp(extra.atmos.N_values(measurement_number).WLP,'ACD')
     legend('Retrieval - A pair','Retrieval - C pair','Retrieval - D pair',...
@@ -53,8 +57,8 @@ end
 yhat2 = vertcat(N.zs,yhat1.a)';
 sz_yhat1 = size(yhat1);
 figure;
-fig = gcf;
-set(fig,'color','white','Position',[100 100 1000 700]);
+fig3 = gcf;
+set(fig3,'color','white','Position',[100 100 1000 700]);
 %plot(repmat(extra.atmos.true_actual,sz_yhat1(2)/3+1,1)'
 
 color = 'b';
@@ -89,17 +93,17 @@ for i = 1:sz_yhat1(2)+1
 end
     
 err = errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1,'LineStyle','--','color','k');
-ylabel('N-Value','fontsize',20);
-xlabel('SZA','fontsize',20);
-set(gca,'fontsize',18);
+ylabel('N-Value','fontsize',16);
+xlabel('SZA','fontsize',16);
+set(gca,'fontsize',14);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
-,'{ }','N-values'),'fontsize',24);
+,'{ }','N-values'),'fontsize',20);
 sz = size(yhat2);
 
 legendhandle = [legendhandle,err(1)];
 legendnames{i+1} = 'measurements';
 
-legend(legendhandle,legendnames)
+legend(legendhandle,legendnames,'location','NorthWest');
 
 %set(fig, 'PaperPositionMode','auto');
 %print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(measurement_number),'.eps'));

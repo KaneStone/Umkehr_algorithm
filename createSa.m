@@ -1,27 +1,43 @@
-function Sa = createSa(quarter,logswitch,extra,i,mf,L_curve_diag)
+function Sa = createSa(quarter,date_to_use,seasonal,logswitch,extra,i,mf,L_curve_diag,station)
 
-folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone/Standard_Deviation/';
-fid = fopen(strcat(folder,'Hobart_SD.dat'));
-data = fscanf(fid,'%f',[5,inf])';
-SD = data(:,quarter)';
-SD (SD <= 1e11) = 1e11;
-if logswitch
-    SD = log10(SD);
+if seasonal
+    folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone/Standard_Deviation/';
+    fid = fopen(strcat(folder,station,'_SD.dat'));
+    data = fscanf(fid,'%f',[5,inf])';
+    SD = data(:,quarter)';
+else folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone_monthly/Standard_Deviation/';
+    fid = fopen(strcat(folder,station,'_SD.dat'));
+    data = fscanf(fid,'%f',[13,inf])';
+    SD = data(:,date_to_use+1)';
 end
+SD (SD <= 1e11) = 1e11;
+% if logswitch
+%     SD = log10(SD);
+% end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
+
+scale_factor = 10;
 
 %For testing optimal Sa (L-curve)
 if L_curve_diag
     if i == 1
-        Sa_temp = Sa_temp*12;
+        Sa_temp = Sa_temp*scale_factor;
     else Sa_temp = Sa_temp.*mf;
     end
-else Sa_temp = Sa_temp*12;
+else Sa_temp = Sa_temp*scale_factor;
 end
 
-Sa_temp = Sa_temp.^2;
-Sa = diag(Sa_temp);
+%Sa_temp(1,1:15) = Sa_temp(1,1:15)/10;
 
+Sa_temp = Sa_temp.^2;
+if logswitch
+    Sa = diag(log10(Sa_temp));
+else Sa = diag(Sa_temp);
+end
+
+%Sa1 = ones(1,15)*1e23;
+%Sa2 = ones(1,66)*1e24;
+%Sa = diag(horzcat(Sa1,Sa2));
 %Sa = diag(ones(1,81)*1e24); %2e22
 %Sa (Sa <= 1e22) = 1e22;
 %sigma=log10(1e11);

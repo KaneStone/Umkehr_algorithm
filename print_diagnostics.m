@@ -1,13 +1,15 @@
-function [] = print_diagnostics(x,y,AK,station,extra,measurement_number)%,AK,station,year,test)
+function [] = print_diagnostics(x,y,z,AK,station,extra,measurement_number,L_ozone)%,AK,station,year,test)
 
 date = extra.atmos.date(measurement_number).date;
 WLP = extra.atmos.N_values(measurement_number).WLP;
 
-print(x,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'));
+file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/',...
+station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2))...
+,'-',num2str(date(3)),'.ps');
 
-print(y,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+print(x,'-dpsc2','-r200',file);
+print(z,'-dpsc2','-r200',file,'-append');
+print(y,'-dpsc2','-r200',file,'-append');
 
 figure;
 fig3 = gcf;
@@ -20,11 +22,8 @@ ylabel('Altitude (km)','fontsize',20);
 xlabel('AK','fontsize',20);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
-%print(fig3,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-%station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
-print(fig3,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+print(fig3,'-dpsc2','-r200',file,'-append');
 
 figure;
 fig4 = gcf;
@@ -35,8 +34,7 @@ ylabel('Altitude (km)','fontsize',20);
 xlabel('Area of AK','fontsize',20);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Area of AK'),'fontsize',24);
-print(fig4,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+print(fig4,'-dpsc2','-r200',file,'-append');
 
 AK.resolution (AK.resolution > 100) = 100;
 
@@ -56,10 +54,7 @@ xlabel('1/diag(AK) (km)','fontsize',20);
 set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','resolution'),'fontsize',24);
-%print(fig5,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-%station,'/',station,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
 
-print(fig5,'-dpsc2','-r200',strcat('/Users/stonek/work/Dobson/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),'.ps'),'-append');
+print(fig5,'-dpsc2','-r200',file,'-append');
 
 end

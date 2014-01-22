@@ -16,7 +16,7 @@ SD (SD <= 1e11) = 1e11;
 % end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
 
-scale_factor = 10;
+scale_factor = 4;
 
 %For testing optimal Sa (L-curve)
 if L_curve_diag
@@ -26,6 +26,10 @@ if L_curve_diag
     end
 else Sa_temp = Sa_temp*scale_factor;
 end
+
+% scale_upper = ones(1,extra.atmos.nlayers-40);
+% scale_upper2 = 1:.1:5;
+% Sa_temp(1,extra.atmos.nlayers-40:end) = Sa_temp(extra.atmos.nlayers-40:end)./scale_upper2;
 
 %Sa_temp(1,1:15) = Sa_temp(1,1:15)/10;
 

@@ -50,6 +50,8 @@ if strcmp(extra.atmos.N_values(measurement_number).WLP,'ACD')
         'y-yhat','y-yhat','y-yhat','location','NorthWest');
 elseif strcmp(extra.atmos.N_values(measurement_number).WLP,'C')
     legend('Retrieval - C pair','measurement','y-yhat','location','NorthWest');
+elseif strcmp(extra.atmos.N_values(measurement_number).WLP,'AC')
+    legend('Retrieval - A pair','Retrieval - C pair','measurement','y-yhat','location','NorthWest');
 end
 
 %yhat1.a = reshape(yhat1.a',fliplr(size(N.zs)))';

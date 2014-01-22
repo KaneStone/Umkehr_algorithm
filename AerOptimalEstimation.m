@@ -42,7 +42,7 @@ sz = size(extra.atmos.Apparent);
 yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
-for i = 1:3;
+for i = 1:7;
     K1(i).a = K;
     %reshaping into one vector for all wavelengths
     y = reshape(y',1,numel(y));

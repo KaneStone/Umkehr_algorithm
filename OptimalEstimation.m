@@ -1,4 +1,4 @@
-function [xhat,yhat,K,yhat1, K1, S]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat,yhat,K,yhat1, K1, S, Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -43,7 +43,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:3;
+    for i = 1:4;
         K1(i).a = K;
         %reshaping into one vector for all wavelengths
         y = reshape(y',1,numel(y));
@@ -71,7 +71,7 @@ if strcmp(method,'Opt')
         yhat1(i).a = yhat;
         
         %testing for convergence
-        Sdayy = Se*(K*Sa*K'+Se)\Se;
+        %Sdayy = Se*(K*Sa*K'+Se)\Se;
 %         if i > 1;
 %             d2(i-1) = (yhat1(i).a - yhat1(i-1).a)/Sdayy*(yhat1(i).a-yhat1(i-1).a)';  
 %         end
@@ -109,6 +109,7 @@ elseif strcmp(method,'LS');
     K = K(sz(3)+1:2*sz(3),:);
 end
 S = (K'*(Se^-1)*K +Sa^-1)^-1;
+Sdayy = Se*((K*Sa*K'+Se)\Se);
 %S = Sa - Sa*K'*((Se+K*Sa*K')\(K*Sa));
 end
 

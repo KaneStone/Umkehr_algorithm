@@ -1,5 +1,5 @@
 tic;
-measurement_number = 1;
+measurement_number = 6;
 station = 'Melbourne';
 year = '1994';
 sf = 0;
@@ -44,7 +44,7 @@ for i = 1:1;%number_of_measurements;
         y = extra.atmos.N_values(measurement_number).N;
         %Optimal estimation
         %y (isnan(y)) = [];
-        [xhat yhat K yhat1 K1 S] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
+        [xhat yhat K yhat1 K1 S Sdayy] = OptimalEstimation(y,N.zs,Se,extra.atmos.ozone,Sa,K,extra,'Opt');
     elseif L_Aerosol
         Sa = createSaAer;
         sf = sf+4;
@@ -59,18 +59,20 @@ for i = 1:1;%number_of_measurements;
     if L_curve_diag
         RMS(i) = createRMS(y,yhat);
     end
-    [AK] = AveragingKernel(S,Sa,Se,extra,K);
+    
+    g = Umkehr_layers(extra,xhat,station,measurement_number,L_Ozone,S);    
+    [AK] = AveragingKernel(S,Sa,Se,extra,K,g);
     print_diagnostics(fig1,fig2,fig3,AK,station,extra,measurement_number,L_Ozone);
     
-    Umkehr_layers(extra,xhat,station,measurement_number);
-    
+    X2 = (y-yhat)*(Sdayy\(y-yhat)');
+ 
     measurement_number = measurement_number+1;
     if i == 1;
         number_of_measurements = length(extra.atmos.N_values);
     end
     close all hidden
     pause(1);
-    clearvars -except measurement_number station year i sf L_curve_diag number_of_measurements
+    clearvars -except measurement_number station year i sf L_curve_diag number_of_measurements L_Ozone L_Aerosol
 end
 time = toc;
 display(time);

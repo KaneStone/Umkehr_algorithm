@@ -3,9 +3,15 @@ function [] = print_diagnostics(x,y,z,AK,station,extra,measurement_number,L_ozon
 date = extra.atmos.date(measurement_number).date;
 WLP = extra.atmos.N_values(measurement_number).WLP;
 
-file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/',...
-station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2))...
-,'-',num2str(date(3)),'.ps');
+if L_ozone
+    file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/',...
+    station,'/',station,'_',WLP,'_',num2str(date(3)),'-',num2str(date(2))...
+    ,'-',num2str(date(1)),'.ps');
+else
+    file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/aerosols/',...
+    station,'/',station,'_',WLP,'_',num2str(date(3)),'-',num2str(date(2))...
+    ,'-',num2str(date(1)),'.ps');
+end
 
 print(x,'-dpsc2','-r200',file);
 print(z,'-dpsc2','-r200',file,'-append');
@@ -56,5 +62,24 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
     ,'{ }','resolution'),'fontsize',24);
 
 print(fig5,'-dpsc2','-r200',file,'-append');
+
+figure;
+fig6 = gcf;
+set(fig6,'color','white','Position',[100 100 1000 700]);
+plot(AK.AK1(:,5:7)'/5,1:length(AK.AK1),'LineWidth',2);
+hold on
+%plot(extra.atmos.true_actual',N_val','LineWidth',2);
+% annotation('textbox',[.6 .25 .25 .1],...
+%     'String',{['Degrees of freedom = ' num2str(AK.dof1)]},...
+%     'fontsize',12,...
+%     'EdgeColor','white')
+xlim([-.2 .9]);
+ylabel('Layer No.','fontsize',20);
+xlabel('AK','fontsize',20);
+set(gca,'fontsize',18);
+title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+    ,'{ }','Averaging Kernel'),'fontsize',24);
+
+print(fig6,'-dpsc2','-r200',file,'-append');
 
 end

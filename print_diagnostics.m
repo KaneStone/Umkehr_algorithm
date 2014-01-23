@@ -66,7 +66,7 @@ print(fig5,'-dpsc2','-r200',file,'-append');
 figure;
 fig6 = gcf;
 set(fig6,'color','white','Position',[100 100 1000 700]);
-plot(AK.AK1(:,5:7)'/5,1:length(AK.AK1),'LineWidth',2);
+plot(AK.AK1(:,1:16)'/5,1:length(AK.AK1),'LineWidth',2);
 hold on
 %plot(extra.atmos.true_actual',N_val','LineWidth',2);
 % annotation('textbox',[.6 .25 .25 .1],...

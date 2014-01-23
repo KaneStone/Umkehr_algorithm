@@ -43,7 +43,7 @@ yhat1(1).a = yhat;
 xa = xa';
 xi = xa;
 if strcmp(method,'Opt')
-    for i = 1:4;
+    for i = 1:3;
         K1(i).a = K;
         %reshaping into one vector for all wavelengths
         y = reshape(y',1,numel(y));

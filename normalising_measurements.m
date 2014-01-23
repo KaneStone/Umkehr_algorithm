@@ -1,8 +1,6 @@
 function [atmos] = normalising_measurements(atmos)
 %Normalising to lowest SZA
 
-
-
 for i = 1:length(atmos.N_values);
     sz = size(atmos.N_values(i).N);
     [~, SZA_min_location] = min(atmos.initial_SZA(i).SZA,[],2);
@@ -13,5 +11,3 @@ for i = 1:length(atmos.N_values);
 end
 
 end
-%find the lowest SZA position and subtract associated N_value from all
-%N_values.

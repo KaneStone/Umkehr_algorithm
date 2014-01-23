@@ -7,7 +7,7 @@ extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
 extra.normalise_to_LSZA =1;
-extra.WLP_to_retrieve = 'C'; %all permutations possible.
+extra.WLP_to_retrieve = 'ACD'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 
 %choose cross section study to use - BP,BDM or S
@@ -36,9 +36,10 @@ extra.seasonal = 0;
 profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
 if extra.seasonal
     profilepath.ozone = strcat(inputpath,'station_climatology/ozone/',station,'.dat');
+    profilepath.Temp = strcat(inputpath,'station_climatology/temperature/',station,'_temperature.dat');
 else profilepath.ozone = strcat(inputpath,'station_climatology/ozone_monthly/',station,'.dat');
+    profilepath.Temp = strcat(inputpath,'station_climatology/temperature_monthly/',station,'_temperature.dat');
 end
-profilepath.Temp = strcat(inputpath,'station_climatology/Temperature/',station,'_temperature.dat');
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pressure.dat');
 %profilepath.TaP = strcat(inputpath,'TP23_9Ant.dat');
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/M*'); %excluding hidden files

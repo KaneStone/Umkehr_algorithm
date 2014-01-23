@@ -140,6 +140,10 @@ end
 atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
 
+%removing data that is that is taken at a SZA that is above 94 degrees.
+atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+
 date_to_use = atmos.date(measurement_number).date(2);
 
 %reading in ozone profile
@@ -173,11 +177,18 @@ else
 end
 
 %Reading in temperature.
-fid = fopen(temperaturefilename);
-temperature = fscanf(fid,'%f',[5,inf])';
-atmos.T = interp1(temperature(:,1),temperature(:,quarter),atmos.Z,'linear','extrap');
-atmos.Tmid = interp1(temperature(:,1),temperature(:,quarter),atmos.Zmid,'linear','extrap');
-fclose(fid);
+    fid = fopen(temperaturefilename);
+if seasonal
+    temperature = fscanf(fid,'%f',[5,inf])';
+    atmos.T = interp1(temperature(:,1),temperature(:,quarter),atmos.Z,'linear','extrap');
+    atmos.Tmid = interp1(temperature(:,1),temperature(:,quarter),atmos.Zmid,'linear','extrap');
+    fclose(fid);
+else
+    temperature = fscanf(fid,'%f',[13,inf])';
+    atmos.T = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Z,'linear','extrap');
+    atmos.Tmid = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Zmid,'linear','extrap');
+    fclose(fid);
+end
 
 %Reading in pressure
 fid = fopen(pressurefilename);

@@ -15,11 +15,18 @@ end
 
 Scol = g*S(1:end-1,1:end-1)*g';
 Scolerrors = diag((Scol).^.5);
+Scolerrors1 = Scolerrors.*DU_coeff;
 xhat_layer = DU_coeff.*xhat(1:end-1);
 xhat_layer1 = g*xhat_layer';
 
 Total_Ozone = sum(xhat_layer1);
-Result = vertcat(xhat_layer1,Total_Ozone);
+
+Total_column_errors = (sum(diag(S))).^.5*DU_coeff;
+
+Result_retrieval = vertcat(xhat_layer1,Total_Ozone);
+Error_Result = vertcat(Scolerrors1,Total_column_errors);
+Result = horzcat(Result_retrieval,Error_Result);
+
 
 % lth = length(Upper_limits);
 % Ozone = ones(lth,5);
@@ -42,8 +49,8 @@ WLP = extra.atmos.N_values(measurement_number).WLP;
 
 if L_ozone
     save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  
-    station,'/',station,'_',WLP,'_',num2str(date(1)),'-',num2str(date(2))...
-    ,'-',num2str(date(3)),'.txt'),'Result','-ascii');
+    station,'/',WLP,'/',station,'_',WLP,'_',num2str(date(3)),'-',num2str(date(2))...
+    ,'-',num2str(date(1)),'.txt'),'Result','-ascii');
 else save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/aerosols/',...  
     station,'/',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),...
     '_',station,'_',WLP,'.txt'),'Result','-ascii');

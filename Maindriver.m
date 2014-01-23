@@ -1,5 +1,5 @@
 tic;
-measurement_number = 6;
+measurement_number = 7;
 station = 'Melbourne';
 year = '1994';
 sf = 0;
@@ -9,7 +9,7 @@ number_of_measurements = 11;
 L_Aerosol = 0;
 L_Ozone = 1;
 
-for i = 1:1;%number_of_measurements;
+for i = 1:20;%number_of_measurements;
     extra = extrasetup(measurement_number,station,year);
     if L_Ozone == 1
         Kflg = 1;
@@ -64,7 +64,7 @@ for i = 1:1;%number_of_measurements;
     [AK] = AveragingKernel(S,Sa,Se,extra,K,g);
     print_diagnostics(fig1,fig2,fig3,AK,station,extra,measurement_number,L_Ozone);
     
-    X2 = (y-yhat)*(Sdayy\(y-yhat)');
+    %X2 = (y-yhat)*(Sdayy\(y-yhat)');
  
     measurement_number = measurement_number+1;
     if i == 1;

@@ -1,4 +1,4 @@
-function [AK] = AveragingKernel(S,Sa,Se,extra,K,g)
+function [AK] = AveragingKernel(S,Sa,Se,extra,K,g,station,measurement_number)
 
 AK.AK = S*(K'/Se*K);
 %Area of the AK is a measure of the amount of information coming from the
@@ -21,6 +21,14 @@ AK.dof1=g*trace(AK.AK);
 %Information content - 3D reduction in the error covariance volumes - how
 %much information from measurements versus a priori
 %H;
+
+AK_to_print = AK.AK1;
+date = extra.atmos.date(measurement_number).date;
+WLP = extra.atmos.N_values(measurement_number).WLP;
+
+save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  
+    station,'/',WLP,'/AK/',station,'_',WLP,'_AK_',num2str(date(3)),'-',num2str(date(2))...
+    ,'-',num2str(date(1)),'.txt'),'AK_to_print','-ascii');
 
 %
 %Ss - smoothing error component from the a priori error smoothing error

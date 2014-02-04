@@ -141,7 +141,16 @@ atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) 
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
 
 %removing data that is that is taken at a SZA that is above 94 degrees.
-atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+
+%if atmos.initial_SZA
+for i = 1:sz_SZA(1);
+    lsza = find(atmos.initial_SZA(measurement_number).SZA(i,:) > 94);
+    atmos.N_values(measurement_number).N(:,min(lsza):max(lsza)) = [];
+    atmos.initial_SZA(measurement_number).SZA(:,min(lsza):max(lsza)) = [];
+end
+       
+
+    atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
 
 date_to_use = atmos.date(measurement_number).date(2);

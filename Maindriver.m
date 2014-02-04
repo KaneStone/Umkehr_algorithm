@@ -1,5 +1,5 @@
 tic;
-measurement_number = 7;
+measurement_number = 1;
 station = 'Melbourne';
 year = '1994';
 sf = 0;
@@ -9,7 +9,7 @@ number_of_measurements = 11;
 L_Aerosol = 0;
 L_Ozone = 1;
 
-for i = 1:20;%number_of_measurements;
+for i = 1:80;%number_of_measurements;
     extra = extrasetup(measurement_number,station,year);
     if L_Ozone == 1
         Kflg = 1;
@@ -61,7 +61,7 @@ for i = 1:20;%number_of_measurements;
     end
     
     g = Umkehr_layers(extra,xhat,station,measurement_number,L_Ozone,S);    
-    [AK] = AveragingKernel(S,Sa,Se,extra,K,g);
+    [AK] = AveragingKernel(S,Sa,Se,extra,K,g,station,measurement_number);
     print_diagnostics(fig1,fig2,fig3,AK,station,extra,measurement_number,L_Ozone);
     
     %X2 = (y-yhat)*(Sdayy\(y-yhat)');

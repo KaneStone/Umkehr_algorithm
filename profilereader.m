@@ -6,8 +6,7 @@ function [atmos date] = profilereader(measurementfilename,ozonefilename,temperat
 % - measurments
 % - ozone
 % - temperature and pressure
-% - aerosols
-% - solar spectrum
+% - aerosol
 
 %reading in R-values, N-values, Time and trueSZA
 fid = fopen(measurementfilename,'r');
@@ -140,7 +139,7 @@ end
 atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
 
-%removing data that is that is taken at a SZA that is above 94 degrees.
+%removing data that is taken at a SZA that is above 94 degrees.
 
 %if atmos.initial_SZA
 for i = 1:sz_SZA(1);

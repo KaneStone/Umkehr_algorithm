@@ -18,6 +18,7 @@ print(z,'-dpsc2','-r200',file,'-append');
 print(y,'-dpsc2','-r200',file,'-append');
 
 figure;
+set(gcf, 'Visible', 'off')
 fig3 = gcf;
 set(fig3,'color','white','Position',[100 100 1000 700]);
 plot(AK.AK',1:length(AK.AK),'LineWidth',2);
@@ -32,6 +33,7 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 print(fig3,'-dpsc2','-r200',file,'-append');
 
 figure;
+set(gcf, 'Visible', 'off')
 fig4 = gcf;
 set(fig4,'color','white','Position',[100 100 1000 700]);
 plot(AK.area',1:length(AK.AK),'LineWidth',2);
@@ -45,6 +47,7 @@ print(fig4,'-dpsc2','-r200',file,'-append');
 AK.resolution (AK.resolution > 100) = 100;
 
 figure;
+set(gcf, 'Visible', 'off')
 fig5 = gcf;
 set(fig5,'color','white','Position',[100 100 1000 700]);
 plot(AK.resolution',1:length(AK.AK),'LineWidth',2);
@@ -64,6 +67,7 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 print(fig5,'-dpsc2','-r200',file,'-append');
 
 figure;
+set(gcf, 'Visible', 'off')
 fig6 = gcf;
 set(fig6,'color','white','Position',[100 100 1000 700]);
 plot(AK.AK1(:,1:16)'/5,1:length(AK.AK1),'LineWidth',2);

@@ -1,5 +1,12 @@
 function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number)
  
+%This function calculates the zenith ray paths. The SZAs that are given in
+%the measurements are calculated from time, and are thus the true SZAs. To
+%calcualte the Zenith paths, Apparent SZAs are needed. Initial apparent 
+%SZAs are setup that confine the measurements. The initial SZAs are used 
+%to calculate initial true SZAs. Then through interpolation, actual 
+%apparent SZAs are calculated. 
+
 a = atmos.initial_SZA(measurement_number).SZA;
 %a (isnan(a)) = [];
 %Two lines below may cause problems
@@ -10,14 +17,6 @@ mn = floor(min(a(:)));
 
 Apparent = mn:1:mx; 
 al = length(Apparent);
-
-% mx = ceil(max(a(:,:),[],2));
-% mn = floor(min(a(:,:),[],2));
-% 
-% for k = 1:length(mn);
-%      Apparent(k).a = mn(k):1:mx(k); 
-%      al(k).a = length(Apparent);
-% end
 
 %predefining array sizes
 Apparent_Final = zeros(length(lambda), atmos.nlayers-1, length(a));
@@ -35,12 +34,10 @@ end
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        %gamma = (atmos.r/atmos.N(i,:))*(atmos.dndz(i,:));
         gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:));
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
-                %True.actual (isnan(True.actual)) = []; % This causes problems when SZA dimensions are inconsistent between wavelength pairs                
                 True_I = reshape(True.Initial(i,iscat,:),1,al);
                 True_I (True_I == 0) = [];
                 Apparent = interp1(squeeze(True_I)...
@@ -63,20 +60,13 @@ end
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
 
-% removes excess zenoth paths from SZAs that do not exist in cases where
-% wavelength pair vectors are uneven.
-% p_count = 1;
-% for p = 1:sz_a(1)
-%     zs(p_count:p_count+1,lth(p)+1:end,:,:) = 0;
-%     p_count = p_count+2;
-% end
-
 end
 
 function [True Apparent_Initial Apparent_Final zs atmos] = zenithpaths_tangent(atmos,i,j,True...
     ,Apparent_Initial,Apparent_Final,Apparent,iscat,gamma,zs,iteration)                    
+%Calculates zenith paths when theta is greater than 90
 
-Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j)); %(Meant to be 180-Apparent)
+Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j));
 atmos.ztan = interp1(atmos.Nr(i,:),atmos.r,Rg(iscat),'linear','extrap');
 tanlayer = ceil(((atmos.ztan-atmos.r(1))/atmos.dz));
 

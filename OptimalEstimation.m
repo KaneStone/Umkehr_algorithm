@@ -8,29 +8,21 @@ function [xhat,yhat,K,yhat1, K1, S, Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,e
 %OptimalEstimation function that solves the inversion of measurements given
 %their errors, an a priori and associated error using a forward model 
 %function that models the observations given the state vector. The formula 
-%as given by Rodgers 1990 Pg 85 the Newtonian iteration allows for also a 
-%non linear inversion:
-%xi+1=xi+(Sa-1+KiTSe-1K)-1[KiTSe-1(y-yhat)-Sa-1(xi-xa)] %Eqn 5.8 or
-%alternatively use equations 5.9 and 5.10
+%as given by Rodgers 1990 Pg 85 Eqn 5.8 or alternatively equations 5.9 and 
+%5.10 can be used
 
 %Outputs 
 %xhat - the retrieved state vector
 %yhat - here the modeled SCDs or DSCDs
 %K - the weighting functions
+%S - retrieval error covariance
+%Sdayy - some other covariance
 
 %Inputs
 %y - measurement vector - N values
 %Se - measurement error covariance matrix
 %xa - a priori vector - climatology
 %Sa - a priori covariance matrix
-
-%Sa is the covariance between the a priori and
-%Se is the covariance between the 
-
-%non iterativ maximum a posteriori solution for linear problems
-%Gy=Sa*(K/(K'*Sa*K+Se));
-%y_xa=K'*xa;
-%xhat=xa+Gy*(y-y_xa);
 
 %for different wavelength pair vector length functionality
 yhat = reshape(yhat',1,numel(yhat));
@@ -49,20 +41,19 @@ if strcmp(method,'Opt')
         y = reshape(y',1,numel(y));
         yhat = reshape(yhat',1,numel(yhat));
         yhat (isnan(yhat)) = [];
+        
         %5.8
         %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
+        
         %5.9 - N-form
         %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
+        
         %5.10 - M-form  
         xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
-        % testing for slow convergence
-        %Sdayy = Se*(K*Sa*K'+Se)\Se;
-        %S = (K'*(Se^-1)*K +Sa^-1)^-1;
-        %di2(i) = (yhat' - y')'/Sdayy*(yhat'-y');       
+        
+        %continue on with next iteration by calling forward model
         xi = xhat;
         xhat = xhat';
-        %for each iteration calculate yhat and Ki (turn on Kflg - the flag that 
-        %means calculate K)
         Kflg = 1;
         AeroKflg = 0;
         [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
@@ -70,25 +61,19 @@ if strcmp(method,'Opt')
         %yhat1(i).a = reshape(yhat',1,numel(yhat));
         yhat1(i).a = yhat;
         
-        %testing for convergence
+        %%%%--Diagnostic testing for slow covergence--%%%%
         %Sdayy = Se*(K*Sa*K'+Se)\Se;
-%         if i > 1;
-%             d2(i-1) = (yhat1(i).a - yhat1(i-1).a)/Sdayy*(yhat1(i).a-yhat1(i-1).a)';  
-%         end
-    
-    %Decide whether the solution has converged (we can discuss different ways
-    %of working this out - but not such a big issue as at least to start with
-    %your problem will be with a weak absorber and a linear problem...
+        %if i > 1;
+        %    d2(i-1) = (yhat1(i).a - yhat1(i-1).a)/Sdayy*(yhat1(i).a-yhat1(i-1).a)';  
+        %end
+        %%%%------------------------------------------%%%%
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution
         Gy=(Sa*K')/((K*Sa*K')+Se);
-        %Gy = Sa*(K/(K'*Sa*K+Se));
         y_xa=K*xa';
         xhat=xa'+Gy*(y'-y_xa);
         %xhat = abs(xhat);       
-        %Must recalculate the yhat with the new xhat
-        %yhat=K*Xhat;
         xi = xhat;
         xhat = xhat';
         Kflg=1;
@@ -99,7 +84,6 @@ elseif strcmp(method,'MAP')
         K = K(sz(3)+1:2*sz(3),:);
 elseif strcmp(method,'LS');
     xhat = ((K'*K)\K')*y';
-    %xhat = (K'/(K*K'))*y';
     Kflg=1;
     xhat = xhat';
     [yhat,K,N]=ForwardModel(xhat,Kflg,extra);
@@ -110,7 +94,6 @@ elseif strcmp(method,'LS');
 end
 S = (K'*(Se^-1)*K +Sa^-1)^-1;
 Sdayy = Se*((K*Sa*K'+Se)\Se);
-%S = Sa - Sa*K'*((Se+K*Sa*K')\(K*Sa));
 end
 
 

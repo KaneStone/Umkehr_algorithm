@@ -6,7 +6,7 @@ function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,norm_switch)
 g = .86;
 
 sz = size(zs);
-intensity = ones(length(lambda),sz(2),atmos.nlayers-1); %This might need to be the actual solar radiance outside atmosphere
+intensity = ones(length(lambda),sz(2),atmos.nlayers-1);
 intenstar = ones(length(lambda),sz(2),atmos.nlayers-1);
 rayphase = zeros(length(lambda),sz(2));
 atmos.Apparent (atmos.Apparent == 0) = NaN;

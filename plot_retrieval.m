@@ -3,6 +3,7 @@ function [fig1 fig2 fig3] = plot_retrieval(N,yhat,extra,xhat,Sa,S,measurement_nu
 
 addpath('/Users/stonek/work/Dobson/data_code');
 figure;
+set(gcf, 'Visible', 'off')
 fig1 = gcf;
 set(fig1,'color','white','Position',[100 100 1000 700]);
 herrorbar(xhat,1:extra.atmos.nlayers,(diag(S)).^.5,'r');
@@ -31,6 +32,7 @@ N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
 
 figure;
+set(gcf, 'Visible', 'off')
 fig2 = gcf;
 set(fig2,'color','white','Position',[100 100 1000 700]);
 plot(extra.atmos.true_actual',yhat','LineWidth',2);
@@ -59,6 +61,7 @@ end
 yhat2 = vertcat(N.zs,yhat1.a)';
 sz_yhat1 = size(yhat1);
 figure;
+set(gcf, 'Visible', 'off')
 fig3 = gcf;
 set(fig3,'color','white','Position',[100 100 1000 700]);
 %plot(repmat(extra.atmos.true_actual,sz_yhat1(2)/3+1,1)'

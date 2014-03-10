@@ -9,13 +9,13 @@ extra.refraction = 1;
 extra.normalise_to_LSZA =1;
 extra.WLP_to_retrieve = 'A'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
+extra.seasonal = 0; %monthly or seasonal ozone profiles
 
 %choose cross section study to use - BP,BDM or S
 study = 'BDM';
 
-%dobson wavelength pairs
+%dobson wavelength pairs - nm
 wl = struct('a',[305.5,325.4],'c',[311.4,332.4],'d',[317.6,339.8]);
-%wl = struct('a',[440,300],'c',[360,330],'d',[343,345]);
 bandpass = [1.4,3.2,1.4,3.2,1.4,3.2]; %3.2 from Petropavlovskikh
 
 %dobson SZA values
@@ -24,13 +24,10 @@ instralt = 0;
 
 %defining layer structure
 maxalt = 80000; 
-atmos.dz = (1000);
+atmos.dz = 1000;
 atmos.Z = 0:atmos.dz:maxalt;
 atmos.nlayers = length(atmos.Z);
 atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1:atmos.nlayers-1);
-
-%monthly or seasonal ozone profiles
-extra.seasonal = 0;
 
 %defining profile paths
 profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
@@ -57,16 +54,22 @@ end
 %defining wavelengths
 lambda = definelambda(wl,measurement_number,atmos);
 
+%reading in solar radiance profile
 atmos = read_solar(atmos,profilepath.solar,lambda);
+
 %calculates refractive index using pres and temp files.
 atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 
+%calculates direct paths
 %ds = Directpaths(atmos,lambda,instralt,theta);
+
+%calculates zenith paths
 [zs atmos] = Zenithpaths(atmos,lambda,measurement_number);
 
 %reading in cross sections
 xs = xsectreader(strcat(inputpath,'ozonexs/'));
 
+%interpolating cross sections to lambda
 if strcmp(study,'BP')
     temphold = interp1(xs.BPtemp,xs.BPsigma,atmos.T,'linear','extrap'); 
     ozonexs = interp1(xs.BPwl,temphold',lambda,'linear','extrap');    

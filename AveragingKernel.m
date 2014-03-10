@@ -27,10 +27,10 @@ date = extra.atmos.date(measurement_number).date;
 WLP = extra.atmos.N_values(measurement_number).WLP;
 
 save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  
-    station,'/',WLP,'/AK/',station,'_',WLP,'_AK_',num2str(date(3)),'-',num2str(date(2))...
-    ,'-',num2str(date(1)),'.txt'),'AK_to_print','-ascii');
+    station,'/',WLP,'/AK/',sprintf('%d',date(3)),'/',station,'_',WLP,'_',...
+    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+    sprintf('%02d',date(1)),'.txt'),'AK_to_print','-ascii');
 
-%
 %Ss - smoothing error component from the a priori error smoothing error
 %Sn - noise  error component of the measurements in your retrievals
 %Shat - both

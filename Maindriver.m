@@ -1,9 +1,9 @@
 tic;
 
 %inputs for files to retrieve
-measurement_number = 2;
+measurement_number = 46;
 station = 'Melbourne';
-year = '1994';
+year = '1971';
 
 %for covariance matrix diagnostics
 scale_factor = 0;

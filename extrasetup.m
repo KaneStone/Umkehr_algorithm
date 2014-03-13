@@ -7,12 +7,12 @@ extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
 extra.normalise_to_LSZA =1;
-extra.WLP_to_retrieve = 'A'; %all permutations possible.
+extra.WLP_to_retrieve = 'C'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 extra.seasonal = 0; %monthly or seasonal ozone profiles
 
 %choose cross section study to use - BP,BDM or S
-study = 'BDM';
+study = 'BP';
 
 %dobson wavelength pairs - nm
 wl = struct('a',[305.5,325.4],'c',[311.4,332.4],'d',[317.6,339.8]);

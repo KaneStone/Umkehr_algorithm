@@ -6,27 +6,31 @@ function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,norm_switch)
 g = .86;
 
 sz = size(zs);
-intensity = ones(length(lambda),sz(2),atmos.nlayers-1);
-intenstar = ones(length(lambda),sz(2),atmos.nlayers-1);
+intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
+intenstar = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 rayphase = zeros(length(lambda),sz(2));
 atmos.Apparent (atmos.Apparent == 0) = NaN;
 
 for j = 1:length(lambda);
     for iscat = 1:atmos.nlayers-1;
         rayphase = reshape(3./(4.*(1+2.*atmos.pgamma(j))).*...
-        ((1+3.*atmos.pgamma(j))+(1-atmos.pgamma(j)).*((cosd(atmos.Apparent(j,iscat,:))).^2)),1,sz(2));
+        ((1+3.*atmos.pgamma(j))+(1-atmos.pgamma(j)).*...
+        ((cosd(atmos.Apparent(j,iscat,:))).^2)),1,sz(2));
     
-        miephase = reshape((1-g^2)./((1+g^2-2.*g.*cosd(atmos.Apparent(j,iscat,:))).^(3/2)),1,sz(2)); 
+        miephase = reshape((1-g^2)./((1+g^2-2.*g.*...
+            cosd(atmos.Apparent(j,iscat,:))).^(3/2)),1,sz(2)); 
         
         if mieswitch
         intensity(j,:,iscat) = (intensity(j,:,iscat).*...
-            ((atmos.bRay(j,iscat).*rayphase)+(atmos.bMie(j,iscat).*miephase)))./(4.*pi);   
+            ((atmos.bRay(j,iscat).*rayphase)+...
+            (atmos.bMie(j,iscat).*miephase)))./(4.*pi).*atmos.Z(iscat+1);   
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
-            ((atmos.bRay(j,iscat).*rayphase)+(atmos.bMie(j,iscat).*miephase)))./(4.*pi);    
+            ((atmos.bRay(j,iscat).*rayphase)+...
+            (atmos.bMie(j,iscat).*miephase)))./(4.*pi).*atmos.Z(iscat+1);    
         
         else intensity(j,:,iscat) = (intensity(j,:,iscat).*...
-            (atmos.bRay(j,iscat).*rayphase))./(4.*pi); %maybe put in .*solar_at_lambda here
+            (atmos.bRay(j,iscat).*rayphase))./(4.*pi);
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase))./(4.*pi);   
@@ -34,19 +38,17 @@ for j = 1:length(lambda);
         end   
         
         for i = 1:atmos.nlayers-1;
-            %majority of time is spent here!!! Try to think of a better
-            %more streamlined way of doing this!!!
-            if mieswitch
-            intensity(j,:,iscat) = intensity(j,:,iscat).*...
-                exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
-                zs(j,:,iscat,i).*100);            
+            if mieswitch            
+                intensity(j,:,iscat) = intensity(j,:,iscat).*...
+                exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)+...
+                ozonexs(j,i).*atmos.ozonemid(i)).*zs(j,:,iscat,i).*100);            
             
-            intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
-                exp(-1.*(atmos.bRay(j,i)+atmos.bMie(j,i)).*zs(j,:,iscat,i).*100);    
+            intenstar(j,:,iscat) = intenstar(j,:,iscat).*exp(-1.*...
+                (atmos.bRay(j,i)+atmos.bMie(j,i)).*zs(j,:,iscat,i).*100);    
             
             else intensity(j,:,iscat) = intensity(j,:,iscat).*...
-                exp(-1.*(atmos.bRay(j,i)+ozonexs(j,i).*atmos.ozonemid(i)).*...
-                zs(j,:,iscat,i).*100);            
+                exp(-1.*(atmos.bRay(j,i)+ozonexs(j,i).*...
+                atmos.ozonemid(i)).*zs(j,:,iscat,i).*100);            
             
             intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
                 exp(-1.*atmos.bRay(j,i).*zs(j,:,iscat,i).*100);      
@@ -95,23 +97,21 @@ for j = 1:length(lambda);
     find_nan = find(~isnan(atmos.true_actual(ceil(j/2),:)));
     sz_ind = length(find_nan);
     for k = 1:sz_ind
-        ratio(j,k)=sum(intensity(j,:,k)/intenstar(j,:,k));
+        ratio(j,k)=sum(intensity(j,:,k).*intenstar(j,:,k))...
+            ./sum(intenstar(j,:,k));
     end
 end
-
-%For extraterrestrial solar flux
-% for l = 1:length(lambda);
-%     atmos.solar(l) = interp1(atmos.solar(:,1),lambda,atmos.solar(:,2),'linear','extrap');
-% end
 
 N=zeros(length(lambda)/2,sz(2));
 wn = 1;
 for k = 1:length(lambda)/2;
-    ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),lambda(wn:wn+1),'linear','extrap');
-    ETSF_ratio = ETSF(2)/ETSF(1);    
-    %ETSF_ratio = 1;
+    ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),...
+        lambda(wn:wn+1),'linear','extrap');
+    %ETSF_ratio = ETSF(2)/ETSF(1);    
+    ETSF_ratio = 1;
         N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
-    %N(k,:) = 100*(log10(ratio(wn+1,:)./ratio(wn,:))-log10(ratio(wn+1,1)./ratio(wn,1)));
+    %N(k,:) = 100*(log10(ratio(wn+1,:)./ratio(wn,:))...
+    %-log10(ratio(wn+1,1)./ratio(wn,1)));
     wn = wn+2;
 end
 

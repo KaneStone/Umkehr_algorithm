@@ -1,4 +1,4 @@
-function [g] = Umkehr_layers(extra,xhat,station,measurement_number,L_ozone,S)
+function [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_ozone,S)
 
 %Irina's layering system.
 %This could get quite complicated
@@ -8,10 +8,20 @@ DU_coeff = 1e5*1.38e-21*1e3*(273.1/10.13);
 
 layers = 5;
 
-g(1,1:length(extra.atmos.Zmid)) = horzcat(ones(1,layers),zeros(1,length(extra.atmos.Zmid)-layers));
+g(1,1:length(extra.atmos.Zmid)) = horzcat(ones(1,layers),...
+    zeros(1,length(extra.atmos.Zmid)-layers));
 for k = 1:length(extra.atmos.Zmid)/layers-1;
     g(k+1,:) = circshift(g(1,:),[0 layers*(k)]);
 end
+g1 = zeros(8,80);
+g1(1,1:10) = 1;
+g1(2,11:20) = 1;
+g1(3,21:25) = 1;
+g1(4,26:30) = 1;
+g1(5,31:35) = 1;
+g1(6,36:40) = 1;
+g1(7,41:45) = 1;
+g1(8,45:end) = 1;
 
 Scol = g*S(1:end-1,1:end-1)*g';
 Scolerrors = diag((Scol).^.5);

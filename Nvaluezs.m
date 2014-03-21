@@ -23,17 +23,17 @@ for j = 1:length(lambda);
         if mieswitch
         intensity(j,:,iscat) = (intensity(j,:,iscat).*...
             ((atmos.bRay(j,iscat).*rayphase)+...
-            (atmos.bMie(j,iscat).*miephase)))./(4.*pi).*atmos.Z(iscat+1);   
+            ((atmos.bMie(j,iscat).*miephase)))./(4.*pi)).*atmos.Z(iscat+1);   
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
             ((atmos.bRay(j,iscat).*rayphase)+...
-            (atmos.bMie(j,iscat).*miephase)))./(4.*pi).*atmos.Z(iscat+1);    
+            ((atmos.bMie(j,iscat).*miephase)))./(4.*pi)).*atmos.Z(iscat+1);    
         
         else intensity(j,:,iscat) = (intensity(j,:,iscat).*...
-            (atmos.bRay(j,iscat).*rayphase))./(4.*pi);
+            (atmos.bRay(j,iscat).*rayphase))./(4.*pi).*atmos.Z(iscat+1);
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
-            (atmos.bRay(j,iscat).*rayphase))./(4.*pi);   
+            (atmos.bRay(j,iscat).*rayphase))./(4.*pi).*atmos.Z(iscat+1);   
         
         end   
         

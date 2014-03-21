@@ -86,4 +86,25 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 
 print(fig6,'-dpsc2','-r200',file,'-append');
 
+figure;
+set(gcf, 'Visible', 'off')
+fig7 = gcf;
+set(fig6,'color','white','Position',[100 100 1000 700]);
+plot(AK.AK2(:,1:8)',1:length(AK.AK2),'LineWidth',2);
+hold on
+%plot(extra.atmos.true_actual',N_val','LineWidth',2);
+% annotation('textbox',[.6 .25 .25 .1],...
+%     'String',{['Degrees of freedom = ' num2str(AK.dof1)]},...
+%     'fontsize',12,...
+%     'EdgeColor','white')
+xlim([-.2 .9]);
+ylabel('Layer No.','fontsize',20);
+xlabel('AK','fontsize',20);
+set(gca,'fontsize',18);
+set(gca,'yticklabel',{'0+1','2+3','4','5','6','7','8','9+'});
+title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+    ,'{ }','Averaging Kernel'),'fontsize',24);
+
+print(fig7,'-dpsc2','-r200',file,'-append');
+
 end

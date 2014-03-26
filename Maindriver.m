@@ -3,7 +3,7 @@ tic;
 %inputs for files to retrieve
 measurement_number = 1;
 station = 'Melbourne';
-year = '1970';
+year = '1994';
 
 %for covariance matrix diagnostics
 scale_factor = 0;
@@ -15,6 +15,10 @@ L_Ozone = 1;
 
 for i = 1:100;
     extra = extrasetup(measurement_number,station,year);
+    if extra.no_data
+        measurement_number = measurement_number+1;
+        continue
+    end
     if L_Ozone == 1
         Kflg = 1;
         AeroKflg = 0;

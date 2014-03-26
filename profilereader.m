@@ -114,9 +114,11 @@ elseif strfind(existing_WLP,'D');
 end
 
 if isempty(atmos.N_values(measurement_number).WLP);
-    error(strcat('No measurements for the wavelengths specified exist for date:',...
+    display(strcat('No measurements for the wavelengths specified exist for date:',...
     num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-    ,'-',num2str(atmos.date(measurement_number).date(3)),'. wavelength pairs that exist are-',A,C,D));
+    ,'-',num2str(atmos.date(measurement_number).date(3)),'.'))
+display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
+return
 end
 
 for k = 1:No_WLP
@@ -171,7 +173,7 @@ end
 if seasonal
     prof = fscanf(fid,'%f',[5,inf])';
     atmos.ozone = interp1(prof(:,1),prof(:,quarter),atmos.Z,'linear','extrap');
-    atmos.ozone (atmos.ozone < 1e8) = 1e8;
+    atmos.ozone (atmos.ozone < 1e8) = 1e8;    
     atmos.ozonemid = interp1(prof(:,1),prof(:,quarter),atmos.Zmid,'linear','extrap');
     atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
     fclose (fid);
@@ -179,6 +181,7 @@ else
     prof = fscanf(fid,'%f',[13,inf])';
     atmos.ozone = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Z,'linear','extrap');
     atmos.ozone (atmos.ozone < 1e8) = 1e8;
+    %atmos.ozone = -(atmos.ozone*30/100)+atmos.ozone; %A prioir testing
     atmos.ozonemid = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Zmid,'linear','extrap');
     atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
     fclose (fid);
@@ -201,8 +204,10 @@ end
 %Reading in pressure
 fid = fopen(pressurefilename);
 pressure = fscanf(fid,'%f',[5,inf])';
-atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
-atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+%atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
+%atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+atmos.P = interp1(pressure(:,1),pressure(:,quarter),atmos.Z,'linear','extrap');
+atmos.Pmid = interp1(pressure(:,1),pressure(:,quarter),atmos.Zmid,'linear','extrap');
 fclose (fid);
 
 %Reading in aerosols

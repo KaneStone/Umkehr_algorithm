@@ -46,10 +46,38 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
     profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,measurement_number,...
     extra.WLP_to_retrieve,extra.morn_or_even,extra.seasonal);
-
+if isempty(atmos.N_values(measurement_number).WLP)
+    extra.no_data = 1;
+    return
+end
 if extra.normalise_to_LSZA
     atmos = normalising_measurements(atmos);
 end
+
+%TESTING WHETHER PRESSURE AND TEMPERATURE PROFILES ARE CAUSING ERRORS.
+%IRINAS
+%Testing Temperature and Pressure
+%Press_temp = importdata(strcat(inputpath,'phprofil.dat'));
+%atmos.P = Press_temp(1:81)';
+%atmos.Pmid = interp1(1000:1000:81000,atmos.P,atmos.Zmid,'linear','extrap');
+
+%Temp_temp = importdata(strcat(inputpath,'temprofil.dat'));
+%atmos.T = interp1(Temp_temp(:,1)*1000,Temp_temp(:,2),atmos.Z,'linear','extrap');
+%atmos.Tmid = interp1(1000:1000:81000,atmos.T,atmos.Zmid,'linear','extrap');
+
+%ROBYNS
+%temp = importdata(strcat(inputpath,'not_used/','TP23_9Ant.dat'));
+%atmos.P = interp1(temp(:,1),temp(:,3),atmos.Z,'linear','extrap');
+%atmos.Pmid = interp1(temp(:,1),temp(:,3),atmos.Zmid,'linear','extrap');
+%atmos.T = interp1(temp(:,1),temp(:,2),atmos.Z,'linear','extrap');
+%atmos.Tmid = interp1(temp(:,1),temp(:,2),atmos.Zmid,'linear','extrap');
+
+%CONSTANSTS
+%atmos.T(:) = 270;
+%atmos.Tmid(:) = 270;
+%atmos.P = 1000;
+%atmos.Pmid = 1000;
+%---------------------------------------------------------------------
 
 %defining wavelengths
 lambda = definelambda(wl,measurement_number,atmos);
@@ -90,5 +118,6 @@ extra.zs = zs;
 extra.theta = theta;
 extra.ozonexs = ozonexs;
 extra.bandpass = bandpass;
+extra.no_data = 0;
 
 end

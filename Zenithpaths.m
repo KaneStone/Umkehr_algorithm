@@ -34,14 +34,15 @@ end
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:));
+        gamma = -(atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:));
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
                 True_I = reshape(True.Initial(i,iscat,:),1,al);
                 True_I (True_I == 0) = [];
                 Apparent = interp1(squeeze(True_I)...
-                    ,squeeze(Apparent_Initial(i,iscat,1:length(True_I))),True.actual(cwlp,:),'linear','extrap');
+                    ,squeeze(Apparent_Initial(i,iscat,1:length(True_I)))...
+                    ,True.actual(cwlp,:),'linear','extrap');
             end        
             for j = 1:length(Apparent) 
                 if Apparent(j) > 90                 
@@ -59,11 +60,14 @@ end
 
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
+%figure;
+%plot(squeeze(zs(1,1,1,:)))
 
 end
 
-function [True Apparent_Initial Apparent_Final zs atmos] = zenithpaths_tangent(atmos,i,j,True...
-    ,Apparent_Initial,Apparent_Final,Apparent,iscat,gamma,zs,iteration)                    
+function [True Apparent_Initial Apparent_Final zs atmos] = ...
+    zenithpaths_tangent(atmos,i,j,True,Apparent_Initial,Apparent_Final,...
+    Apparent,iscat,gamma,zs,iteration)                    
 %Calculates zenith paths when theta is greater than 90
 
 Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j));
@@ -85,12 +89,16 @@ for l = iscat-1:-1:tanlayer+1;
     x1 = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*a^2-Rg(iscat)^2));
     x2 = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*b^2-Rg(iscat)^2));
     dx = abs(x2-x1);
-    phi1 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(a^2)-(gamma(l+1)*(Rg(iscat)^2)));
-    phi2 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(b^2)-(gamma(l)*(Rg(iscat)^2)));  
+    phi1 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(a^2)-...
+        (gamma(l+1)*(Rg(iscat)^2)));
+    phi2 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(b^2)-(gamma(l)*...
+        (Rg(iscat)^2)));  
     
     if iteration == 2
-        ds1 = ((atmos.N(i,l+1)^2)*(a^2))/((atmos.N(i,l+1)^2)*(a^2)-(gamma(l+1)*(Rg(iscat)^2)));
-        ds2 = ((atmos.N(i,l)^2)*(b^2))/((atmos.N(i,l)^2)*(b^2)-(gamma(l)*(Rg(iscat)^2)));
+        ds1 = ((atmos.N(i,l+1)^2)*(a^2))/((atmos.N(i,l+1)^2)*(a^2)-...
+            (gamma(l+1)*(Rg(iscat)^2)));
+        ds2 = ((atmos.N(i,l)^2)*(b^2))/((atmos.N(i,l)^2)*(b^2)-(gamma(l)*...
+            (Rg(iscat)^2)));
         zs(i,j,iscat,l) = atmos.dz+dx*(ds1+ds2);
     end
         phi(l) = (dx*((phi1+phi2)/2))*(180/pi)*2;                         
@@ -103,14 +111,18 @@ b = atmos.ztan;
 x1 = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*a^2-Rg(iscat)^2));
 x2 = 0;
 dx = abs(x2-x1);
-phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*(Rg(iscat)^2)));
-phi2 = (Rg(iscat)^2/atmos.ztan)/((Rg(iscat)^2/atmos.ztan^2)*(b^2)-(gamma(1)*(Rg(iscat)^2)));     
+phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+    (Rg(iscat)^2)));
+phi2 = (Rg(iscat)^2/atmos.ztan)/((Rg(iscat)^2/atmos.ztan^2)*(b^2)-...
+    (gamma(1)*(Rg(iscat)^2)));     
 phi(l) = (dx*((phi1+phi2)/2))*(180/pi)*2;  
 
 if iteration == 2
     gtan = interp1(atmos.r,gamma,atmos.ztan,'linear','extrap');
-    ds1 = ((atmos.N(i,l+1)^2)*(a^2))/((atmos.N(i,l+1)^2)*(a^2)-(gamma(l+1)*Rg(iscat)^2));
-    ds2 = (((Rg(iscat)/atmos.ztan)^2)*(b^2))/(((Rg(iscat)/atmos.ztan)^2)*(b^2)-(gtan*Rg(iscat)^2));
+    ds1 = ((atmos.N(i,l+1)^2)*(a^2))/((atmos.N(i,l+1)^2)*(a^2)-(gamma(l+1)*...
+        Rg(iscat)^2));
+    ds2 = (((Rg(iscat)/atmos.ztan)^2)*(b^2))/(((Rg(iscat)/atmos.ztan)^2)*...
+        (b^2)-(gtan*Rg(iscat)^2));
     zs(i,j,iscat,l) = atmos.dz+dx*(ds1+ds2);
 end
 
@@ -121,12 +133,16 @@ for l = iscat:atmos.nlayers-1;
     x1 = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2));
     x2 = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2));
     dx = abs(x2-x1);
-    phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*(Rg(iscat)^2)));
-    phi2 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)*(Rg(iscat)^2)));           
+    phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+        (Rg(iscat)^2)));
+    phi2 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)...
+        *(Rg(iscat)^2)));           
     
     if iteration == 2
-        ds1 = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*(Rg(iscat)^2)));
-        ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)*(Rg(iscat)^2)));
+        ds1 = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+            (Rg(iscat)^2)));
+        ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)...
+            *(Rg(iscat)^2)));
         zs(i,j,iscat,l) = dx*(ds1+ds2)/2;
     end    
     phi(l) = (dx*((phi1+phi2)/2))*(180/pi);                               
@@ -142,9 +158,9 @@ else
 end
 end            
 
-
-function [True Apparent_Initial Apparent_Final zs] = zenithpaths_down(atmos,i,j,True,...
-    Apparent_Initial,Apparent_Final,Apparent,iscat,gamma,zs,iteration)
+function [True Apparent_Initial Apparent_Final zs] = ...
+    zenithpaths_down(atmos,i,j,True,Apparent_Initial,Apparent_Final,...
+    Apparent,iscat,gamma,zs,iteration)
 %Calculates down through the atmosphere for cases where theta is less than 90         
     
 Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j)); 
@@ -153,14 +169,25 @@ for l = iscat:atmos.nlayers-1;
     a = atmos.r(l);
     b = a+atmos.dz;
     x1 = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2));
+    x1_test(l) = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2)); %for testing
     x2 = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2));
+    x2_test(l) = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2)); %for testing
     dx = abs(x2-x1);
-    phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*(Rg(iscat)^2)));
-    phi2 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)*(Rg(iscat)^2)));  
+    dx1(l) = abs(x2-x1); %for testing
+    phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+        (Rg(iscat)^2)));
+    phi2 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(b^2)-...
+        (gamma(l+1)*(Rg(iscat)^2)));  
     
     if iteration == 2
-        ds1 = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*(Rg(iscat)^2)));
-        ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-(gamma(l+1)*(Rg(iscat)^2)));
+        ds1 = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+            (Rg(iscat)^2)));
+        ds1_test(l) = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+            (Rg(iscat)^2)));
+        ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
+            (gamma(l+1)*(Rg(iscat)^2)));
+        ds2_test(l) = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
+            (gamma(l+1)*(Rg(iscat)^2)));
         zs(i,j,iscat,l) = dx*(ds1+ds2)/2;
     end
     

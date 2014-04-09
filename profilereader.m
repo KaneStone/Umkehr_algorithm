@@ -1,4 +1,4 @@
-function [atmos date] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
+function [atmos] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
     pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,WLP,morn_or_even,seasonal)
 
 %reads in measurements and atmospheric profiles.
@@ -7,7 +7,7 @@ function [atmos date] = profilereader(measurementfilename,ozonefilename,temperat
 % - ozone
 % - temperature and pressure
 % - aerosol
-
+atmos.next_year = 0;
 %reading in R-values, N-values, Time and trueSZA
 fid = fopen(measurementfilename,'r');
 for i = 1:6;
@@ -98,6 +98,11 @@ for j = 1:12;
     end
 end
 
+if measurement_number > length(atmos.date)
+    atmos.next_year = 1;
+    return
+end
+
 disp(strcat({'Current date being retrieved: '},num2str(atmos.date(measurement_number).date(1))...
     ,'-',num2str(atmos.date(measurement_number).date(2))...
     ,'-',num2str(atmos.date(measurement_number).date(3))));
@@ -151,7 +156,7 @@ for i = 1:sz_SZA(1);
 end
        
 
-    atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
 
 date_to_use = atmos.date(measurement_number).date(2);
@@ -204,10 +209,10 @@ end
 %Reading in pressure
 fid = fopen(pressurefilename);
 pressure = fscanf(fid,'%f',[5,inf])';
-%atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
-%atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
-atmos.P = interp1(pressure(:,1),pressure(:,quarter),atmos.Z,'linear','extrap');
-atmos.Pmid = interp1(pressure(:,1),pressure(:,quarter),atmos.Zmid,'linear','extrap');
+atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
+atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+%atmos.P = interp1(pressure(:,1),pressure(:,quarter),atmos.Z,'linear','extrap');
+%atmos.Pmid = interp1(pressure(:,1),pressure(:,quarter),atmos.Zmid,'linear','extrap');
 fclose (fid);
 
 %Reading in aerosols

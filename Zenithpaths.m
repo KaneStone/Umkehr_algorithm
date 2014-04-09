@@ -1,4 +1,4 @@
-function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number)
+function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,designated_SZA)
  
 %This function calculates the zenith ray paths. The SZAs that are given in
 %the measurements are calculated from time, and are thus the true SZAs. To
@@ -7,7 +7,10 @@ function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number)
 %to calculate initial true SZAs. Then through interpolation, actual 
 %apparent SZAs are calculated. 
 
-a = atmos.initial_SZA(measurement_number).SZA;
+if designated_SZA
+    a = theta;
+else a = atmos.initial_SZA(measurement_number).SZA;
+end
 %a (isnan(a)) = [];
 %Two lines below may cause problems
 
@@ -34,7 +37,7 @@ end
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma = -(atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:));
+        gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:)); %defined as negative
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
@@ -164,6 +167,7 @@ function [True Apparent_Initial Apparent_Final zs] = ...
 %Calculates down through the atmosphere for cases where theta is less than 90         
     
 Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j)); 
+%Rg(iscat) = atmos.N(i,iscat)*atmos.r(iscat)*sind(Apparent(j));
 %layers above the scattering height which are the slant paths  
 for l = iscat:atmos.nlayers-1; 
     a = atmos.r(l);
@@ -185,9 +189,13 @@ for l = iscat:atmos.nlayers-1;
         ds1_test(l) = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
             (Rg(iscat)^2)));
         ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
-            (gamma(l+1)*(Rg(iscat)^2)));
+            (gamma(l+1)*(Rg(iscat)^2)));        
         ds2_test(l) = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
             (gamma(l+1)*(Rg(iscat)^2)));
+        
+        ds1_temp(l) = 1/(1+(gamma(l).*(sind(Apparent(j).^2))));
+        ds2_temp(l) = 1/(1+(gamma(l+1).*(sind(Apparent(j).^2))));
+        
         zs(i,j,iscat,l) = dx*(ds1+ds2)/2;
     end
     

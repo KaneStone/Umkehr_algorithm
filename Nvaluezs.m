@@ -1,7 +1,8 @@
-function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,norm_switch)
+function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,...
+    designated_SZA,theta,norm_switch)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
-
+   
 %g is the assymetry factor and = .86 for assumed radius of 6 micrometers
 g = .86;
 

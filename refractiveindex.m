@@ -34,13 +34,26 @@ atmos.Ns = Ns;
 % refraction (atmos.Nr)
 if (refraction)
     atmos.N = 1+(Ns*((Ts./atmos.T.*(atmos.P./Ps))));
+    %atmos.N = 1+(Ns*((atmos.T(1)./atmos.T.*(atmos.P./atmos.P(1)))));
+    %atmos.N(1,:) = .0029*exp(-(0:80)/5)+1;
+    %atmos.N(2,:) = .0029*exp(-(0:80)/5)+1;
     atmos.H = Rd./g0.*atmos.T(1,:);
-    atmos.dndz = Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H);    
+    atmos.dndz = (Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H));    
+    %atmos.dndz = vertcat(horzcat(abs(diff(atmos.N(1,:))),0)./atmos.H,horzcat(abs(diff(atmos.N(2,:))),0)./atmos.H);
+     %for i = 1:atmos.nlayers-1
+     %    atmos.dndz(:,i) = ((1+(Ns*(Ts./atmos.T(i).*(atmos.P(i)./Ps))))-...
+     %        (1+(Ns*(Ts./atmos.T(i+1).*(atmos.P(i+1)./Ps)))))./atmos.dz;
+     %end
+    %atmos.dndz(:,end+1) = atmos.dndz(:,end);
     for i = 1:length(lambda);
+        %atmos.dndr(i,:) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
+        %    (atmos.r(2:end)-atmos.r(1:end-1));
         atmos.dndr(i,:) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
-            (atmos.r(2:end)-atmos.r(1:end-1));
+            (atmos.r(2:end)-atmos.r(1:end-1));        
         atmos.Nr(i,:) = atmos.N(i,:).*atmos.r;
     end                
+     %atmos.dndr(:,end+1) = atmos.dndr(:,end);
+     %atmos.dndr = fliplr(atmos.dndr);
 else
     atmos.N = ones(length(lambda),length(atmos.Z));
     atmos.H = Rd/g0*atmos.T;

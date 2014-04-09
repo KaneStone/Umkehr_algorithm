@@ -7,9 +7,10 @@ extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
 extra.normalise_to_LSZA =1;
-extra.WLP_to_retrieve = 'C'; %all permutations possible.
+extra.WLP_to_retrieve = 'ACD'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 extra.seasonal = 0; %monthly or seasonal ozone profiles
+extra.designated_SZA = 0;
 
 %choose cross section study to use - BP,BDM or S
 study = 'BP';
@@ -48,10 +49,16 @@ atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Tem
     extra.WLP_to_retrieve,extra.morn_or_even,extra.seasonal);
 if isempty(atmos.N_values(measurement_number).WLP)
     extra.no_data = 1;
+    extra.next_year = 0;
     return
 end
+if atmos.next_year
+    extra.next_year = atmos.next_year;
+    return
+else extra.next_year = 0;
+end
 if extra.normalise_to_LSZA
-    atmos = normalising_measurements(atmos);
+    atmos = normalising_measurements(atmos,extra.designated_SZA,theta,measurement_number);
 end
 
 %TESTING WHETHER PRESSURE AND TEMPERATURE PROFILES ARE CAUSING ERRORS.
@@ -59,7 +66,7 @@ end
 %Testing Temperature and Pressure
 %Press_temp = importdata(strcat(inputpath,'phprofil.dat'));
 %atmos.P = Press_temp(1:81)';
-%atmos.Pmid = interp1(1000:1000:81000,atmos.P,atmos.Zmid,'linear','extrap');
+%atmos.Pmid = exp(interp1(0:1000:80000,log(atmos.P),atmos.Zmid,'linear','extrap'));
 
 %Temp_temp = importdata(strcat(inputpath,'temprofil.dat'));
 %atmos.T = interp1(Temp_temp(:,1)*1000,Temp_temp(:,2),atmos.Z,'linear','extrap');
@@ -77,6 +84,10 @@ end
 %atmos.Tmid(:) = 270;
 %atmos.P = 1000;
 %atmos.Pmid = 1000;
+
+%Pres_EQUATION
+%atmos.P = 1013.5*exp(-(0:80)/7.5);
+%atmos.Pmid = 1013.5*exp(-(.5:79.5)/7.5);
 %---------------------------------------------------------------------
 
 %defining wavelengths
@@ -92,7 +103,7 @@ atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 %ds = Directpaths(atmos,lambda,instralt,theta);
 
 %calculates zenith paths
-[zs atmos] = Zenithpaths(atmos,lambda,measurement_number);
+[zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,extra.designated_SZA);
 
 %reading in cross sections
 xs = xsectreader(strcat(inputpath,'ozonexs/'));

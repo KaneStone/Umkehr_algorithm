@@ -1,5 +1,6 @@
 function [atmos] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
-    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,WLP,morn_or_even,seasonal)
+    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,...
+    WLP,morn_or_even,seasonal)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -175,14 +176,14 @@ elseif date_to_use == 9 || date_to_use == 10 || date_to_use == 11
     quarter = 5;
 end
 
-if seasonal
+if strcmp(seasonal,'seasonal')
     prof = fscanf(fid,'%f',[5,inf])';
     atmos.ozone = interp1(prof(:,1),prof(:,quarter),atmos.Z,'linear','extrap');
     atmos.ozone (atmos.ozone < 1e8) = 1e8;    
     atmos.ozonemid = interp1(prof(:,1),prof(:,quarter),atmos.Zmid,'linear','extrap');
     atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
     fclose (fid);
-else
+elseif strcmp(seasonal,'monthly');
     prof = fscanf(fid,'%f',[13,inf])';
     atmos.ozone = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Z,'linear','extrap');
     atmos.ozone (atmos.ozone < 1e8) = 1e8;
@@ -190,19 +191,31 @@ else
     atmos.ozonemid = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Zmid,'linear','extrap');
     atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
     fclose (fid);
+else prof = fscanf(fid,'%f',[5,inf])';
+    atmos.ozone = interp1(prof(:,1),prof(:,2),atmos.Z,'linear','extrap');
+    atmos.ozone (atmos.ozone < 1e8) = 1e8;
+    %atmos.ozone = -(atmos.ozone*30/100)+atmos.ozone; %A prioir testing
+    atmos.ozonemid = interp1(prof(:,1),prof(:,2),atmos.Zmid,'linear','extrap');
+    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
+    fclose (fid);
+
 end
 
 %Reading in temperature.
     fid = fopen(temperaturefilename);
-if seasonal
+if strcmp(seasonal,'seasonal')
     temperature = fscanf(fid,'%f',[5,inf])';
     atmos.T = interp1(temperature(:,1),temperature(:,quarter),atmos.Z,'linear','extrap');
     atmos.Tmid = interp1(temperature(:,1),temperature(:,quarter),atmos.Zmid,'linear','extrap');
     fclose(fid);
-else
+elseif strcmp(seasonal,'monthly')
     temperature = fscanf(fid,'%f',[13,inf])';
     atmos.T = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Z,'linear','extrap');
     atmos.Tmid = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Zmid,'linear','extrap');
+    fclose(fid);
+else temperature = fscanf(fid,'%f',[5,inf])';
+    atmos.T = interp1(temperature(:,1),temperature(:,2),atmos.Z,'linear','extrap');
+    atmos.Tmid = interp1(temperature(:,1),temperature(:,2),atmos.Zmid,'linear','extrap');
     fclose(fid);
 end
 

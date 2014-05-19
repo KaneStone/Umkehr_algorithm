@@ -1,9 +1,9 @@
 tic;
 
 %inputs for files to retrieve
-measurement_number = 1;
+measurement_number = 3;
 station = 'Melbourne';
-year = '1988';
+year = '1994';
 
 %for covariance matrix diagnostics
 scale_factor = 0;
@@ -13,7 +13,7 @@ L_curve_diag = 0;
 L_Aerosol = 0;
 L_Ozone = 1;
 
-for i = 1:100;
+for i = 1:1;
     extra = extrasetup(measurement_number,station,year);
     if extra.next_year
         year = year+1;
@@ -67,8 +67,8 @@ for i = 1:100;
         RMS(i) = createRMS(y,yhat);
     end
     
-    [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_Ozone,S);    
-    [AK] = AveragingKernel(S,Sa,Se,extra,K,g,g1,station,measurement_number);
+    [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_Ozone,S,extra.seasonal);    
+    [AK] = AveragingKernel(S,Sa,Se,extra,K,g,g1,station,measurement_number,extra.seasonal);
     print_diagnostics(fig1,fig2,fig3,AK,station,extra,...
         measurement_number,L_Ozone);
     measurement_number = measurement_number+1;

@@ -1,4 +1,4 @@
-function [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_ozone,S)
+function [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_ozone,S,seasonal)
 
 %Irina's layering system.
 %This could get quite complicated
@@ -21,7 +21,7 @@ g1(4,26:30) = 1;
 g1(5,31:35) = 1;
 g1(6,36:40) = 1;
 g1(7,41:45) = 1;
-g1(8,45:end) = 1;
+g1(8,46:end) = 1;
 
 Scol = g*S(1:end-1,1:end-1)*g';
 Scolerrors = diag((Scol).^.5);
@@ -55,7 +55,10 @@ Result = horzcat(Result_retrieval,Error_Result);
 % Result = vertcat(Layer_amount,Total_Ozone);
 
 date = extra.atmos.date(measurement_number).date;
-WLP = extra.atmos.N_values(measurement_number).WLP;
+if strcmp(seasonal, 'constant');
+    WLP = 'C_CAP';
+else WLP = extra.atmos.N_values(measurement_number).WLP;
+end
 
 if L_ozone
     save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  

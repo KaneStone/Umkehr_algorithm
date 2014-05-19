@@ -7,9 +7,9 @@ extra.logswitch = 0;
 extra.mieswitch = 1;
 extra.refraction = 1;
 extra.normalise_to_LSZA =1;
-extra.WLP_to_retrieve = 'ACD'; %all permutations possible.
+extra.WLP_to_retrieve = 'C'; %all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
-extra.seasonal = 0; %monthly or seasonal ozone profiles
+extra.seasonal = 'seasonal'; %'monthly', 'seasonal' or 'constant'
 extra.designated_SZA = 0;
 
 %choose cross section study to use - BP,BDM or S
@@ -32,11 +32,14 @@ atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+atmos.Z(1
 
 %defining profile paths
 profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,'_',year,'.txt');
-if extra.seasonal
+if strcmp(extra.seasonal,'seasonal');
     profilepath.ozone = strcat(inputpath,'station_climatology/ozone/',station,'.dat');
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature/',station,'_temperature.dat');
-else profilepath.ozone = strcat(inputpath,'station_climatology/ozone_monthly/',station,'.dat');
+elseif strcmp(extra.seasonal,'monthly') 
+    profilepath.ozone = strcat(inputpath,'station_climatology/ozone_monthly/',station,'.dat');
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature_monthly/',station,'_temperature.dat');
+else profilepath.ozone = strcat(inputpath,'station_climatology/ozone/',station,'.dat');
+    profilepath.Temp = strcat(inputpath,'station_climatology/temperature/',station,'_temperature.dat');
 end
 profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',station,'_pressure.dat');
 %profilepath.TaP = strcat(inputpath,'TP23_9Ant.dat');

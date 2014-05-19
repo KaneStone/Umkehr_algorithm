@@ -10,13 +10,22 @@ else folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone_monthly
     data = fscanf(fid,'%f',[13,inf])';
     SD = data(:,date_to_use+1)';
 end
+C = .1; %.05, .1, .2, .8
+%Roger's a priori covariance equation
+for i = 1:length(extra.atmos.Z)
+    for j = 1:length(extra.atmos.Z);
+        COV(i,j) = C*extra.atmos.ozone(i)*extra.atmos.ozone(j)*exp(-(abs(i-j))/4);
+    end
+end
+
+
 SD (SD <= 1e11) = 1e11;
 % if logswitch
 %     SD = log10(SD);
 % end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
 
-scale_factor = 8; 
+scale_factor = 8; %was 8; 
 
 %For testing optimal Sa (L-curve)
 if L_curve_diag
@@ -46,6 +55,8 @@ end
 %Sa (Sa <= 1e22) = 1e22;
 %sigma=log10(1e11);
 %Sa = diag(ones(1,61).*sigma.^2);
+
+Sa = COV; %To use Roger's definition with Irina's constants
 
 end
 

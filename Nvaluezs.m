@@ -12,6 +12,7 @@ intenstar = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 rayphase = zeros(length(lambda),sz(2));
 atmos.Apparent (atmos.Apparent == 0) = NaN;
 
+
 for j = 1:length(lambda);
     for iscat = 1:atmos.nlayers-1;
         rayphase = reshape(3./(4.*(1+2.*atmos.pgamma(j))).*...
@@ -58,6 +59,7 @@ for j = 1:length(lambda);
     end
 end
 
+
 intensity = permute(intensity,[1 3 2]);
 intensity (isnan(intensity)) = 0;
 
@@ -93,6 +95,8 @@ intenstar (isnan(intenstar)) = 0;
 
 ratio = zeros(sz(1),sz(2));
 
+plot_inten(intensity, atmos, sz);
+
 for j = 1:length(lambda);
     %for different wavelength pair vector length functionality
     find_nan = find(~isnan(atmos.true_actual(ceil(j/2),:)));
@@ -115,7 +119,6 @@ for k = 1:length(lambda)/2;
     %-log10(ratio(wn+1,1)./ratio(wn,1)));
     wn = wn+2;
 end
-
 %normalising
 
 if norm_switch

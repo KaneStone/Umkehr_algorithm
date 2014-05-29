@@ -1,4 +1,4 @@
-function atmos = read_in_Umkehr(measurementfilename)
+function [atmos measurement_length] = read_in_Umkehr(measurementfilename)
 
 atmos.next_year = 0;
 
@@ -47,113 +47,114 @@ for j = 1:12;
             atmos.date(count).date = horzcat(i,j,date_of_meas.YYYY(1));                                   
             hour = date_of_meas.HH(location);
             
-            %separating measurements morning and evening measuremnets -
-            %maybe not infallable.
-            if max(hour) - min(hour) >=9 
-                disp(strcat('Both morning and evening measurements were taken at date: ',...
-                    num2str(atmos.date(count).date(1))...
-                    ,'-',num2str(atmos.date(count).date(2))...
-                    ,'-',num2str(atmos.date(count).date(3)),', continuing with specified case.'));                                                 
-                if strcmp(morn_or_even,'evening');
-                    location (hour <= 12) = []; %This is not infallable 
-                elseif strcmp(morn_or_even,'morning');
-                    location (hour >= 12) = [];
-                end
-            end            
+%             %separating measurements morning and evening measuremnets -
+%             %maybe not infallable.
+%             if max(hour) - min(hour) >=9 
+%                 disp(strcat('Both morning and evening measurements were taken at date: ',...
+%                     num2str(atmos.date(count).date(1))...
+%                     ,'-',num2str(atmos.date(count).date(2))...
+%                     ,'-',num2str(atmos.date(count).date(3)),', continuing with specified case.'));                                                 
+%                 if strcmp(morn_or_even,'evening');
+%                     location (hour <= 12) = []; %This is not infallable 
+%                 elseif strcmp(morn_or_even,'morning');
+%                     location (hour >= 12) = [];
+%                 end
+%             end            
             atmos.WLP(count,1:length(location)) =...
-                Wavelength_pair.Wavelength_Pair(min(location):max(location));            
-            if find(WLP == 'A')                
-                what_WLP.a = strfind(atmos.WLP(count,:),'A');
-                if isempty(what_WLP.a) == 0     
-                    atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(location(1):location(1)-1+what_WLP.a(end));
-                    atmos.N_values(count).WLP(position_handle) = 'A';
-                    atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(location(1):location(1)-1+what_WLP.a(end));
-                    atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(location(1):location(1)-1+what_WLP.a(end));
-                    position_handle = position_handle+1;
-                end
+                Wavelength_pair.Wavelength_Pair(min(location):max(location));                                      
+            what_WLP.a = strfind(atmos.WLP(count,:),'A');
+            
+            if isempty(what_WLP.a) == 0     
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(location(1):location(1)-1+what_WLP.a(end));
+                atmos.N_values(count).WLP(position_handle) = 'A';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(location(1):location(1)-1+what_WLP.a(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(location(1):location(1)-1+what_WLP.a(end));
+                position_handle = position_handle+1;
             end
-            if find(WLP == 'C')
-                what_WLP.c = strfind(atmos.WLP(count,:),'C');
-                if isempty(what_WLP.c) == 0                
-                    atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.c)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
-                    atmos.N_values(count).WLP(position_handle) = 'C';
-                    atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
-                    atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.R_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
-                    position_handle = position_handle+1;                
-                end
+            
+
+            what_WLP.c = strfind(atmos.WLP(count,:),'C');
+            if isempty(what_WLP.c) == 0                
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.c)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
+                atmos.N_values(count).WLP(position_handle) = 'C';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.R_value(location(1)-1+what_WLP.c(1):location(1)-1+what_WLP.c(end));
+                position_handle = position_handle+1;                
             end
-            if find(WLP == 'D')
-                what_WLP.d = strfind(atmos.WLP(count,:),'D');
-                if isempty(what_WLP.d) == 0     
-                    atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.d)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
-                    atmos.N_values(count).WLP(position_handle) = 'D';
-                    atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.N_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
-                    atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end)); 
-                end
-            end                                            
+
+
+            what_WLP.d = strfind(atmos.WLP(count,:),'D');
+            if isempty(what_WLP.d) == 0     
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.d)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
+                atmos.N_values(count).WLP(position_handle) = 'D';
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.N_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end)); 
+            end
+                                           
             count = count+1; 
             position_handle = 1;
         end
     end
 end
 
-if measurement_number > length(atmos.date)
-    atmos.next_year = 1;
-    return
-end
-
-disp(strcat({'Current date being retrieved: '},num2str(atmos.date(measurement_number).date(1))...
-    ,'-',num2str(atmos.date(measurement_number).date(2))...
-    ,'-',num2str(atmos.date(measurement_number).date(3))));
-No_WLP = length(WLP);
-
-existing_WLP = atmos.WLP(measurement_number,:);
-A = ' '; C = ' '; D = ' ';
-if strfind(existing_WLP,'A');
-    A = 'A';
-elseif strfind(existing_WLP,'C');
-    C = 'C';
-elseif strfind(existing_WLP,'D');
-    D = 'D';
-end
-
-if isempty(atmos.N_values(measurement_number).WLP);
-    display(strcat('No measurements for the wavelengths specified exist for date:',...
-    num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-    ,'-',num2str(atmos.date(measurement_number).date(3)),'.'))
-display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
-return
-end
-
-for k = 1:No_WLP
-    if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
-    display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
-        {' Continuing with other wavelength pairs specified'}))
-    end
-end
-    
-%checking whether vector lengths are the same
-no_zeros = nonzeros(atmos.initial_SZA(measurement_number).SZA');
-sz_SZA = size(atmos.initial_SZA(measurement_number).SZA);
-if length(no_zeros) ~= length(reshape(atmos.initial_SZA(measurement_number).SZA,1,sz_SZA(1)*sz_SZA(2)))
-    disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
-        num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-        ,'-',num2str(atmos.date(measurement_number).date(3))));
-end
-
-%removing padded zeros if wavelength pair data sizes are different.
-atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
-atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
-
-%removing data that is taken at a SZA that is above 94 degrees.
-
-%if atmos.initial_SZA
-for i = 1:sz_SZA(1);
-    lsza = find(atmos.initial_SZA(measurement_number).SZA(i,:) > 94);
-    atmos.N_values(measurement_number).N(:,min(lsza):max(lsza)) = [];
-    atmos.initial_SZA(measurement_number).SZA(:,min(lsza):max(lsza)) = [];
-end
-       
-atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
-atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+measurement_length = length(atmos.N_values);
+% if measurement_number > length(atmos.date)
+%     atmos.next_year = 1;
+%     return
+% end
+% 
+% disp(strcat({'Current date being retrieved: '},num2str(atmos.date(measurement_number).date(1))...
+%     ,'-',num2str(atmos.date(measurement_number).date(2))...
+%     ,'-',num2str(atmos.date(measurement_number).date(3))));
+% No_WLP = length(WLP);
+% 
+% existing_WLP = atmos.WLP(measurement_number,:);
+% A = ' '; C = ' '; D = ' ';
+% if strfind(existing_WLP,'A');
+%     A = 'A';
+% elseif strfind(existing_WLP,'C');
+%     C = 'C';
+% elseif strfind(existing_WLP,'D');
+%     D = 'D';
+% end
+% 
+% if isempty(atmos.N_values(measurement_number).WLP);
+%     display(strcat('No measurements for the wavelengths specified exist for date:',...
+%     num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
+%     ,'-',num2str(atmos.date(measurement_number).date(3)),'.'))
+% display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
+% return
+% end
+% 
+% for k = 1:No_WLP
+%     if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
+%     display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
+%         {' Continuing with other wavelength pairs specified'}))
+%     end
+% end
+%     
+% %checking whether vector lengths are the same
+% no_zeros = nonzeros(atmos.initial_SZA(measurement_number).SZA');
+% sz_SZA = size(atmos.initial_SZA(measurement_number).SZA);
+% if length(no_zeros) ~= length(reshape(atmos.initial_SZA(measurement_number).SZA,1,sz_SZA(1)*sz_SZA(2)))
+%     disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
+%         num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
+%         ,'-',num2str(atmos.date(measurement_number).date(3))));
+% end
+% 
+% %removing padded zeros if wavelength pair data sizes are different.
+% atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
+% atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
+% 
+% %removing data that is taken at a SZA that is above 94 degrees.
+% 
+% %if atmos.initial_SZA
+% for i = 1:sz_SZA(1);
+%     lsza = find(atmos.initial_SZA(measurement_number).SZA(i,:) > 94);
+%     atmos.N_values(measurement_number).N(:,min(lsza):max(lsza)) = [];
+%     atmos.initial_SZA(measurement_number).SZA(:,min(lsza):max(lsza)) = [];
+% end
+%        
+% atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
+% atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = [];
 end

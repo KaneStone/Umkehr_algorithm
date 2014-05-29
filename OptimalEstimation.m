@@ -31,14 +31,16 @@ y = reshape(y',1,numel(y));
 y (isnan(y)) = [];
 
 sz = size(extra.atmos.Apparent);
-yhat1(1).a = yhat;
+yhat1(1).y = yhat;
 xa = xa';
 xi = xa;
+di2 = length(y);
 if strcmp(method,'Opt')
-    for i = 1:3;
-        K1(i).a = K;
-        %reshaping into one vector for all wavelengths
-        y = reshape(y',1,numel(y));
+    %for i = 1:5; %Number of iterations
+    i = 1;
+    while di2 > length(y)/2
+        K1(i).K = K;
+        %reshaping into one vector for all wavelengths               
         yhat = reshape(yhat',1,numel(yhat));
         yhat (isnan(yhat)) = [];
         
@@ -59,14 +61,15 @@ if strcmp(method,'Opt')
         [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
         yhat = N.zs;
         %yhat1(i).a = reshape(yhat',1,numel(yhat));
-        yhat1(i).a = yhat;
+        yhat1(i+1).y = reshape(yhat',1,numel(yhat));
         
-        %%%%--Diagnostic testing for slow covergence--%%%%
-        %Sdayy = Se*(K*Sa*K'+Se)\Se;
-        %if i > 1;
-        %    d2(i-1) = (yhat1(i).a - yhat1(i-1).a)/Sdayy*(yhat1(i).a-yhat1(i-1).a)';  
-        %end
-        %%%%------------------------------------------%%%%
+        %%%TESTING FOR CONVERGENCE%%%
+        Sdayy = Se*(K*Sa*K'+Se)\Se;
+        di2 = (yhat1(i+1).y-yhat1(i).y)*(Sdayy\(yhat1(i+1).y-yhat1(i).y)');                            
+%         if di2(i) < length(y)/10
+%             break
+%         end
+        i = i+1;
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution
@@ -93,7 +96,6 @@ elseif strcmp(method,'LS');
     K = K(sz(3)+1:2*sz(3),:);
 end
 S = (K'*(Se^-1)*K +Sa^-1)^-1;
-Sdayy = Se*((K*Sa*K'+Se)\Se);
 end
 
 

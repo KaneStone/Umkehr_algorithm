@@ -58,21 +58,21 @@ elseif strcmp(extra.atmos.N_values(measurement_number).WLP,'AC')
         'Residual - A pair','Residual - C pair','location','NorthWest');
 end
 
-%yhat1.a = reshape(yhat1.a',fliplr(size(N.zs)))';
-
-yhat2 = vertcat(N.zs,yhat1.a)';
+for i = 1:length(yhat1)
+    yhat1(i).y = reshape(yhat1(i).y',fliplr(size(N.zs)))';
+end
+yhat2 = vertcat(N.zs,yhat1.y)';
 sz_yhat1 = size(yhat1);
 figure;
 set(gcf, 'Visible', 'off')
 fig3 = gcf;
 set(fig3,'color','white','Position',[100 100 1000 700]);
-%plot(repmat(extra.atmos.true_actual,sz_yhat1(2)/3+1,1)'
 
 color = 'b';
 for i = 1:sz_yhat1(2)+1
     if i == 1
         pl(i).p = plot(extra.atmos.true_actual',N.zs',color,'LineWidth',2.5);
-    else pl(i).p = plot(extra.atmos.true_actual',yhat1(i-1).a',color,'LineWidth',2.5);
+    else pl(i).p = plot(extra.atmos.true_actual',yhat1(i-1).y',color,'LineWidth',2.5);
     end
     if color == 'b'
         color = 'r';        

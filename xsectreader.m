@@ -3,9 +3,9 @@ function [xs] = xsectreader(folder)
 %Reads in the ozone cross sections for three different cross section
 %studies:
 
-%Bass-Paur
-%Brion-Daumont-Malicet
-%Serdyuchenko
+%Bass-Paur (Bass et al., 1985) 
+%Brion-Daumont-Malicet (Daumont et al. 1992)
+%Serdyuchenko Gorshelev et al., 2014)
     
 %Bass-Paur
 BPfiles = dir(strcat(folder,'Bass-Paur/','*.dat'));

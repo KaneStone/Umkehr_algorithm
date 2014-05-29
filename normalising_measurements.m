@@ -1,5 +1,5 @@
 function [atmos] = normalising_measurements(atmos,designated_SZA,theta,measurement_number)
-%Normalising to lowest SZA
+%Normalising measurements to lowest SZA
 
 if designated_SZA
     atmos.N_values(measurement_number).N = interp1(atmos.initial_SZA(measurement_number).SZA,...

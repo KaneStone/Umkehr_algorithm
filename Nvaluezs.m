@@ -1,5 +1,5 @@
 function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,...
-    designated_SZA,theta,norm_switch)
+    designated_SZA,theta,norm_switch, plot_inten)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
    
@@ -95,7 +95,10 @@ intenstar (isnan(intenstar)) = 0;
 
 ratio = zeros(sz(1),sz(2));
 
-plot_inten(intensity, atmos, sz);
+%To plot intensity curves
+if plot_inten
+    plot_inten(intensity, atmos, sz);
+end
 
 for j = 1:length(lambda);
     %for different wavelength pair vector length functionality
@@ -111,16 +114,13 @@ N=zeros(length(lambda)/2,sz(2));
 wn = 1;
 for k = 1:length(lambda)/2;
     ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),...
-        lambda(wn:wn+1),'linear','extrap');
-    %ETSF_ratio = ETSF(2)/ETSF(1);    
-    ETSF_ratio = 1;
-        N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
-    %N(k,:) = 100*(log10(ratio(wn+1,:)./ratio(wn,:))...
-    %-log10(ratio(wn+1,1)./ratio(wn,1)));
+        lambda(wn:wn+1),'linear','extrap');  
+    ETSF_ratio = 1; %ETFS is removed by normalising to lowest SZA
+    N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
     wn = wn+2;
 end
-%normalising
 
+%normalising simulated N-values to lowest SZA.
 if norm_switch
     [~, SZA_min_location] = min(atmos.true_actual,[],2);
     for j = 1:length(SZA_min_location);

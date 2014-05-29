@@ -13,6 +13,7 @@ if extra.logswitch
 else extra.pert = x./100;
 end
 
+%Calculating weighting functions
 if (Kflg == 1)
     for i = 1:extra.atmos.nlayers
         clearvars xpert

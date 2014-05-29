@@ -1,7 +1,7 @@
 function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,designated_SZA)
  
 %This function calculates the zenith ray paths. The SZAs that are given in
-%the measurements are calculated from time, and are thus the true SZAs. To
+%the measurements are calculated from time, and are thus are the true SZAs. To
 %calcualte the Zenith paths, Apparent SZAs are needed. Initial apparent 
 %SZAs are setup that confine the measurements. The initial SZAs are used 
 %to calculate initial true SZAs. Then through interpolation, actual 
@@ -11,8 +11,6 @@ if designated_SZA
     a = theta;
 else a = atmos.initial_SZA(measurement_number).SZA;
 end
-%a (isnan(a)) = [];
-%Two lines below may cause problems
 
 %setting up initial apparent SZA.
 mx = ceil(max(a(:)));
@@ -29,10 +27,11 @@ Apparent_Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 
 sz_a = size(a);
 
-for p = 1:sz_a(1)
-    values = find(isnan(a(p,:))==0);
-    lth(p) = length(values);
-end
+%NOT USED
+% for p = 1:sz_a(1)
+%     values = find(isnan(a(p,:))==0);
+%     lth(p) = length(values);
+% end
 
 for iteration = 1:2;
     for i = 1:length(lambda)  
@@ -164,10 +163,9 @@ end
 function [True Apparent_Initial Apparent_Final zs] = ...
     zenithpaths_down(atmos,i,j,True,Apparent_Initial,Apparent_Final,...
     Apparent,iscat,gamma,zs,iteration)
-%Calculates down through the atmosphere for cases where theta is less than 90         
-    
+%Calculates down through the atmosphere for cases where theta is less than 90           
 Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j)); 
-%Rg(iscat) = atmos.N(i,iscat)*atmos.r(iscat)*sind(Apparent(j));
+
 %layers above the scattering height which are the slant paths  
 for l = iscat:atmos.nlayers-1; 
     a = atmos.r(l);

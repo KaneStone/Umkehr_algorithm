@@ -1,6 +1,6 @@
 function [atmos] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
     pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,...
-    WLP,morn_or_even,seasonal)
+    WLP,morn_or_even,seasonal,SZA_limit)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -107,27 +107,40 @@ atmos.next_year = 0;
 % end
 
 %retrieving measurement vectors.
-count = 1;
-if ~isempty(strfind(WLP,'A')) && find(atmos.N_values(measurement_number).WLP == 'A');
-    N_temp(count,:) = atmos.N_values(measurement_number).N(atmos.N_values(measurement_number).WLP == 'A',:);
-    R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'A'),:);
-    I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'A'),:);
-    WLP_temp(:,count) = 'A';
-    count = count+1;
+N_temp = [];
+WLP_temp = [];
+R_temp = [];
+I_temp = [];
 
+count = 1;
+if ~isempty(strfind(WLP,'A')) 
+    what_WLP.a = strfind(atmos.WLP(measurement_number,:),'A');
+    if isempty(what_WLP.a) == 0
+        N_temp(count,:) = atmos.N_values(measurement_number).N(atmos.N_values(measurement_number).WLP == 'A',:);
+        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'A'),:);
+        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'A'),:);
+        WLP_temp(:,count) = 'A';
+        count = count+1;
+    end
 end
-if ~isempty(strfind(WLP,'C')) && find(atmos.N_values(measurement_number).WLP == 'C');
-    N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-    R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-    I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-    WLP_temp(:,count) = 'C';
-    count = count+1;    
+if ~isempty(strfind(WLP,'C')) 
+    what_WLP.c = strfind(atmos.WLP(measurement_number,:),'C');
+    if isempty(what_WLP.c) == 0
+        N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'C'),:);
+        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'C'),:);
+        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'C'),:);
+        WLP_temp(:,count) = 'C';
+        count = count+1;    
+    end
 end
-if ~isempty(strfind(WLP,'D')) && find(atmos.N_values(measurement_number).WLP == 'D');
-    N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'D'),:);
-    R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'D'),:);
-    I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'D'),:);    
-    WLP_temp(:,count) = 'D';
+if ~isempty(strfind(WLP,'D'))
+    what_WLP.d = strfind(atmos.WLP(measurement_number,:),'D');
+    if isempty(what_WLP.d) == 0
+        N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'D'),:);
+        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'D'),:);
+        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'D'),:);    
+        WLP_temp(:,count) = 'D';
+    end
 end
 
 atmos.N_values(measurement_number).N = N_temp;
@@ -159,14 +172,19 @@ if isempty(atmos.N_values(measurement_number).WLP);
     display(strcat('No measurements for the wavelengths specified exist for date:',...
     num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
     ,'-',num2str(atmos.date(measurement_number).date(3)),'.'))
-display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
-return
+    display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
+    atmos.return = 1;
+    return
+else atmos.return = 0;
 end
 
 for k = 1:No_WLP
     if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
     display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
         {' Continuing with other wavelength pairs specified'}))
+    atmos.return = 1;
+    return
+    else atmos.return = 0;
     end
 end
     
@@ -184,8 +202,8 @@ atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) 
 atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
 
 %removing data that is taken at a SZA that is above 94 degrees.       
-atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= 94) = NaN;
-atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= 94) = NaN;
+atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= SZA_limit) = NaN;
+atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= SZA_limit) = NaN;
 
 date_to_use = atmos.date(measurement_number).date(2);
 

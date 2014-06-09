@@ -2,6 +2,9 @@ function [atmos] = normalising_measurements(atmos,designated_SZA,theta,measureme
 %Normalising measurements to lowest SZA
 
 if designated_SZA
+    %next two lines only work for C_pair
+    atmos.N_values(measurement_number).N (isnan(atmos.N_values(measurement_number).N)) = [];
+    atmos.initial_SZA(measurement_number).SZA (isnan(atmos.initial_SZA(measurement_number).SZA)) = [];
     atmos.N_values(measurement_number).N = interp1(atmos.initial_SZA(measurement_number).SZA,...
         atmos.N_values(measurement_number).N,theta,'linear','extrap');
     atmos.initial_SZA(measurement_number).SZA = theta;

@@ -1,4 +1,4 @@
-function [xhat,yhat,K,yhat1, K1, S, Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat yhat K yhat1 K1 S Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -26,19 +26,20 @@ function [xhat,yhat,K,yhat1, K1, S, Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,e
 
 %for different wavelength pair vector length functionality
 yhat = reshape(yhat',1,numel(yhat));
+yhat1(1).y = yhat;
 yhat (isnan(yhat)) = [];
 y = reshape(y',1,numel(y));
 y (isnan(y)) = [];
 
 sz = size(extra.atmos.Apparent);
-yhat1(1).y = yhat;
+yhat2(1).y = yhat;
 xa = xa';
 xi = xa;
 di2 = length(y);
 if strcmp(method,'Opt')
-    %for i = 1:5; %Number of iterations
-    i = 1;
-    while di2 > length(y)/2
+    for i = 1:3; %Number of iterations
+    %i = 1;
+    %while di2 > length(y)/2
         K1(i).K = K;
         %reshaping into one vector for all wavelengths               
         yhat = reshape(yhat',1,numel(yhat));
@@ -60,16 +61,19 @@ if strcmp(method,'Opt')
         AeroKflg = 0;
         [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
         yhat = N.zs;
+        %yhat (isnan(yhat)) = [];
         %yhat1(i).a = reshape(yhat',1,numel(yhat));
         yhat1(i+1).y = reshape(yhat',1,numel(yhat));
+        yhat2(i+1).y = reshape(yhat',1,numel(yhat));
+        yhat2(i+1).y (isnan(yhat2(i+1).y)) = [];
         
         %%%TESTING FOR CONVERGENCE%%%
         Sdayy = Se*(K*Sa*K'+Se)\Se;
-        di2 = (yhat1(i+1).y-yhat1(i).y)*(Sdayy\(yhat1(i+1).y-yhat1(i).y)');                            
+        di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
 %         if di2(i) < length(y)/10
 %             break
 %         end
-        i = i+1;
+        %i = i+1;
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution

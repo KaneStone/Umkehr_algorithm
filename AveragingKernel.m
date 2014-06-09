@@ -30,7 +30,7 @@ AK.resolution=1./diag(AK.AK);
 res = AK.resolution;
 save(strcat('/Users/stonek/work/Dobson/OUTPUT/resolution/',station,'_res_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),'.txt'),'res','-ascii');
+    sprintf('%02d',date(1)),extra.name_ext,'.txt'),'res','-ascii');
 
 %Degrees of Freedom for signal
 AK.dof=sum(diag(AK.AK));
@@ -39,7 +39,7 @@ AK.dof1=g1*diag(AK.AK(1:80,1:80));
 dof = vertcat(AK.dof1,AK.dof);
 save(strcat('/Users/stonek/work/Dobson/OUTPUT/resolution/',station,'_dof_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),'.txt'),'dof','-ascii');
+    sprintf('%02d',date(1)),extra.name_ext,'.txt'),'dof','-ascii');
 
 %Information content - 3D reduction in the error covariance volumes - how
 %much information from measurements versus a priori
@@ -99,7 +99,7 @@ end
 H_print = horzcat(H_layer,H);
 save(strcat('/Users/stonek/work/Dobson/OUTPUT/resolution/',station,'_H_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),'.txt'),'H_print','-ascii');
+    sprintf('%02d',date(1)),extra.name_ext,'.txt'),'H_print','-ascii');
 
 %close all; %needs to be removed when finished diagnostics
 AK_to_print = AK.AK1;
@@ -111,7 +111,7 @@ else WLP = extra.atmos.N_values(measurement_number).WLP;
 save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  
     station,'/',WLP,'/AK/',sprintf('%d',date(3)),'/',station,'_',WLP,'_AK_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),'.txt'),'AK_to_print','-ascii');
+    sprintf('%02d',date(1)),extra.name_ext,'.txt'),'AK_to_print','-ascii');
 
 %Ss - smoothing error component from the a priori error smoothing error
 %Sn - noise  error component of the measurements in your retrievals

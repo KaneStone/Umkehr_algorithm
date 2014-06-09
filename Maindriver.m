@@ -2,20 +2,22 @@ tic;
 
 %inputs for files to retrieve
 station = 'Melbourne';
-year = '1994';
+year = '1970';
 Umkehr_path = '/Users/stonek/work/Dobson/input/Umkehr/';
 
 %AND SO WE BEGIN%
 measurementfilename = strcat(Umkehr_path,station,'/',station,...
      '_',year,'.txt');
-[atmos measurement_length] = read_in_Umkehr(measurementfilename);
-for measurement_number = 11
+[atmos_init measurement_length] = read_in_Umkehr(measurementfilename);
+for measurement_number = 20;%:measurement_length;
     
-    extra = extrasetup(atmos,measurement_number,station,year);
+    extra = extrasetup(atmos_init,measurement_number,station,year);
     if extra.next_year
         year = year+1;
     end
     if extra.no_data
+        clearvars -except measurement_number station year i sf...
+        number_of_measurements L_Ozone L_Aerosol atmos_init
         continue
     end
     if extra.L_Ozone == 1
@@ -67,11 +69,11 @@ for measurement_number = 11
     [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,extra.L_Ozone,S,extra.seasonal);    
     [AK] = AveragingKernel(S,Sa,Se,extra,K,g,g1,station,measurement_number,extra.seasonal);
     print_diagnostics(fig1,fig2,fig3,AK,station,extra,...
-        measurement_number,extra.L_Ozone);   
+        measurement_number,extra.L_Ozone,extra.seasonal);   
     %X2 = (y-yhat)*(Sdayy\(y-yhat)');
     close all hidden
     clearvars -except measurement_number station year i sf...
-        number_of_measurements L_Ozone L_Aerosol
+        number_of_measurements L_Ozone L_Aerosol atmos_init
 end
 time = toc;
 display(time);

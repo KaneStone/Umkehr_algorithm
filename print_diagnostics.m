@@ -1,12 +1,16 @@
-function [] = print_diagnostics(x,y,z,AK,station,extra,measurement_number,L_ozone)%,AK,station,year,test)
+function [] = print_diagnostics(x,y,z,AK,station,extra,measurement_number,L_ozone,seasonal)%,AK,station,year,test)
 
 date = extra.atmos.date(measurement_number).date;
-WLP = extra.atmos.N_values(measurement_number).WLP;
+
+if strcmp(seasonal, 'constant');
+    WLP = 'C_CAP';
+else WLP = extra.atmos.N_values(measurement_number).WLP;
+end
 
 if L_ozone
     file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/',...
     station,'/',station,'_',WLP,'_',sprintf('%d',date(3)),'-',sprintf('%02d',date(2))...
-    ,'-',sprintf('%02d',date(1)),'.ps');
+    ,'-',sprintf('%02d',date(1)),extra.name_ext,'.ps');
 else
     file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/aerosols/',...
     station,'/',station,'_',WLP,'_',num2str(date(3)),'-',num2str(date(2))...
@@ -45,6 +49,7 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
 print(fig4,'-dpsc2','-r200',file,'-append');
 
 AK.resolution (AK.resolution > 100) = 100;
+AK.resolution (AK.resolution < 0) = 100;
 
 figure;
 set(gcf, 'Visible', 'off')

@@ -29,6 +29,8 @@ legend([p1 p2],'retrieval','A priori','location','NorthWest');
 N_val = extra.atmos.N_values(measurement_number).N;
 N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
+% true_actual_temp = extra.atmos.true_actual;
+% true_actual_temp (isnan(true_actual_temp)) = [];
 
 figure;
 set(gcf, 'Visible', 'off')
@@ -69,10 +71,10 @@ fig3 = gcf;
 set(fig3,'color','white','Position',[100 100 1000 700]);
 
 color = 'b';
-for i = 1:sz_yhat1(2)+1
+for i = 1:sz_yhat1(2)
     if i == 1
         pl(i).p = plot(extra.atmos.true_actual',N.zs',color,'LineWidth',2.5);
-    else pl(i).p = plot(extra.atmos.true_actual',yhat1(i-1).y',color,'LineWidth',2.5);
+    else pl(i).p = plot(extra.atmos.true_actual',yhat1(i).y',color,'LineWidth',2.5);
     end
     if color == 'b'
         color = 'r';        

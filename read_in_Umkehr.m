@@ -65,10 +65,10 @@ for j = 1:12;
             what_WLP.a = strfind(atmos.WLP(count,:),'A');
             
             if isempty(what_WLP.a) == 0     
-                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(location(1):location(1)-1+what_WLP.a(end));
+                atmos.initial_SZA(count).SZA(position_handle,1:length(what_WLP.a)) = angles.Solar_zenith_angle(location(1)-1+what_WLP.a(1):location(1)-1+what_WLP.a(end));
                 atmos.N_values(count).WLP(position_handle) = 'A';
-                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(location(1):location(1)-1+what_WLP.a(end));
-                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(location(1):location(1)-1+what_WLP.a(end));
+                atmos.N_values(count).N(position_handle,1:length(what_WLP.a)) = intensity_values.N_value(location(1)-1+what_WLP.a(1):location(1)-1+what_WLP.a(end));
+                atmos.R_values(count).R(position_handle,1:length(what_WLP.a)) = intensity_values.R_value(location(1)-1+what_WLP.a(1):location(1)-1+what_WLP.a(end));
                 position_handle = position_handle+1;
             end
             
@@ -90,7 +90,8 @@ for j = 1:12;
                 atmos.N_values(count).N(position_handle,1:length(what_WLP.d)) = intensity_values.N_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end));
                 atmos.R_values(count).R(position_handle,1:length(what_WLP.d)) = intensity_values.R_value(location(1)-1+what_WLP.d(1):location(1)-1+what_WLP.d(end)); 
             end
-                                           
+            atmos.MAX_SZA(count) = max(max(atmos.initial_SZA(count).SZA)); 
+            atmos.MIN_SZA(count) = min(min(atmos.initial_SZA(count).SZA)); 
             count = count+1; 
             position_handle = 1;
         end

@@ -17,7 +17,7 @@ if full_covariance
     C = .1; %.05, .1, .2, .8
     for k = 1:length(extra.atmos.Z)
         for j = 1:length(extra.atmos.Z);
-            COV(i,j) = C*extra.atmos.ozone(i)*extra.atmos.ozone(j)*exp(-(abs(k-j))/4);
+            COV(k,j) = C*extra.atmos.ozone(i)*extra.atmos.ozone(j)*exp(-(abs(k-j))/4);
         end
     end
     Sa = COV; %To use Roger's definition with Irina's constants

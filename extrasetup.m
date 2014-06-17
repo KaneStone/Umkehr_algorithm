@@ -8,12 +8,12 @@ extra.logswitch = 0; %retrieve in log space (currently doesn't work)
 extra.mieswitch = 1; %include Mie scattering
 extra.refraction = 1; %include refraction
 extra.normalise_to_LSZA =1; %normalise measurments
-extra.WLP_to_retrieve = 'C'; % define wavelength pairs to retrieve: all permutations possible.
+extra.WLP_to_retrieve = 'ACD'; % define wavelength pairs to retrieve: all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 extra.seasonal = 'monthly'; %'monthly', 'seasonal' or 'constant' for ozone, temperature, and pressure profiles
 extra.designated_SZA = 0; %retrieve using desiganted SZAs (not infallable)
 extra.plot_inten = 0; %plot intensity curves for selected SZAs (diagnostic code)
-extra.full_covariance = 1; %produce Sa matrix using Rodgers definition
+extra.full_covariance = 0; %produce Sa matrix using Rodgers definition
 extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
@@ -21,7 +21,7 @@ extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
 extra.SZA_limit = 94;
 
 %Naming conventions
-name_ext = [];
+extra.name_ext = [];
 ext_start = 1;
 if extra.designated_SZA
     extra.name_ext(ext_start:ext_start+5) = '_desig';

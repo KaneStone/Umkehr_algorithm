@@ -2,6 +2,8 @@ function [fig1 fig2 fig3] = plot_retrieval(N,yhat,extra,xhat,Sa,S,measurement_nu
 
 
 addpath('/Users/stonek/work/Dobson/data_code');
+
+%plotting ozone profile
 figure;
 set(gcf, 'Visible', 'off')
 fig1 = gcf;
@@ -31,7 +33,10 @@ N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
 % true_actual_temp = extra.atmos.true_actual;
 % true_actual_temp (isnan(true_actual_temp)) = [];
+difff = (N_val-yhat);
+perc_of_Se = ((N_val-yhat)./reshape(Se_for_errors,fliplr(size(N_val)))')*100;
 
+%plotting N_values
 figure;
 set(gcf, 'Visible', 'off')
 fig2 = gcf;
@@ -65,6 +70,8 @@ for i = 1:length(yhat1)
 end
 yhat2 = vertcat(N.zs,yhat1.y)';
 sz_yhat1 = size(yhat1);
+
+%plot iterations
 figure;
 set(gcf, 'Visible', 'off')
 fig3 = gcf;

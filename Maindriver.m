@@ -2,14 +2,14 @@ tic;
 
 %inputs for files to retrieve
 station = 'Melbourne';
-year = '1970';
+year = '1994';
 Umkehr_path = '/Users/stonek/work/Dobson/input/Umkehr/';
 
 %AND SO WE BEGIN%
 measurementfilename = strcat(Umkehr_path,station,'/',station,...
      '_',year,'.txt');
 [atmos_init measurement_length] = read_in_Umkehr(measurementfilename);
-for measurement_number = 20;%:measurement_length;
+for measurement_number = 3;%:measurement_length;
     
     extra = extrasetup(atmos_init,measurement_number,station,year);
     if extra.next_year

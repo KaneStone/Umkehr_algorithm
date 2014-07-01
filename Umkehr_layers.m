@@ -37,34 +37,26 @@ Result_retrieval = vertcat(xhat_layer1,Total_Ozone);
 Error_Result = vertcat(Scolerrors1,Total_column_errors);
 Result = horzcat(Result_retrieval,Error_Result);
 
-
-% lth = length(Upper_limits);
-% Ozone = ones(lth,5);
-% Layer_amount = ones(lth,1);
-% 
-% for i = 1:length(Upper_limits);
-%     Ozone(i,:) = xhat(Lower_limits(i):Upper_limits(i));
-%     if L_ozone
-%         Layer_amount(i,1) = DU_coeff.*sum(Ozone(i,:));
-%     else Layer_amount(i,1) = sum(Ozone(i,:));
-%     end
-% end
-
-% Total_Ozone = sum(Layer_amount);
-
-% Result = vertcat(Layer_amount,Total_Ozone);
-
 date = extra.atmos.date(measurement_number).date;
 if strcmp(seasonal, 'constant');
     WLP = 'C_CAP';
 else WLP = extra.atmos.N_values(measurement_number).WLP;
 end
 
+%Saving retrieval
 if L_ozone
-    save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/',...  
-    station,'/',WLP,'/',sprintf('%d',date(3)),'/',station,'_',WLP,'_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt'),'Result','-ascii');
+    output_folder = strcat(extra.output_retrievals,station,'/',WLP,'/',...
+        sprintf('%d',date(3)),'/');
+
+    file_name = strcat(station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
+        sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),...
+        extra.name_ext,'.txt');
+
+    if ~exist(strcat(output_folder),'dir')
+        mkdir(output_folder);
+    end
+    save(strcat(output_folder,file_name),'Result','-ascii');
+    
 else save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/aerosols/',...  
     station,'/',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),...
     '_',station,'_',WLP,'.txt'),'Result','-ascii');

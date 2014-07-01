@@ -25,15 +25,9 @@ title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(dat
     ,'{ }','Ozone Profile'),'fontsize',24);
 legend([p1 p2],'retrieval','A priori','location','NorthWest');
 
-%set(fig1, 'PaperPositionMode','auto');
-%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_profile_',num2str(measurement_number),'.eps'));
-
 N_val = extra.atmos.N_values(measurement_number).N;
 N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
-% true_actual_temp = extra.atmos.true_actual;
-% true_actual_temp (isnan(true_actual_temp)) = [];
-difff = (N_val-yhat);
 perc_of_Se = ((N_val-yhat)./reshape(Se_for_errors,fliplr(size(N_val)))')*100;
 
 %plotting N_values
@@ -45,7 +39,6 @@ h2 = errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1.5,'LineS
 hold on
 set(gca, 'ColorOrder', [0 .5 0; 0 0 1; 1 0 0]);
 h1 = plot(extra.atmos.true_actual',yhat','LineWidth',2);
-%plot(extra.atmos.true_actual',N_val','LineWidth',2);
 h3 = plot(extra.atmos.true_actual',(N_val-yhat)');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);
@@ -53,7 +46,6 @@ xlim([55 95])
 set(gca,'fontsize',18);
 title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','N-Values'),'fontsize',24);
-%legend('retrieval','measurement','location','NorthWest');
 if strcmp(extra.atmos.N_values(measurement_number).WLP,'ACD')
    legend(vertcat(h2(1),h1,h3),'Measurements','Retrieval - A pair',...
        'Retrieval - C pair','Retrieval - D pair','Residual - A pair',...
@@ -121,9 +113,6 @@ legendnames{i+1} = 'measurements';
 
 legend(legendhandle,legendnames,'location','NorthWest');
 
-%set(fig, 'PaperPositionMode','auto');
-%print('-dpsc2','-r200', strcat('/Users/stonek/work/Dobson/plots/retrievals/Initial/','Hobart_Nvalue_',num2str(measurement_number),'.eps'));
-%delete(1); delete(3);
 end
 
 

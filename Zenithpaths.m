@@ -27,12 +27,6 @@ Apparent_Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 
 sz_a = size(a);
 
-%NOT USED
-% for p = 1:sz_a(1)
-%     values = find(isnan(a(p,:))==0);
-%     lth(p) = length(values);
-% end
-
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);

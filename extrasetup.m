@@ -8,11 +8,12 @@ extra.logswitch = 0; %retrieve in log space (currently doesn't work)
 extra.mieswitch = 1; %include Mie scattering
 extra.refraction = 1; %include refraction
 extra.normalise_to_LSZA =1; %normalise measurments
-extra.WLP_to_retrieve = 'ACD'; % define wavelength pairs to retrieve: all permutations possible.
+extra.WLP_to_retrieve = 'C'; % define wavelength pairs to retrieve: all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 extra.seasonal = 'monthly'; %'monthly', 'seasonal' or 'constant' for ozone, temperature, and pressure profiles
 extra.designated_SZA = 0; %retrieve using desiganted SZAs (not infallable)
 extra.plot_inten = 0; %plot intensity curves for selected SZAs (diagnostic code)
+extra.test_model_height_limit = 0; %switch for testing model height limit on zenith paths
 extra.full_covariance = 0; %produce Sa matrix using Rodgers definition
 extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
@@ -20,6 +21,10 @@ extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce r
 extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
 extra.SZA_limit = 94;
 
+%OUTPUT folders are not complete
+extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';
+extra.output_resolution = '/Users/stonek/work/Dobson/OUTPUT/resolution/';
+extra.output_diagnostics = '/Users/stonek/work/Dobson/OUTPUT/plots/diagnotics/';
 %Naming conventions
 extra.name_ext = [];
 ext_start = 1;
@@ -100,35 +105,6 @@ end
 if extra.normalise_to_LSZA
     atmos = normalising_measurements(atmos,extra.designated_SZA,theta,measurement_number);
 end
-
-%TESTING WHETHER PRESSURE AND TEMPERATURE PROFILES ARE CAUSING ERRORS.
-%IRINAS
-%Testing Temperature and Pressure
-%Press_temp = importdata(strcat(inputpath,'phprofil.dat'));
-%atmos.P = Press_temp(1:81)';
-%atmos.Pmid = exp(interp1(0:1000:80000,log(atmos.P),atmos.Zmid,'linear','extrap'));
-
-%Temp_temp = importdata(strcat(inputpath,'temprofil.dat'));
-%atmos.T = interp1(Temp_temp(:,1)*1000,Temp_temp(:,2),atmos.Z,'linear','extrap');
-%atmos.Tmid = interp1(1000:1000:81000,atmos.T,atmos.Zmid,'linear','extrap');
-
-%ROBYNS
-%temp = importdata(strcat(inputpath,'not_used/','TP23_9Ant.dat'));
-%atmos.P = interp1(temp(:,1),temp(:,3),atmos.Z,'linear','extrap');
-%atmos.Pmid = interp1(temp(:,1),temp(:,3),atmos.Zmid,'linear','extrap');
-%atmos.T = interp1(temp(:,1),temp(:,2),atmos.Z,'linear','extrap');
-%atmos.Tmid = interp1(temp(:,1),temp(:,2),atmos.Zmid,'linear','extrap');
-
-%CONSTANSTS
-%atmos.T(:) = 270;
-%atmos.Tmid(:) = 270;
-%atmos.P = 1000;
-%atmos.Pmid = 1000;
-
-%Pres_EQUATION
-%atmos.P = 1013.5*exp(-(0:80)/7.5);
-%atmos.Pmid = 1013.5*exp(-(.5:79.5)/7.5);
-%---------------------------------------------------------------------
 
 %defining wavelengths
 lambda = definelambda(wl,measurement_number,atmos);

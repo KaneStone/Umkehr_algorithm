@@ -31,11 +31,9 @@ if (AeroKflg == 1)
         clearvars aeropert
         aeropert = aero_x;
         aeropert(:,i) = aero_x(:,i)+extra.aeropert;   
-        %atmos.bMiept = (500./wavelength).^-1.2*atmos.Aer;
-        %atmos.bMie = (500./wavelength).^-1.2*atmos.Aermid;    
         extra.atmos.bMiept = aeropert;
-        extra.atmos.bMie = interp1(extra.atmos.Z,extra.atmos.bMiept(:,:)',extra.atmos.Zmid,'linear','extrap')';              
-        %extra.atmos = Rayleigh(atmos,lambda);           
+        extra.atmos.bMie = interp1(extra.atmos.Z,extra.atmos.bMiept(:,:)',...
+            extra.atmos.Zmid,'linear','extrap')';                
         ypert_aer = Ncalc(extra.atmos.ozone,extra);       
         K(:,i) = (ypert_aer - yhat)./extra.aeropert;
     end

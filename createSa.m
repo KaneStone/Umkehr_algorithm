@@ -25,9 +25,9 @@ if full_covariance
 end
 
 SD (SD <= 1e11) = 1e11;
-% if logswitch
-%     SD = log10(SD);
-% end
+if logswitch
+    SD = log10(SD);
+end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
 
 scale_factor = 8; %was 8; 

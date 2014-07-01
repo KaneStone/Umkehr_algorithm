@@ -1,5 +1,5 @@
 function [N] = Nvaluezs(atmos,lambda,zs,ozonexs,bandpass,mieswitch,...
-    designated_SZA,theta,norm_switch, plot_inten)
+    designated_SZA,theta,norm_switch, plot_inten,test_model_height)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
    
@@ -67,31 +67,35 @@ intenstar = permute(intenstar,[1 3 2]);
 intenstar (isnan(intenstar)) = 0;
 
 %Code for testing the model top height limitations for high SZAs
-% [maxa inda] = max(intensity(1,:,:));
-% [maxb indb] = max(intensity(2,:,:));
-% figure;
-% fig1 = gcf;
-% set(fig1,'color','white','Position',[100 100 1000 700]);
-% plot(atmos.true_actual,squeeze(inda),'o-','LineWidth',2);
-% hold on
-% plot(atmos.true_actual,squeeze(indb),'ro-','LineWidth',2);
-% set(gca,'fontsize',18);
-% xlabel('SZA','fontsize',20);
-% ylabel('Altitude','fontsize',20);
-% title('Atitude of maximum scattering intensity','fontsize',22);
-% legend('Short wavelength','Long wavelength','location','NorthWest');
-% 
-% figure;
-% fig2 = gcf;
-% set(fig2,'color','white','Position',[100 100 1000 700]);
-% plot(atmos.true_actual,squeeze(maxa),'o-','LineWidth',2);
-% hold on
-% plot(atmos.true_actual,squeeze(maxb),'ro-','LineWidth',2);
-% set(gca,'fontsize',18);
-% xlabel('SZA','fontsize',20);
-% ylabel('Maximum intensity','fontsize',20);
-% title('Value of maximum scattering intensity','fontsize',22);
-% legend('Short wavelength','Long wavelength');
+if test_model_height
+    [maxa inda] = max(intensity(1,:,:));
+    [maxb indb] = max(intensity(2,:,:));
+    figure;
+    fig1 = gcf;
+    set(fig1,'color','white','Position',[100 100 1000 700]);
+    plot(atmos.true_actual,squeeze(inda),'o-','LineWidth',2);
+    hold on
+    plot(atmos.true_actual,squeeze(indb),'ro-','LineWidth',2);
+    set(gca,'fontsize',18);
+    xlabel('SZA','fontsize',20);
+    ylabel('Altitude','fontsize',20);
+    title('Atitude of maximum scattering intensity','fontsize',22);
+    legend('Short wavelength','Long wavelength','location','NorthWest');
+
+    figure;
+    fig2 = gcf;
+    set(fig2,'color','white','Position',[100 100 1000 700]);
+    plot(atmos.true_actual,squeeze(maxa),'o-','LineWidth',2);
+    hold on
+    plot(atmos.true_actual,squeeze(maxb),'ro-','LineWidth',2);
+    set(gca,'fontsize',18);
+    xlabel('SZA','fontsize',20);
+    ylabel('Maximum intensity','fontsize',20);
+    title('Value of maximum scattering intensity','fontsize',22);
+    legend('Short wavelength','Long wavelength');
+    pause
+    close fig1 fig2
+end
 
 ratio = zeros(sz(1),sz(2));
 

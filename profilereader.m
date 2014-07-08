@@ -24,8 +24,31 @@ atmos.next_year = 0;
 %     end
 % end            
 
-
 %retrieving measurement vectors.
+% atmos.initial_SZA(measurement_number).SZA ...
+%     (atmos.initial_SZA(measurement_number).SZA == 0) = NaN; 
+% 
+% difference = diff(atmos.initial_SZA(measurement_number).SZA');
+% for k = 1:size(difference,2)
+%     if length(find((difference(:,k)) > 0)) == length(find(~isnan(difference(:,k))));
+%         monotonic(k) = 1;
+%         vector_break(k) = 0;
+%     elseif length(find((difference(:,k)) < 0)) == find(~isnan(difference(:,k)));
+%         monotonic(k) = 1;
+%         vector_break(k) = 0;
+%     else monotonic(k) = 0;
+%         vector_mult(:,k) = difference(1:end-1,k).*difference(2:end,k);
+%         vector_break(k) = find(vector_mult(:,k) < 0)+1;
+%         
+%     end
+%     
+%     if ~monotonic(k)
+%         SZA_temp_1 = atmos.initial_SZA(measurement_number).SZA(k,1:vector_break(k));
+%         SZA_temp_2 = atmos.initial_SZA(measurement_number).SZA(k,vector_break(k)+1:end);
+%     end
+% end
+
+
 N_temp = [];
 WLP_temp = [];
 R_temp = [];

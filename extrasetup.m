@@ -3,15 +3,15 @@ function extra = extrasetup(atmos,measurement_number,station,year)
 inputpath = '/Users/stonek/work/Dobson/input/';
 %Need to appropriately define input file locations throughout script
 
-%SWITCHES
+%Logicals and other switches
 extra.logswitch = 0; %retrieve in log space (currently doesn't work)
 extra.mieswitch = 1; %include Mie scattering
 extra.refraction = 1; %include refraction
-extra.normalise_to_LSZA =1; %normalise measurments
+extra.normalise_to_LSZA = 1; %normalise measurments
 extra.WLP_to_retrieve = 'C'; % define wavelength pairs to retrieve: all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
 extra.seasonal = 'monthly'; %'monthly', 'seasonal' or 'constant' for ozone, temperature, and pressure profiles
-extra.designated_SZA = 0; %retrieve using desiganted SZAs (not infallable)
+extra.designated_SZA = 0; %retrieve using designated SZAs (not infallable)
 extra.plot_inten = 0; %plot intensity curves for selected SZAs (diagnostic code)
 extra.test_model_height_limit = 0; %switch for testing model height limit on zenith paths
 extra.full_covariance = 0; %produce Sa matrix using Rodgers definition
@@ -19,12 +19,13 @@ extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
 extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
-extra.SZA_limit = 94;
+extra.SZA_limit = 94; %upper limit of SZA to use
 
 %OUTPUT folders are not complete
 extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';
 extra.output_resolution = '/Users/stonek/work/Dobson/OUTPUT/resolution/';
-extra.output_diagnostics = '/Users/stonek/work/Dobson/OUTPUT/plots/diagnotics/';
+extra.output_diagnostics = '/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/';
+
 %Naming conventions
 extra.name_ext = [];
 ext_start = 1;

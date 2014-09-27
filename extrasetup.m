@@ -19,7 +19,7 @@ extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
 extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
-extra.SZA_limit = 94; %upper limit of SZA to use
+extra.SZA_limit = 90; %upper limit of SZA to use
 
 %OUTPUT folders are not complete
 extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';

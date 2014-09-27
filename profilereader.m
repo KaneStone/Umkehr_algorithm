@@ -24,6 +24,7 @@ atmos.next_year = 0;
 %     end
 % end            
 
+%INCOMPLETE CODE
 %retrieving measurement vectors.
 % atmos.initial_SZA(measurement_number).SZA ...
 %     (atmos.initial_SZA(measurement_number).SZA == 0) = NaN; 
@@ -50,7 +51,7 @@ atmos.next_year = 0;
 
 
 N_temp = [];
-WLP_temp = [];
+%WLP_temp = [];
 R_temp = [];
 I_temp = [];
 
@@ -61,7 +62,7 @@ if ~isempty(strfind(WLP,'A'))
         N_temp(count,:) = atmos.N_values(measurement_number).N(atmos.N_values(measurement_number).WLP == 'A',:);
         R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'A'),:);
         I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'A'),:);
-        WLP_temp(:,count) = 'A';
+        WLP_temp(count) = 'A';
         count = count+1;
     end
 end
@@ -71,7 +72,7 @@ if ~isempty(strfind(WLP,'C'))
         N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'C'),:);
         R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'C'),:);
         I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-        WLP_temp(:,count) = 'C';
+        WLP_temp(count) = 'C';
         count = count+1;    
     end
 end
@@ -81,7 +82,7 @@ if ~isempty(strfind(WLP,'D'))
         N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'D'),:);
         R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'D'),:);
         I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'D'),:);    
-        WLP_temp(:,count) = 'D';
+        WLP_temp(count) = 'D';
     end
 end
 

@@ -165,11 +165,11 @@ for l = iscat:atmos.nlayers-1;
     a = atmos.r(l);
     b = a+atmos.dz;
     x1 = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2));
-    x1_test(l) = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2)); %for testing
+    %x1_test(l) = ((1/atmos.N(i,l))*sqrt(atmos.N(i,l)^2*a^2-Rg(iscat)^2)); %for testing
     x2 = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2));
-    x2_test(l) = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2)); %for testing
+    %x2_test(l) = ((1/atmos.N(i,l+1))*sqrt(atmos.N(i,l+1)^2*b^2-Rg(iscat)^2)); %for testing
     dx = abs(x2-x1);
-    dx1(l) = abs(x2-x1); %for testing
+    %dx1(l) = abs(x2-x1); %for testing
     phi1 = (atmos.N(i,l)*Rg(iscat))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
         (Rg(iscat)^2)));
     phi2 = (atmos.N(i,l+1)*Rg(iscat))/((atmos.N(i,l+1)^2)*(b^2)-...
@@ -178,15 +178,15 @@ for l = iscat:atmos.nlayers-1;
     if iteration == 2
         ds1 = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
             (Rg(iscat)^2)));
-        ds1_test(l) = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
-            (Rg(iscat)^2)));
+       % ds1_test(l) = ((atmos.N(i,l)^2)*(a^2))/((atmos.N(i,l)^2)*(a^2)-(gamma(l)*...
+       %     (Rg(iscat)^2)));
         ds2 = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
             (gamma(l+1)*(Rg(iscat)^2)));        
-        ds2_test(l) = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
-            (gamma(l+1)*(Rg(iscat)^2)));
+        %ds2_test(l) = ((atmos.N(i,l+1)^2)*(b^2))/((atmos.N(i,l+1)^2)*(b^2)-...
+        %    (gamma(l+1)*(Rg(iscat)^2)));
         
-        ds1_temp(l) = 1/(1+(gamma(l).*(sind(Apparent(j).^2))));
-        ds2_temp(l) = 1/(1+(gamma(l+1).*(sind(Apparent(j).^2))));
+        %ds1_temp(l) = 1/(1+(gamma(l).*(sind(Apparent(j).^2))));
+        %ds2_temp(l) = 1/(1+(gamma(l+1).*(sind(Apparent(j).^2))));
         
         zs(i,j,iscat,l) = dx*(ds1+ds2)/2;
     end

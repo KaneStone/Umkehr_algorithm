@@ -56,8 +56,8 @@ end
 
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
-figure;
-plot(squeeze(zs(1,1,1,:)))
+%figure;
+%plot(squeeze(zs(1,1,1,:)))
 
 end
 
@@ -70,6 +70,7 @@ function [True Apparent_Initial Apparent_Final zs atmos] = ...
 Rg = ones(1,length(atmos.N(i,1:atmos.nlayers-1))).*...
     atmos.Nr(i,iscat)*sind(Apparent(j)); 
 atmos.ztan = interp1(atmos.Nr(i,:),atmos.r,Rg(iscat),'linear','extrap');
+
 tanlayer = ceil(((atmos.ztan-atmos.r(1))/atmos.dz));
 
 if tanlayer < 1

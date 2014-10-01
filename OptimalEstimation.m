@@ -37,9 +37,9 @@ xa = xa';
 xi = xa;
 di2 = length(y);
 if strcmp(method,'Opt')
-    for i = 1:3; %Number of iterations
-    %i = 1;
-    %while di2 > length(y)/2 %Stops due to convergence test.
+    %for i = 1:3; %Number of iterations
+    i = 1;
+    while di2 >= length(y) %Stops due to convergence test.
         K1(i).K = K;
         %reshaping into one vector for all wavelengths               
         yhat = reshape(yhat',1,numel(yhat));
@@ -70,7 +70,8 @@ if strcmp(method,'Opt')
         %%%TESTING FOR CONVERGENCE%%%
         Sdayy = Se*(K*Sa*K'+Se)\Se;
         di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
-        %i = i+1;
+        di3(i) = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
+        i = i+1;
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution

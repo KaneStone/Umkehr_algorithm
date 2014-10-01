@@ -212,7 +212,7 @@ fid = fopen(pressurefilename);
 pressure = fscanf(fid,'%f',[5,inf])';
 atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
 atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
-fclose (fid);
+fclose(fid);
 
 %Reading in aerosols
 %These aerosols are for extinction at 500nm. To calculate extinction at

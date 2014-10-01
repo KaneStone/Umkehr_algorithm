@@ -13,6 +13,8 @@
 9. Potential for multiple scattering needs to be coded in.
 10. Potential for stray light needs to be coded in.
 11. Zenith path ray lengths near the surface for short SZA are going haywire!
+12. Convergence is working put seems to be taking a while. Look into
+13. Include monthly and constant option for reading in pressure.
 
 
 

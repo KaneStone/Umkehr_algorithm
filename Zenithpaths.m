@@ -30,7 +30,7 @@ sz_a = size(a);
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:)); %defined as negative
+        gamma =(atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:)); %defined as negative
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;

@@ -37,9 +37,9 @@ xa = xa';
 xi = xa;
 di2 = length(y);
 if strcmp(method,'Opt')
-    %for i = 1:3; %Number of iterations
-    i = 1;
-    while di2 >= length(y) %Stops due to convergence test.
+    for i = 1:3; %Number of iterations
+    %i = 1;
+    %while di2 >= length(y) %Stops due to convergence test.
         K1(i).K = K;
         %reshaping into one vector for all wavelengths               
         yhat = reshape(yhat',1,numel(yhat));
@@ -71,7 +71,7 @@ if strcmp(method,'Opt')
         Sdayy = Se*(K*Sa*K'+Se)\Se;
         di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
         di3(i) = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
-        i = i+1;
+        %i = i+1;
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution
@@ -97,7 +97,11 @@ elseif strcmp(method,'LS');
     K1 =1;
     K = K(sz(3)+1:2*sz(3),:);
 end
-S = (K'*(Se^-1)*K +Sa^-1)^-1;
+S.Ss = ((K'*(Se^-1)*K +Sa^-1)^-1*(Sa\((K'*(Se^-1)*K +Sa^-1)^-1)));
+S.Sm = ((K'*(Se^-1)*K +Sa^-1)^-1)*(K'*(Se\K))*((K'*(Se^-1)*K +Sa^-1)^-1);
+S.Ss_plus_Ss = S.Ss+S.Sm;
+S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
+% pass through Ss and times by g to obtain layer four smoothing errors.
 end
 
 

@@ -28,8 +28,37 @@ file_name_H = strcat(station,'_H_',WLP,'_',...
 file_name_AK = strcat(station,'_',WLP,'_AK_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
     sprintf('%02d',date(1)),extra.name_ext,'.txt');
+file_name_S = strcat(station,'_',WLP,'_S_',...
+    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+    sprintf('%02d',date(1)),extra.name_ext,'.txt');
 
-AK.AK = S*(K'/Se*K);
+Ss_layers = g1*S.Ss(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g1';
+Ss_layers(:,1:2) = Ss_layers(:,1:2)/10;
+Ss_layers(:,3:7) = Ss_layers(:,3:7)/5;
+Ss_layers(:,8) = Ss_layers(:,8)/35;
+
+S_layers = g1*S.S(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g1';
+S_layers(:,1:2) = S_layers(:,1:2)/10;
+S_layers(:,3:7) = S_layers(:,3:7)/5;
+S_layers(:,8) = S_layers(:,8)/35;
+
+S_to_print = S_layers;
+S_to_print2 = S.S;
+save(strcat(output_folder_res, file_name_S),'S_to_print','-ascii');
+save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
+% %diagnostic code - remove after
+% figure;
+% fig = gcf;
+% set(fig,'color','white','position',[100 100 1000 700]);
+% ag = plot(Ss_layers,1:8,'LineWidth',2);
+% title('Ss','fontsize',22);
+% set(gca,'yticklabel',{'0+1';'2+3';'4';'5';'6';'7';'8';'9+'},'fontsize',18);
+% ylabel('Umkehr layer','fontsize', 20);
+% xlabel('Ss','fontsize', 20);
+% hj = legend(ag,'0+1','2+3','4','5','6','7','8','9+');
+% export_fig(fig,'-eps','-nocrop');
+
+AK.AK = S.S*(K'/Se*K);
 %Area of the AK is a measure of the amount of information coming from the
 %measurements relative to the a priori information, ideally = 1.0
 AK.area=sum(AK.AK,1);
@@ -52,7 +81,6 @@ AK.dof_all = diag(AK.AK(1:80,1:80));
 
 dof = vertcat(AK.dof1,AK.dof);
 %dof = vertcat(AK.dof_all,AK.dof);
-
 save(strcat(output_folder_res, file_name_dof),'dof','-ascii');
 
 %Information content - 3D reduction in the error covariance volumes - how
@@ -90,7 +118,11 @@ save(strcat(output_folder_res, file_name_H),'H_print','-ascii');
 
 %AK_to_print = AK.AK1; Outputting full AK as all information can be
 %obtained from it directly.
-AK_to_print = AK.AK;
+AK_to_print = AK.AK1;
 save(strcat(output_folder_AK, file_name_AK),'AK_to_print','-ascii');
+
+AK_to_print2 = AK.AK;
+save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals', file_name_AK),'AK_to_print2','-ascii');
+
 
 end

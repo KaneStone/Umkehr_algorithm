@@ -8,10 +8,12 @@ function [K,N]=ForwardModel(x,Kflg,AeroKflg,extra)
 
 %extra.pert = x./100;
 %one percent change in ozone.
-if extra.logswitch
-    extra.pert = log10(x./100);
-else extra.pert = x./100;
-end
+% if extra.logswitch
+%     extra.pert = log10(x./100);
+% else extra.pert = x./100;
+% end
+
+extra.pert = x./100;
 
 %Calculating weighting functions
 if (Kflg == 1)

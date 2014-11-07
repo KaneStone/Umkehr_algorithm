@@ -8,7 +8,7 @@ Umkehr_path = '/Users/stonek/work/Dobson/input/Umkehr/';
 measurementfilename = strcat(Umkehr_path,station,'/',station,...
      '_',year,'.txt');
 [atmos_init measurement_length] = read_in_Umkehr(measurementfilename);
-for measurement_number = 20;%:measurement_length;
+for measurement_number = 1:7%measurement_length+1;
     
     extra = extrasetup(atmos_init,measurement_number,station,year);
     if extra.next_year
@@ -25,11 +25,7 @@ for measurement_number = 20;%:measurement_length;
     elseif extra.L_Aerosol == 1 
         AeroKflg = 1;
         Kflg = 0;
-    end
-    
-    if extra.logswitch
-       extra.atmos.ozone=log10(extra.atmos.ozone);        
-    end
+    end       
     
     if AeroKflg
         Aero_Weighting_Functions(AeroKflg,extra);

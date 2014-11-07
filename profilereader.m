@@ -1,6 +1,6 @@
 function [atmos] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
     pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,...
-    WLP,morn_or_even,seasonal,SZA_limit)
+    WLP,morn_or_even,seasonal,SZA_limit,logswitch)
 
 %reads in measurements and atmospheric profiles.
 %currently reading in
@@ -187,6 +187,11 @@ else prof = fscanf(fid,'%f',[5,inf])';
     atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
     fclose (fid);
 
+end
+
+if logswitch;
+    atmos.ozone = log10(atmos.ozone);
+    atmos.ozonemid = log10(atmos.ozone);
 end
 
 %Reading in temperature.

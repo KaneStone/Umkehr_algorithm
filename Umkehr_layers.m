@@ -23,7 +23,7 @@ g1(6,36:40) = 1;
 g1(7,41:45) = 1;
 g1(8,46:end) = 1;
 
-Scol = g*S(1:end-1,1:end-1)*g';
+Scol = g*S.S(1:end-1,1:end-1)*g';
 Scolerrors = diag((Scol).^.5);
 Scolerrors1 = Scolerrors.*DU_coeff;
 xhat_layer = DU_coeff.*xhat(1:end-1);
@@ -31,7 +31,7 @@ xhat_layer1 = g*xhat_layer';
 
 Total_Ozone = sum(xhat_layer1);
 
-Total_column_errors = (sum(diag(S))).^.5*DU_coeff;
+Total_column_errors = (sum(diag(S.S))).^.5*DU_coeff;
 
 Result_retrieval = vertcat(xhat_layer1,Total_Ozone);
 Error_Result = vertcat(Scolerrors1,Total_column_errors);

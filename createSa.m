@@ -25,11 +25,7 @@ if full_covariance
 end
 
 SD (SD <= 1e11) = 1e11;
-if logswitch
-    SD = log10(SD);
-end
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
-
 scale_factor = 8; %was 8; 
 
 %For testing optimal Sa (L-curve)
@@ -45,12 +41,13 @@ scale_upper2 = 1:.1:5.5;
 Sa_temp(1,extra.atmos.nlayers-45:end) = Sa_temp(extra.atmos.nlayers-45:end)./scale_upper2;
 
 Sa_temp = Sa_temp.^2;
-if logswitch
-    Sa = diag(log10(Sa_temp));
-else Sa = diag(Sa_temp);
-end
+Sa = diag(Sa_temp);
 
-
+% if logswitch
+%     Sa = diag(log10(Sa_temp));
+% else Sa = diag(Sa_temp);
+% end
+%Sa = diag(Sa_temp);
 
 end
 

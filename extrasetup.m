@@ -14,7 +14,7 @@ extra.seasonal = 'monthly'; %'monthly', 'seasonal' or 'constant' for ozone, temp
 extra.designated_SZA = 0; %retrieve using designated SZAs (not infallable)
 extra.plot_inten = 0; %plot intensity curves for selected SZAs (diagnostic code)
 extra.test_model_height_limit = 0; %switch for testing model height limit on zenith paths
-extra.full_covariance = 1; %produce Sa matrix using Rodgers definition
+extra.full_covariance = 0; %produce Sa matrix using Rodgers definition
 extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
@@ -89,7 +89,7 @@ profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.
 atmos = profilereader(profilepath.measurements,profilepath.ozone,profilepath.Temp,...
     profilepath.Pres,profilepath.solar,profilepath.aerosol,atmos,...
     measurement_number,extra.WLP_to_retrieve,extra.morn_or_even,extra.seasonal,...
-    extra.SZA_limit);
+    extra.SZA_limit,extra.logswitch);
 
 if atmos.return
     extra.no_data = 1;
@@ -131,11 +131,15 @@ if strcmp(study,'BP')
     ozonexs = interp1(xs.BPwl,temphold',lambda,'linear','extrap');    
 elseif strcmp(study,'BDM')
     temphold = interp1(xs.BDMtemp,xs.BDMsigma,atmos.T,'linear','extrap'); 
-    ozonexs = interp1(xs.BDMwl,temphold',lambda,'linear','extrap');  
+    ozonexs = interp1(xs.BDMwl,temphold',lambda,'linear','extrap');     
 elseif strcmp(study,'S')
     temphold = interp1(xs.Stemp,xs.Ssigma,atmos.T,'linear','extrap'); 
     ozonexs = interp1(xs.Swl,temphold',lambda,'linear','extrap');  
 end
+
+%if extra.logswitch
+%    ozonexs = log10(ozonexs);
+%end
 
 % rayleigh scattering code
 [~,atmos] = Rayleigh(atmos,lambda);

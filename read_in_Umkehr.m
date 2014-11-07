@@ -37,6 +37,12 @@ end
 fclose(fid);
 
 %Seperating into separate measurements
+N_temp_C = [];
+R_temp_C = [];
+SZA_temp_C = [];
+WLP_temp_C = [];
+atmos.WLP = zeros(49,500);
+WLP_month_C = zeros(12,500);
 position_handle = 1;
 count = 1;
 for j = 1:12;
@@ -66,6 +72,11 @@ for j = 1:12;
                 atmos.N_values(count).WLP(position_handle) = 'C';                
                 atmos.N_values(count).N(position_handle,1:length(what_WLP.c)) = intensity_values.N_value(what_WLP.c);               
                 atmos.R_values(count).R(position_handle,1:length(what_WLP.c)) = intensity_values.R_value(what_WLP.c);
+                
+                N_temp_C = [N_temp_C intensity_values.N_value(what_WLP.c)'];
+                R_temp_C = [R_temp_C intensity_values.R_value(what_WLP.c)'];
+                SZA_temp_C = [SZA_temp_C angles.Solar_zenith_angle(what_WLP.c)'];
+                WLP_temp_C = [WLP_temp_C atmos.WLP(count,:)];
                 position_handle = position_handle+1;                
             end
 
@@ -80,8 +91,27 @@ for j = 1:12;
             atmos.MIN_SZA(count) = min(min(atmos.initial_SZA(count).SZA)); 
             count = count+1; 
             position_handle = 1;
-        end
+        end       
     end
+    
+    %inificient code for testing monthly vector retrievals-----
+    N_month_C(j).N = N_temp_C;
+    N_month_C(j).WLP = 'C';
+    R_month_C(j).R = R_temp_C;
+    SZA_month_C(j).SZA = SZA_temp_C;
+    WLP_temp_C (WLP_temp_C ~= 67) = [];
+    WLP_month_C(j,1:length(WLP_temp_C)) = WLP_temp_C;
+    N_temp_C = [];
+    R_temp_C = [];
+    SZA_temp_C = [];
+    WLP_temp_C = [];
+    %----------------------------------------------------------
 end
 measurement_length = length(atmos.N_values);
+
+atmos.N_values = horzcat(atmos.N_values,N_month_C);
+atmos.R_values = horzcat(atmos.R_values,R_month_C);
+atmos.initial_SZA = horzcat(atmos.initial_SZA,SZA_month_C);
+atmos.date = horzcat(atmos.date,atmos.date(1:12));
+atmos.WLP = vertcat(atmos.WLP,WLP_month_C);
 end

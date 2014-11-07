@@ -1,5 +1,5 @@
 function [N] = Nvaluezs(atmos,ozonemid,lambda,zs,ozonexs,~,mieswitch,...
-    norm_switch, plot_inten,test_model_height)
+    norm_switch, plot_int,test_model_height)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
    
@@ -90,8 +90,9 @@ end
 ratio = zeros(sz(1),sz(2));
 
 %To plot intensity curves
-if plot_inten
+if plot_int
     plot_inten(intensity, atmos, sz);
+    pause;
 end
 
 for j = 1:length(lambda);
@@ -110,7 +111,7 @@ for k = 1:length(lambda)/2;
     ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),...
         lambda(wn:wn+1),'linear','extrap');  
     ETSF_ratio = 1; %ETFS is removed by normalising to lowest SZA
-    N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));
+    N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));    
     wn = wn+2;
 end
 

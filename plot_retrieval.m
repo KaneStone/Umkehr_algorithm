@@ -8,7 +8,7 @@ figure;
 set(gcf, 'Visible', 'off')
 fig1 = gcf;
 set(fig1,'color','white','Position',[100 100 1000 700]);
-herrorbar(xhat,1:extra.atmos.nlayers,(diag(S)).^.5,'r');
+herrorbar(xhat,1:extra.atmos.nlayers,(diag(S.S)).^.5,'r');
 hold on
 p1 = plot(xhat,1:extra.atmos.nlayers,'r','LineWidth',2);
 if L_Ozone

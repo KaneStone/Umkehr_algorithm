@@ -15,7 +15,8 @@ for i = 1:2
 end
 int_weight(1,:) = int_weight(1,:)*scale_factor; 
 
-sample = [10,14,18,22,26,32,36]; %may cause problems if outside range of SZA
+%sample = [10,14,18,22,26,32,36]; %may cause problems if outside range of SZA
+sample = [29,32];
 [max_ind max_ozone] = max(atmos.ozone);
 
 figure;
@@ -34,10 +35,13 @@ short_line = plot(squeeze(intensity(1,1:height_limit,sample))*scale_factor,...
     1:height_limit,'LineWidth',3);
 
 %plot weighted intensitie heights
-iwh1 = plot(int_weight(1,sample)',a_weight(1,sample)','-o','color',[0 0 0],...
-    'LineWidth',4);
-iwh2 = plot(int_weight(2,sample)',a_weight(2,sample)','--o','color',[0 0 0],...
-'LineWidth',4);
+%iwh1 = plot(int_weight(1,sample)',a_weight(1,sample)','-o','color',[0 0 0],...
+%    'LineWidth',4);
+iwh1 = scatter(int_weight(1,sample)',a_weight(1,sample)','o','k','filled');
+
+%iwh2 = plot(int_weight(2,sample)',a_weight(2,sample)','--o','color',[0 0 0],...
+%'LineWidth',4);
+iwh2 = scatter(int_weight(2,sample)',a_weight(2,sample)','o','k','filled');
 
 ylabel('Altitude (km)','fontsize',font_size);
 xlabel('Intensity','fontsize',font_size);
@@ -91,7 +95,7 @@ set(h,'position',psn);
 
 %legend([long_line short_line hline], num2str(ceil(atmos.true_actual(sample))')...
 %    ,num2str(ceil(atmos.true_actual(sample))'),'ozone profile');
-file = '/Users/stonek/work/Dobson/OUTPUT/plots/inten.eps';
+file = '/Users/stonek/work/Dobson/OUTPUT/plots/inten11.eps';
 export_fig(fig,file,'-eps','-nocrop')
 %print(fig,'-depsc2','-r200','-loose',file);
 end

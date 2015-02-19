@@ -28,8 +28,11 @@ legend([p1 p2],'retrieval','A priori','location','NorthWest');
 N_val = extra.atmos.N_values(measurement_number).N;
 N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
+res = N_val - yhat;
 perc_of_Se = ((N_val-yhat)./reshape(Se_for_errors,fliplr(size(N_val)))')*100;
+perc_of_Std = ((N_val-yhat)./N_val_error')*100;
 
+%close all;
 %plotting N_values
 figure;
 set(gcf, 'Visible', 'off')

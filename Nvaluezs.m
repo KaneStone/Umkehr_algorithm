@@ -1,5 +1,5 @@
 function [N] = Nvaluezs(atmos,ozonemid,lambda,zs,ozonexs,~,mieswitch,...
-    norm_switch, plot_int,test_model_height)
+    norm_switch, plot_int,test_model_height,test_cloud_effect)
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
    
@@ -95,6 +95,11 @@ if plot_int
     pause;
 end
 
+if test_cloud_effect;
+    cloud_effect(intensity,intenstar,atmos.true_actual,[1,3,10],'all',...
+        lambda,0,norm_switch);
+end
+
 for j = 1:length(lambda);
     %for different wavelength pair vector length functionality
     find_nan = find(~isnan(atmos.true_actual(ceil(j/2),:)));
@@ -123,5 +128,6 @@ if norm_switch
         N(j,:) = N(j,:) - repmat(N_min,1,sz(2));   
     end
 end
+
 end
 

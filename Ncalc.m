@@ -13,7 +13,7 @@ ozonemid = interp1(extra.atmos.Z,ozone,extra.atmos.Zmid,'linear','extrap');
 %intensities for direct sun and zenith sky
 [N.zs] = Nvaluezs(extra.atmos,ozonemid,extra.lambda,extra.zs,extra.ozonexs,...
     extra.bandpass,extra.mieswitch,extra.normalise_to_LSZA,...
-    extra.plot_inten,extra.test_model_height_limit);
+    extra.plot_inten,extra.test_model_height_limit,extra.test_cloud_effect);
 
 %ac = -ab_midday+ab;
 %h = plot(extra.atmos.true_actual(1,:),ac,'LineWidth',2)

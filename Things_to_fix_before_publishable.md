@@ -15,6 +15,8 @@
 11. Zenith path ray lengths near the surface for short SZA are going haywire!
 12. Convergence is working put seems to be taking a while. Look into
 13. Include monthly and constant option for reading in pressure.
+14. Include option to retrieve entire month as one retrieval vector
+
 
 
 

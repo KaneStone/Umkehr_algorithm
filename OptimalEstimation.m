@@ -37,7 +37,7 @@ xa = xa';
 xi = xa;
 di2 = length(y);
 if strcmp(method,'Opt')
-    for i = 1:3; %Number of iterations
+    for i = 1:4; %Number of iterations
     %i = 1;
     %while di2 >= length(y) %Stops due to convergence test.
         K1(i).K = K;

@@ -20,6 +20,7 @@ extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progr
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
 extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
 extra.SZA_limit = 94; %upper limit of SZA to use
+extra.test_cloud_effect = 1;
 
 %OUTPUT folders are not complete
 extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';
@@ -36,6 +37,10 @@ end
 if extra.full_covariance
     extra.name_ext(ext_start:ext_start+2) = '_FC';
     ext_start = ext_start+3;
+end
+if extra.test_cloud_effect
+    extra.name_ext(ext_start:ext_start+3) = '_TCE';
+    ext_start = ext_start+4;
 end
 if extra.SZA_limit ~= 94 && ~extra.designated_SZA;
     extra.name_ext(ext_start:ext_start+2) = strcat('_',num2str(extra.SZA_limit));

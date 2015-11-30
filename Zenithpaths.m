@@ -56,8 +56,8 @@ end
 
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
-%figure;
-%plot(squeeze(zs(1,1,1,:)))
+figure;
+plot(squeeze(zs(1,1,1,:)))
 
 end
 
@@ -99,11 +99,15 @@ phi1 = (atmos.N(i,tanlayer+2:iscat).*Rg(tanlayer+2:iscat))./...
 if iteration == 2
     
     ds2 = ((atmos.N(i,tanlayer+1:iscat-1).^2).*(b.^2))./...
-        ((atmos.N(i,tanlayer+1:iscat-1).^2).*...
-        (b.^2)-(gamma(tanlayer+1:iscat-1).*(Rg(tanlayer+1:iscat-1).^2)));
+       ((atmos.N(i,tanlayer+1:iscat-1).^2).*...
+       (b.^2)-(gamma(tanlayer+1:iscat-1).*(Rg(tanlayer+1:iscat-1).^2)));
     ds1 = ((atmos.N(i,tanlayer+2:iscat).^2).*(a.^2))./...
-        ((atmos.N(i,tanlayer+2:iscat).^2).*...
-        (a.^2)-(gamma(tanlayer+2:iscat).*Rg(tanlayer+2:iscat).^2));       
+       ((atmos.N(i,tanlayer+2:iscat).^2).*...
+       (a.^2)-(gamma(tanlayer+2:iscat).*Rg(tanlayer+2:iscat).^2));       
+    
+    %ds1 = ones(1,length(tanlayer+1:iscat-1))./(1-(gamma(tanlayer+1:iscat-1).*sind(Apparent(j)).*2));
+    %ds2 = ones(1,length(tanlayer+1:iscat-1))./(1-(gamma(tanlayer+1:iscat-1).*sind(Apparent(j)).*2));
+    
     zs(i,j,iscat,tanlayer+1:iscat-1) = atmos.dz+(dx.*(ds1+ds2));
 end
 phi_down = dx*((phi1+phi2)/2)'.*(180/pi)*2;
@@ -153,11 +157,15 @@ phi_up = dx*((phi1+phi2)./2)'.*(180/pi);
 
 if iteration == 2
     ds1 = ((atmos.N(i,iscat:atmos.nlayers-1).^2).*(a.^2))./...
-        ((atmos.N(i,iscat:atmos.nlayers-1).^2).*...
-        (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg(iscat:atmos.nlayers-1).^2)));
+       ((atmos.N(i,iscat:atmos.nlayers-1).^2).*...
+       (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg(iscat:atmos.nlayers-1).^2)));
     ds2 = ((atmos.N(i,iscat+1:atmos.nlayers).^2).*(b.^2))./...
-        ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
-        (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg(iscat:atmos.nlayers-1).^2)));       
+       ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
+       (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg(iscat:atmos.nlayers-1).^2)));       
+    
+    %ds1 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat:atmos.nlayers-1).*sind(Apparent(j)).*2));
+    %ds2 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat+1:atmos.nlayers).*sind(Apparent(j)).*2));
+    
     zs(i,j,iscat,iscat:atmos.nlayers-1) = dx.*(ds1+ds2)/2;
 end
 
@@ -175,8 +183,10 @@ function [True Apparent_Initial Apparent_Final zs] = ...
     zenithpaths_down(atmos,i,j,True,Apparent_Initial,Apparent_Final,...
     Apparent,iscat,gamma,zs,iteration)
 %Calculates down through the atmosphere for cases where theta is less than 90           
+
 Rg = ones(1,length(atmos.N(i,iscat:atmos.nlayers-1))).*...
     atmos.Nr(i,iscat)*sind(Apparent(j)); 
+
 
 %layers above the scattering height which are the slant paths  
 a = atmos.r(iscat:atmos.nlayers-1);
@@ -197,11 +207,15 @@ phi = dx*((phi1+phi2)./2)'.*(180/pi);
 
 if iteration == 2
     ds1 = ((atmos.N(i,iscat:atmos.nlayers-1).^2).*(a.^2))./...
-        ((atmos.N(i,iscat:atmos.nlayers-1).^2).*...
-        (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg.^2)));
+       ((atmos.N(i,iscat:atmos.nlayers-1).^2).*...
+       (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg.^2)));
+    
+    %ds1 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat:atmos.nlayers-1).*sind(Apparent(j)).*2));
+    %ds2 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat+1:atmos.nlayers).*sind(Apparent(j)).*2));
+    
     ds2 = ((atmos.N(i,iscat+1:atmos.nlayers).^2).*(b.^2))./...
-        ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
-        (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg.^2)));       
+       ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
+       (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg.^2)));       
     zs(i,j,iscat,iscat:atmos.nlayers-1) = dx.*(ds1+ds2)/2;
 end
 

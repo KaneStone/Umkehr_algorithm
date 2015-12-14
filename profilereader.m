@@ -195,6 +195,11 @@ if logswitch;
 end
 
 %Reading in temperature.
+
+%for testing temperature and pressure on zenith paths
+test = importdata('/Users/stonek/work/Dobson/input/not_used/TP23_9Ant.dat');
+
+
     fid = fopen(temperaturefilename);
 if strcmp(seasonal,'seasonal')
     temperature = fscanf(fid,'%f',[5,inf])';

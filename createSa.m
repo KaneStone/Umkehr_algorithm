@@ -1,5 +1,5 @@
-function Sa = createSa(quarter,date_to_use,seasonal,logswitch,extra,i,mf,...
-    L_curve_diag,station,full_covariance)
+function Sa = createSa(quarter,date_to_use,seasonal,logswitch,extra,i,...
+    L_curve_diag,station,full_covariance,scale_factor)
 
 if seasonal
     folder = '/Users/stonek/work/Dobson/input/station_climatology/ozone/Standard_Deviation/';
@@ -26,16 +26,9 @@ end
 
 SD (SD <= 1e11) = 1e11;
 Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
-scale_factor = 8; %was 8; 
+%scale_factor = 8; %was 8; 
 
-%For testing optimal Sa (L-curve)
-if L_curve_diag
-    if i == 1
-        Sa_temp = Sa_temp*scale_factor;
-    else Sa_temp = Sa_temp.*mf;
-    end
-else Sa_temp = Sa_temp*scale_factor;
-end
+Sa_temp = Sa_temp*scale_factor;    
 
 scale_upper2 = 1:.1:5.5;
 Sa_temp(1,extra.atmos.nlayers-45:end) = Sa_temp(extra.atmos.nlayers-45:end)./scale_upper2;

@@ -109,9 +109,9 @@ for j = 1:12;
 end
 measurement_length = length(atmos.N_values);
 
-atmos.N_values = horzcat(atmos.N_values,N_month_C);
-atmos.R_values = horzcat(atmos.R_values,R_month_C);
-atmos.initial_SZA = horzcat(atmos.initial_SZA,SZA_month_C);
-atmos.date = horzcat(atmos.date,atmos.date(1:12));
-atmos.WLP = vertcat(atmos.WLP,WLP_month_C);
+%atmos.N_values = horzcat(atmos.N_values,N_month_C);
+%atmos.R_values = horzcat(atmos.R_values,R_month_C);
+%atmos.initial_SZA = horzcat(atmos.initial_SZA,SZA_month_C);
+%atmos.date = horzcat(atmos.date,atmos.date(1:12));
+%atmos.WLP = vertcat(atmos.WLP,WLP_month_C);
 end

@@ -30,7 +30,8 @@ sz_a = size(a);
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma =(atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:)); %defined as negative
+        gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndz(i,:)); %dndz is defined as negative dndr
+        %gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndr(i,:));
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
@@ -57,8 +58,12 @@ end
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
 figure;
-plot(squeeze(zs(1,1,1,:)))
-
+set(gcf,'color','white','position',[100 100 1000 700]);
+plot(squeeze(zs(1,1,1,:)));
+ylabel('layer path (m)','fontsize',20);
+xlabel('layer no.','fontsize',20);
+export_fig('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/zs.png','-png');
+close gcf
 end
 
 function [True Apparent_Initial Apparent_Final zs atmos] = ...
@@ -193,6 +198,7 @@ a = atmos.r(iscat:atmos.nlayers-1);
 b = a+atmos.dz;
 x1 = ((1./atmos.N(i,iscat:atmos.nlayers-1)).*...
     sqrt(atmos.N(i,iscat:atmos.nlayers-1).^2.*a.^2-Rg.^2));
+
 x2 = ((1./atmos.N(i,iscat+1:atmos.nlayers)).*...
     sqrt(atmos.N(i,iscat+1:atmos.nlayers).^2.*b.^2-Rg.^2));
 dx = abs(x2-x1);
@@ -206,16 +212,15 @@ phi2 = (atmos.N(i,iscat+1:atmos.nlayers).*Rg)./...
 phi = dx*((phi1+phi2)./2)'.*(180/pi);
 
 if iteration == 2
-    ds1 = ((atmos.N(i,iscat:atmos.nlayers-1).^2).*(a.^2))./...
-       ((atmos.N(i,iscat:atmos.nlayers-1).^2).*...
-       (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg.^2)));
+                   
+     ds1 = (atmos.Nr(i,iscat:atmos.nlayers-1).^2)./...
+        ((atmos.Nr(i,iscat:atmos.nlayers-1).^2)...
+        -(gamma(iscat:atmos.nlayers-1).*(Rg.^2)));            
+
+     ds2 = (atmos.Nr(i,iscat+1:atmos.nlayers).^2)./...
+        ((atmos.Nr(i,iscat+1:atmos.nlayers).^2)...
+        -(gamma(iscat+1:atmos.nlayers).*(Rg.^2)));            
     
-    %ds1 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat:atmos.nlayers-1).*sind(Apparent(j)).*2));
-    %ds2 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat+1:atmos.nlayers).*sind(Apparent(j)).*2));
-    
-    ds2 = ((atmos.N(i,iscat+1:atmos.nlayers).^2).*(b.^2))./...
-       ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
-       (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg.^2)));       
     zs(i,j,iscat,iscat:atmos.nlayers-1) = dx.*(ds1+ds2)/2;
 end
 

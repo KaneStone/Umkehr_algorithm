@@ -24,6 +24,8 @@ term2 = 167909./(57.362-(1./(lambda.^2)));
 Ns = ((10^(-8))*(term1+term2));
 atmos.Ns = Ns;
 
+atmos.dndr = zeros(length(lambda),atmos.nlayers);
+
 % Calculating: refraction at all levels (atmos.N), scaleheight (atmos.H),
 % change in refractive index with height (atmos.d(el)ndz), change in
 % refractive index per kilometer atmos.dndr and height correction for
@@ -31,16 +33,18 @@ atmos.Ns = Ns;
 if (refraction)
     atmos.N = 1+(Ns*((Ts./atmos.T.*(atmos.P./Ps))));    
     atmos.H = Rd./g0.*atmos.T(1,:);
-    atmos.dndz = (Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H));  
+    atmos.dndz = (Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H));          
     for i = 1:length(lambda);
-      %   atmos.dndz1(i,:) = ((1+(atmos.Ns(i).*(Ts./atmos.T(1:end-1)).*...
-      %       (atmos.P(1:end-1)./Ps)))-(1+(atmos.Ns(i)*(Ts./atmos.T(2:end)).*...
-      %       (atmos.P(2:end)./Ps))))./atmos.dz;
+        %The next line matches -dndr
+        atmos.dndz(i,2:end) = ((1+(atmos.Ns(i).*(Ts./atmos.T(1:end-1)).*...
+           (atmos.P(1:end-1)./Ps)))-(1+(atmos.Ns(i)*(Ts./atmos.T(2:end)).*...
+           (atmos.P(2:end)./Ps))))./atmos.dz;
          
-        atmos.dndr(i,:) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
+        atmos.dndr(i,2:end) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
             (atmos.r(2:end)-atmos.r(1:end-1));        
         atmos.Nr(i,:) = atmos.N(i,:).*atmos.r;
-    end                
+    end   
+    atmos.dndr(:,1) = -atmos.dndz(:,1);
 else
     atmos.N = ones(length(lambda),length(atmos.Z));
     atmos.H = Rd/g0*atmos.T;

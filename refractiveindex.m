@@ -36,15 +36,15 @@ if (refraction)
     atmos.dndz = (Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H));          
     for i = 1:length(lambda);
         %The next line matches -dndr
-        atmos.dndz(i,2:end) = ((1+(atmos.Ns(i).*(Ts./atmos.T(1:end-1)).*...
-           (atmos.P(1:end-1)./Ps)))-(1+(atmos.Ns(i)*(Ts./atmos.T(2:end)).*...
-           (atmos.P(2:end)./Ps))))./atmos.dz;
-         
+         atmos.dndz(i,2:end) = ((1+(atmos.Ns(i).*(Ts./atmos.T(1:end-1)).*...
+            (atmos.P(1:end-1)./Ps)))-(1+(atmos.Ns(i)*(Ts./atmos.T(2:end)).*...
+            (atmos.P(2:end)./Ps))))./atmos.dz;
+                        
         atmos.dndr(i,2:end) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
             (atmos.r(2:end)-atmos.r(1:end-1));        
         atmos.Nr(i,:) = atmos.N(i,:).*atmos.r;
     end   
-    atmos.dndr(:,1) = -atmos.dndz(:,1);
+     atmos.dndr(:,1) = -atmos.dndz(:,1);
 else
     atmos.N = ones(length(lambda),length(atmos.Z));
     atmos.H = Rd/g0*atmos.T;

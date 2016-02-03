@@ -124,7 +124,7 @@ end
 for k = 1:No_WLP
     if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
     display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
-        {' Continuing with other wavelength pairs specified'}))
+        {' please look in atmos_init for available pairs.'}))
     atmos.return = 1;
     return
     else atmos.return = 0;
@@ -173,6 +173,7 @@ if strcmp(seasonal,'seasonal')
     fclose (fid);
 elseif strcmp(seasonal,'monthly');
     prof = fscanf(fid,'%f',[13,inf])';
+    prof(:,2:end) = prof(:,2:end);
     atmos.ozone = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Z,'linear','extrap');
     atmos.ozone (atmos.ozone < 1e8) = 1e8;
     %atmos.ozone = -(atmos.ozone*30/100)+atmos.ozone; %A prioir testing
@@ -189,41 +190,68 @@ else prof = fscanf(fid,'%f',[5,inf])';
 
 end
 
-if logswitch;
-    atmos.ozone = log10(atmos.ozone);
-    atmos.ozonemid = log10(atmos.ozone);
-end
+% if logswitch;
+%     atmos.ozone = log10(atmos.ozone);
+%     atmos.ozonemid = log10(atmos.ozonemid);
+% end
 
 %Reading in temperature.
 
 %for testing temperature and pressure on zenith paths
 test = importdata('/Users/stonek/work/Dobson/input/not_used/TP23_9Ant.dat');
+a = open('temp_test.mat');
+b = open('test_test_height.mat');
+test2 = interp1(b.b*1000,a.a,atmos.Z,'linear','extrap');
+test3 = interp1(b.b*1000,a.a,atmos.Zmid,'linear','extrap');
+c = open('test_pressure.mat');
+test4 = exp(interp1(0:1000:60000,log(c.c),atmos.Z,'linear','extrap'));
+test5 = exp(interp1(0:1000:60000,log(c.c),atmos.Zmid,'linear','extrap'));
+%-----
+%seasonal = 'seasonal';
 
-
-    fid = fopen(temperaturefilename);
+fid_temp = fopen(temperaturefilename);
+fid_pres = fopen(pressurefilename);
 if strcmp(seasonal,'seasonal')
-    temperature = fscanf(fid,'%f',[5,inf])';
+    temperature = fscanf(fid_temp,'%f',[5,inf])';
     atmos.T = interp1(temperature(:,1),temperature(:,quarter),atmos.Z,'linear','extrap');
     atmos.Tmid = interp1(temperature(:,1),temperature(:,quarter),atmos.Zmid,'linear','extrap');
-    fclose(fid);
+    fclose(fid_temp);
+    
+    pressure = fscanf(fid_pres,'%f',[5,inf])';
+    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
+    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+    fclose(fid_pres);
 elseif strcmp(seasonal,'monthly')
-    temperature = fscanf(fid,'%f',[13,inf])';
+    temperature = fscanf(fid_temp,'%f',[13,inf])';
     atmos.T = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Z,'linear','extrap');
     atmos.Tmid = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Zmid,'linear','extrap');
-    fclose(fid);
-else temperature = fscanf(fid,'%f',[5,inf])';
+    fclose(fid_temp);
+    
+    pressure = fscanf(fid_pres,'%f',[13,inf])';
+    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,date_to_use+1)),atmos.Z,'linear','extrap'));
+    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,date_to_use+1)),atmos.Zmid,'linear','extrap'));
+    fclose(fid_pres);
+else temperature = fscanf(fid_temp,'%f',[5,inf])';
     atmos.T = interp1(temperature(:,1),temperature(:,2),atmos.Z,'linear','extrap');
     atmos.Tmid = interp1(temperature(:,1),temperature(:,2),atmos.Zmid,'linear','extrap');
-    fclose(fid);
+    fclose(fid_temp);
+    
+    pressure = fscanf(fid_pres,'%f',[5,inf])';
+    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
+    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
+    fclose(fid_pres);
 end
 
-%Reading in pressure. ##This needs to include monthly and constant option##
-fid = fopen(pressurefilename);
-pressure = fscanf(fid,'%f',[5,inf])';
-atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
-atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
-fclose(fid);
+ %atmos.T = test2;
+ %atmos.Tmid = test3;
 
+%Reading in pressure. ##This needs to include monthly and constant option##
+
+
+ %atmos.P = test4;
+ %atmos.Pmid = test5;
+% atmos.P(1) = 1.025299541562413e+03;
+% atmos.T(1) = 288.5333;
 %Reading in aerosols
 %These aerosols are for extinction at 500nm. To calculate extinction at
 %otehr wavenegths: *(500/lambda)^1.2

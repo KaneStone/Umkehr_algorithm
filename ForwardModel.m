@@ -6,14 +6,16 @@ function [K,N]=ForwardModel(x,Kflg,AeroKflg,extra)
 
 [yhat,N] = Ncalc(x,extra);
 
-%extra.pert = x./100;
 %one percent change in ozone.
-% if extra.logswitch
-%     extra.pert = log10(x./100);
-% else extra.pert = x./100;
-% end
-
-extra.pert = x./100;
+  if extra.logswitch       
+      %extra.pert = log(x./100);
+        %x = log(x);
+        %extra.pert = log(x)./100;
+        extra.pert = x./100;
+        
+  else
+    extra.pert = x./100;
+  end
 
 %Calculating weighting functions
 if (Kflg == 1)
@@ -21,8 +23,19 @@ if (Kflg == 1)
         clearvars xpert
         xpert = x;
         xpert(i) = x(i)+extra.pert(i);
+%             if extra.logswitch
+%                xpert = exp(xpert);
+%             end
         ypert = Ncalc(xpert,extra);  
-        K(:,i) = (ypert-yhat)./(extra.pert(i));      
+        if extra.logswitch
+            %K(:,i) = (ypert-yhat)./log(extra.pert(i));                  
+            K(:,i) = (ypert-yhat)./log(xpert(i)./x(i));                  
+            %K(:,i) = ((ypert-yhat)./extra.pert(i))*x(i);                  
+            %K(:,i) = (ypert-yhat)./log(extra.pert(i));
+        else
+            K(:,i) = (ypert-yhat)./extra.pert(i);
+        end      
+        %K(:,i) = (ypert-yhat)./log(xpert(i));      
     end
 end
 

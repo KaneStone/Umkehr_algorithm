@@ -1,4 +1,5 @@
-function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,designated_SZA)
+function [zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,...
+    designated_SZA,plot_pathlength)
  
 %This function calculates the zenith ray paths. The SZAs that are given in
 %the measurements are calculated from time, and are thus are the true SZAs. To
@@ -57,13 +58,20 @@ end
 
 atmos.Apparent = Apparent_Final;
 atmos.true_actual = True.actual;
-figure;
-set(gcf,'color','white','position',[100 100 1000 700]);
-plot(squeeze(zs(1,1,1,:)));
-ylabel('layer path (m)','fontsize',20);
-xlabel('layer no.','fontsize',20);
-export_fig('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/zs.png','-png');
-close gcf
+
+%plotting path length 
+if plot_pathlength
+    SZAnumber = 1;
+    figure
+    set(gcf,'color','white','position',[100 100 1000 700]);
+    plot(squeeze(zs(1,SZAnumber ,1,:)));
+    title(strcat('SZA =','{ }', num2str(Apparent(SZAnumber))),'fontsize',20);
+    ylabel('layer path (m)','fontsize',20);
+    xlabel('layer no.','fontsize',20);
+    export_fig(strcat('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/'...
+        ,num2str(Apparent(SZAnumber)),'.png'),'-png');
+    close gcf
+end
 end
 
 function [True Apparent_Initial Apparent_Final zs atmos] = ...

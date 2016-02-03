@@ -1,4 +1,4 @@
-function [xhat yhat K yhat1 K1 S Sdayy]=OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -37,9 +37,9 @@ xa = xa';
 xi = xa;
 di2 = length(y);
 if strcmp(method,'Opt')
-    for i = 1:4; %Number of iterations
-    %i = 1;
-    %while di2 >= length(y) %Stops due to convergence test.
+    %for i = 1:3; %Number of iterations
+    i = 1;
+    while di2 >= length(y) && i < 8 %Stops due to convergence test.
         K1(i).K = K;
         %reshaping into one vector for all wavelengths               
         yhat = reshape(yhat',1,numel(yhat));
@@ -52,7 +52,18 @@ if strcmp(method,'Opt')
         %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
         
         %5.10 - M-form  
-        xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));
+        if extra.logswitch
+            xalog = log(xa);
+            xilog = log(xi);
+            Salog = log(Sa);
+            %xhatlog = xalog+log(Sa)*K'*((K*log(Sa)*K'+Se)\(y'-yhat'+K*(xilog-xalog)));                        
+            xhatlog = xalog+Salog*K'*((K*Salog*K'+Se)\(y'-yhat'+K*(xilog-xalog)));                        
+            
+            xhat = exp(xhatlog);
+            %xhat2 = exp(xhatlog2);
+        else       
+            xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));            
+        end
         
         %continue on with next iteration by calling forward model
         xi = xhat;
@@ -71,7 +82,7 @@ if strcmp(method,'Opt')
         Sdayy = Se*(K*Sa*K'+Se)\Se;
         di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
         di3(i) = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
-        %i = i+1;
+        i = i+1;
     end
 elseif strcmp(method,'MAP')
     %Maximum A Posterior solution
@@ -100,7 +111,11 @@ end
 S.Ss = ((K'*(Se^-1)*K +Sa^-1)^-1*(Sa\((K'*(Se^-1)*K +Sa^-1)^-1)));
 S.Sm = ((K'*(Se^-1)*K +Sa^-1)^-1)*(K'*(Se\K))*((K'*(Se^-1)*K +Sa^-1)^-1);
 S.Ss_plus_Ss = S.Ss+S.Sm;
-S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
+if extra.logswitch
+    S.S = (K'*(Se^-1)*K+Sa^-1)^-1;%
+else S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
+end
+number_of_iterations = i;
 % pass through Ss and times by g to obtain layer four smoothing errors.
 end
 

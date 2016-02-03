@@ -22,7 +22,8 @@ extra.Lcurve_mult_fact = 0; %not a switch but starting L_curve scale factor
 extra.SZA_limit = 94; %upper limit of SZA to use
 extra.test_cloud_effect = 0;
 extra.plot_measurements = 0; %diagnostic to just plot measurements.
-
+extra.plot_pathlength = 0; %plot path length for lowest SZA
+extra.print_diagnostics = 1; %logical specifying whether or not to print figure diagnostics
 %OUTPUT folders are not complete
 extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';
 extra.output_resolution = '/Users/stonek/work/Dobson/OUTPUT/resolution/';
@@ -76,18 +77,22 @@ if strcmp(extra.seasonal,'seasonal');
         station,'.dat');
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature/'...
         ,station,'_temperature.dat');
+    profilepath.Pres = strcat(inputpath,'station_climatology/pressure/'...
+        ,station,'_pressure.dat');
 elseif strcmp(extra.seasonal,'monthly') 
     profilepath.ozone = strcat(inputpath,'station_climatology/ozone_monthly/'...
         ,station,'.dat');
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature_monthly/'...
         ,station,'_temperature.dat');
+    profilepath.Pres = strcat(inputpath,'station_climatology/pressure_monthly/'...
+        ,station,'_pressure.dat');
 else profilepath.ozone = strcat(inputpath,'station_climatology/ozone/',...
         station,'.dat');
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature/',...
         station,'_temperature.dat');
 end
-profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',...
-    station,'_pressure.dat');
+%profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',...
+%    station,'_pressure.dat');
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/M*'); %excluding hidden files
 profilepath.aerosol = strcat(inputpath,'station_climatology/aerosol/AntAero10_9.dat');
 
@@ -126,7 +131,8 @@ atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 %ds = Directpaths(atmos,lambda,instralt,theta);
 
 %calculates zenith paths
-[zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,extra.designated_SZA);
+[zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,...
+    extra.designated_SZA,extra.plot_pathlength);
 
 %reading in cross sections
 xs = xsectreader(strcat(inputpath,'ozonexs/'));
@@ -143,9 +149,9 @@ elseif strcmp(study,'S')
     ozonexs = interp1(xs.Swl,temphold',lambda,'linear','extrap');  
 end
 
-%if extra.logswitch
-%    ozonexs = log10(ozonexs);
-%end
+% if extra.logswitch
+%      ozonexs = log10(ozonexs);
+% end
 
 % rayleigh scattering code
 [~,atmos] = Rayleigh(atmos,lambda);

@@ -39,12 +39,12 @@ for j = 1:length(lambda);
             (atmos.bRay(j,iscat).*rayphase(iscat,:)./(4.*pi))...
             .*exp(-1.*(atmos.bRay(j,:)+...
             ozonexs(j,1:end-1).*ozonemid(:)')*...
-            squeeze(zs(j,:,iscat,:))'.*100);
+            zs(:,:,j,iscat)'.*100);
         
         intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase(iscat,:)./(4.*pi))...
             .*exp(-1.*(atmos.bRay(j,:)+atmos.bMie(j,:))*...
-            squeeze(zs(j,:,iscat,:))'.*100);    
+            zs(:,:,j,iscat)'.*100);    
         
         end          
     end
@@ -124,8 +124,8 @@ end
 if norm_switch
     [~, SZA_min_location] = min(atmos.true_actual,[],2);
     for j = 1:length(SZA_min_location);
-         N_min = N(j,SZA_min_location(j));
-        N(j,:) = N(j,:) - repmat(N_min,1,sz(2));   
+         N_norm = N(j,atmos.normalisationindex(j));
+        N(j,:) = N(j,:) - repmat(N_norm,1,sz(2));   
     end
 end
 

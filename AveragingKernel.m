@@ -48,7 +48,7 @@ S_layers(:,8) = S_layers(:,8)/35;
 S_to_print = S_layers;
 S_to_print2 = S.S;
 save(strcat(output_folder_res, file_name_S),'S_to_print','-ascii');
-save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
+save(strcat('../OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
 % %diagnostic code - remove after
 % figure;
 % fig = gcf;
@@ -124,7 +124,7 @@ save(strcat(output_folder_res, file_name_H),'H_print','-ascii');
 AK_to_print = AK.AK1;
 save(strcat(output_folder_AK, file_name_AK),'AK_to_print','-ascii');
 
-AK_to_print2 = AK.AK;
-save(strcat(output_folder_AK, file_name_AK16),'AK_to_print2','-ascii');
+%AK_to_print2 = AK.AK;
+%save(strcat(output_folder_AK, file_name_AK16),'AK_to_print2','-ascii');
 
 end

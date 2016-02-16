@@ -1,6 +1,6 @@
 function extra = extrasetup(atmos,measurement_number,station,year)
 %path for input files
-inputpath = '/Users/stonek/work/Dobson/input/';
+inputpath = '../input/';
 %Need to appropriately define input file locations throughout script
 
 %Logicals and other switches
@@ -8,13 +8,14 @@ extra.logswitch = 0; %retrieve in log space (currently doesn't work)
 extra.mieswitch = 1; %include Mie scattering
 extra.refraction = 1; %include refraction
 extra.normalise_to_LSZA = 1; %normalise measurments at lowest SZA
-extra.WLP_to_retrieve = 'C'; % define wavelength pairs to retrieve: all permutations possible.
+extra.WLP_to_retrieve = 'D'; % define wavelength pairs to retrieve: all permutations possible.
 extra.morn_or_even = 'evening'; % only invoked if both morning and evening measurements are taken on same day
-extra.seasonal = 'seasonal'; %'monthly', 'seasonal' or 'constant' for ozone, temperature, and pressure profiles
+extra.seasonal = 'monthly'; %'monthly', 'seasonal' or 'constant' for ozone, temperature, and pressure profiles
 extra.designated_SZA = 0; %retrieve using designated SZAs (not infallable)
-extra.plot_inten = 0; %plot intensity curves for selected SZAs (diagnostic code)
+extra.plot_inten = 1; %plot intensity curves for selected SZAs (diagnostic code)
 extra.test_model_height_limit = 0; %switch for testing model height limit on zenith paths
 extra.full_covariance = 1; %produce Sa matrix using Rodgers definition
+extra.covariance_type = 'constant';
 extra.L_Ozone = 1; %Retrieve ozone profile
 extra.L_Aerosol = 0; %Retrieve aerosol profile (currently doesn't work, in progress)
 extra.L_curve_diag = 0; %produce L_curve for Sa optimisation (does not produce regular retrieval)
@@ -25,9 +26,9 @@ extra.plot_measurements = 0; %diagnostic to just plot measurements.
 extra.plot_pathlength = 0; %plot path length for lowest SZA
 extra.print_diagnostics = 1; %logical specifying whether or not to print figure diagnostics
 %OUTPUT folders are not complete
-extra.output_retrievals = '/Users/stonek/work/Dobson/OUTPUT/retrievals/';
-extra.output_resolution = '/Users/stonek/work/Dobson/OUTPUT/resolution/';
-extra.output_diagnostics = '/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/';
+extra.output_retrievals = '../OUTPUT/retrievals/';
+extra.output_resolution = '../OUTPUT/resolution/';
+extra.output_diagnostics = '../OUTPUT/plots/diagnostics/';
 
 %Naming conventions
 extra.name_ext = [];
@@ -36,9 +37,12 @@ if extra.designated_SZA
     extra.name_ext(ext_start:ext_start+5) = '_desig';
     ext_start = ext_start+6;
 end
-if extra.full_covariance
+if strcmp(extra.covariance_type,'full_covariance')
     extra.name_ext(ext_start:ext_start+2) = '_FC';
     ext_start = ext_start+3;
+elseif strcmp(extra.covariance_type,'constant')
+    extra.name_ext(ext_start:ext_start+8) = '_constant';
+    ext_start = ext_start+9;
 end
 if extra.test_cloud_effect
     extra.name_ext(ext_start:ext_start+3) = '_TCE';
@@ -70,6 +74,7 @@ atmos.Zmid = ((atmos.Z(2:atmos.nlayers)-atmos.Z(1:atmos.nlayers-1))/2)+...
     atmos.Z(1:atmos.nlayers-1);
 
 %defining profile paths
+
 profilepath.measurements = strcat(inputpath,'Umkehr/',station,'/',station,...
     '_',year,'.txt');
 if strcmp(extra.seasonal,'seasonal');
@@ -91,6 +96,7 @@ else profilepath.ozone = strcat(inputpath,'station_climatology/ozone/',...
     profilepath.Temp = strcat(inputpath,'station_climatology/temperature/',...
         station,'_temperature.dat');
 end
+
 %profilepath.Pres = strcat(inputpath,'station_climatology/Pressure/',...
 %    station,'_pressure.dat');
 profilepath.solar = strcat(inputpath,'SolarFlux_KittPeak/M*'); %excluding hidden files
@@ -131,7 +137,7 @@ atmos = refractiveindex(atmos,lambda,bandpass,extra.refraction);
 %ds = Directpaths(atmos,lambda,instralt,theta);
 
 %calculates zenith paths
-[zs atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,...
+[zs, atmos] = Zenithpaths(atmos,lambda,measurement_number,theta,...
     extra.designated_SZA,extra.plot_pathlength);
 
 %reading in cross sections

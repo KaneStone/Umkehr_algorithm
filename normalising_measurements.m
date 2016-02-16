@@ -1,28 +1,40 @@
 function [atmos] = normalising_measurements(atmos,designated_SZA,theta,measurement_number)
 %Normalising measurements to lowest SZA
 
-if designated_SZA
-    %next two lines only work for C_pair
-    atmos.N_values(measurement_number).N (isnan(atmos.N_values(measurement_number).N)) = [];
-    atmos.initial_SZA(measurement_number).SZA (isnan(atmos.initial_SZA(measurement_number).SZA)) = [];
-    atmos.N_values(measurement_number).N = interp1(atmos.initial_SZA(measurement_number).SZA,...
-        atmos.N_values(measurement_number).N,theta,'linear','extrap');
-    atmos.initial_SZA(measurement_number).SZA = theta;
-end
-
 
 if atmos.hour_min(measurement_number) < 12
     atmos.N_values(measurement_number).N = fliplr(atmos.N_values(measurement_number).N);
     atmos.initial_SZA(measurement_number).SZA = fliplr(atmos.initial_SZA(measurement_number).SZA);
 end
 for j = 1:size(atmos.initial_SZA(measurement_number).SZA,1);
-    theta1 = min(atmos.initial_SZA(measurement_number).SZA(j,:)):2.5:max(atmos.initial_SZA(measurement_number).SZA(j,:));
+    if size(atmos.initial_SZA(measurement_number).SZA,1) > 1 && j == 1
+        [~,b] = min(atmos.initial_SZA(measurement_number).SZA(j,:));
+        atmos.normalisationindex(j) = b;
+    elseif size(atmos.initial_SZA(measurement_number).SZA,1) > 1 && j == 3
+        [~,b] = min(atmos.initial_SZA(measurement_number).SZA(j,:));
+        atmos.normalisationindex(j) = b;
+    else
+        theta1 = min(atmos.initial_SZA(measurement_number).SZA(j,:)):2.5:max(atmos.initial_SZA(measurement_number).SZA(j,:));
 
-    splfit = splinefit(atmos.initial_SZA(measurement_number).SZA(j,:),atmos.N_values(measurement_number).N(j,:),length(theta1)-1,3,'r');
-    spliney = ppval(splfit,theta1);
-    final = interp1(theta1,spliney,atmos.initial_SZA(measurement_number).SZA(j,:),'linear','extrap');
-    [~, atmos.normalisationindex(j)] = min(abs(final(theta1 < theta1(1)+10) - atmos.N_values(measurement_number).N(j,theta1 < theta1(1)+10)));
+        splfit = splinefit(atmos.initial_SZA(measurement_number).SZA(j,:),atmos.N_values(measurement_number).N(j,:),length(theta1)-1,3,'r');
+        spliney = ppval(splfit,theta1);
+        final = interp1(theta1,spliney,atmos.initial_SZA(measurement_number).SZA(j,:),'linear','extrap');
+        [~, atmos.normalisationindex(j)] = min(abs(final(theta1 < theta1(1)+10) - atmos.N_values(measurement_number).N(j,theta1 < theta1(1)+10)));
+    end
 
+    
+    if designated_SZA
+    %next two lines only work for C_pair
+    atmos.N_values(measurement_number).N (isnan(atmos.N_values(measurement_number).N)) = [];
+    atmos.initial_SZA(measurement_number).SZA (isnan(atmos.initial_SZA(measurement_number).SZA)) = [];
+    atmos.N_values(measurement_number).N = interp1(atmos.initial_SZA(measurement_number).SZA,...
+        atmos.N_values(measurement_number).N,theta,'linear','extrap');
+    atmos.initial_SZA(measurement_number).SZA = theta;
+    atmos.normalisationindex = 1;
+    atmos.N_values(measurement_number).N = atmos.N_values(measurement_number).N - repmat(atmos.N_values(measurement_number).N(1),1,13);
+    return
+    end
+    
 %     figure;
 %     set(gcf,'color','white','position',[100 100 1000 700]);
 %     

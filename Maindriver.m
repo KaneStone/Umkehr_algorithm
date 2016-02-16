@@ -1,26 +1,29 @@
 tic;
 
 %inputs for files to retrieve
-station = 'Darwin';
+station = 'Melbourne';
 year = '1970';
-Umkehr_path = '/Users/stonek/work/Dobson/input/Umkehr/'; 
+addpath('/Users/kanestone/work/supportCode/splineFit/')
+addpath('/Users/kanestone/work/supportCode/exportFig/')
+addpath('/Users/kanestone/work/supportCode/herrorbar/')
+Umkehr_path = '../input/Umkehr/';
+for noyears = 1
+ 
 measurementfilename = strcat(Umkehr_path,station,'/',station,...
      '_',year,'.txt');
 [atmos_init, measurement_length] = read_in_Umkehr(measurementfilename);
-for measurement_number = 5%:measurement_length;
+
+for measurement_number = 21%:measurement_length;
     
     extra = extrasetup(atmos_init,measurement_number,station,year);
     if extra.plot_measurements
         plot_measurements(extra.atmos,extra.theta,station,measurement_number,1);
         return
     end
-    
-    if extra.next_year
-        year = year+1;
-    end
+        
     if extra.no_data
         clearvars -except measurement_number station year i sf...
-        number_of_measurements L_Ozone L_Aerosol atmos_init
+        number_of_measurements L_Ozone L_Aerosol atmos_init measurement_length Umkehr_path
         continue
     end
     if extra.L_Ozone == 1
@@ -48,7 +51,7 @@ for measurement_number = 5%:measurement_length;
     if extra.L_Ozone                
         Sa = createSa(extra.atmos.quarter,extra.atmos.date_to_use,...
             extra.seasonal,extra.logswitch,extra,measurement_number,...
-            extra.L_curve_diag,station,extra.full_covariance,scale_factor);
+            extra.L_curve_diag,station,extra.covariance_type,scale_factor);
         %scale_factor = scale_factor+4;
         y = extra.atmos.N_values(measurement_number).N;
         [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation...
@@ -80,10 +83,13 @@ for measurement_number = 5%:measurement_length;
     if extra.print_diagnostics
         print_diagnostics(fig1,fig2,fig3,AK,station,extra,...
             measurement_number,extra.L_Ozone,extra.seasonal);   
-    end
+    end    
     close all hidden
     clearvars -except measurement_number station year i sf...
-        number_of_measurements L_Ozone L_Aerosol atmos_init measurement_length
+        number_of_measurements L_Ozone L_Aerosol atmos_init measurement_length Umkehr_path
+end
+year = num2str(str2double(year)+1);
+fclose('all'); 
 end
 time = toc;
 display(time);

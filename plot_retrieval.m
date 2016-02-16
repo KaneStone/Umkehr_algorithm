@@ -1,7 +1,7 @@
 function [fig1, fig2, fig3] = plot_retrieval(N,yhat,extra,xhat,Sa,S,measurement_number,yhat1,station,date,Se_for_errors,L_Ozone)
 
 
-addpath('/Users/stonek/work/Dobson/data_code');
+addpath('../data_code');
 
 %plotting ozone profile
 figure;
@@ -46,7 +46,7 @@ h2 = errorbar(extra.atmos.true_actual',N_val',N_val_error,'LineWidth',1.5,'LineS
 hold on
 %set(gca, 'ColorOrder', [0 .5 0; 0 0 1; 1 0 0]);
 h1 = plot(extra.atmos.true_actual',yhat','LineWidth',2);
-set(gca,'ColorOrderIndex',1);
+%set(gca,'ColorOrderIndex',1);
 h3 = plot(extra.atmos.true_actual',(N_val-yhat)','--');
 ylabel('N-Value','fontsize',20);
 xlabel('SZA','fontsize',20);

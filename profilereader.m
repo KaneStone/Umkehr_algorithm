@@ -51,7 +51,7 @@ atmos.next_year = 0;
 
 
 N_temp = [];
-%WLP_temp = [];
+WLP_temp = [];
 R_temp = [];
 I_temp = [];
 
@@ -198,15 +198,15 @@ end
 %Reading in temperature.
 
 %for testing temperature and pressure on zenith paths
-test = importdata('/Users/stonek/work/Dobson/input/not_used/TP23_9Ant.dat');
-a = open('temp_test.mat');
-b = open('test_test_height.mat');
-test2 = interp1(b.b*1000,a.a,atmos.Z,'linear','extrap');
-test3 = interp1(b.b*1000,a.a,atmos.Zmid,'linear','extrap');
-c = open('test_pressure.mat');
-test4 = exp(interp1(0:1000:60000,log(c.c),atmos.Z,'linear','extrap'));
-test5 = exp(interp1(0:1000:60000,log(c.c),atmos.Zmid,'linear','extrap'));
-%-----
+% test = importdata('/Users/stonek/work/Dobson/input/not_used/TP23_9Ant.dat');
+% a = open('temp_test.mat');
+% b = open('test_test_height.mat');
+% test2 = interp1(b.b*1000,a.a,atmos.Z,'linear','extrap');
+% test3 = interp1(b.b*1000,a.a,atmos.Zmid,'linear','extrap');
+% c = open('test_pressure.mat');
+% test4 = exp(interp1(0:1000:60000,log(c.c),atmos.Z,'linear','extrap'));
+% test5 = exp(interp1(0:1000:60000,log(c.c),atmos.Zmid,'linear','extrap'));
+% %-----
 %seasonal = 'seasonal';
 
 fid_temp = fopen(temperaturefilename);

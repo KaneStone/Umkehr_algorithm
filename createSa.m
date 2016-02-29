@@ -16,7 +16,7 @@ elseif strcmp(seasonal,'monthly')
 end
 
 
-scale_upper2 = 1:.2:10;
+scale_upper2 = 1:.1:5.5;
 scale_lower2 = 6:-.2:1;
 %scale_lower2 = 4:-.2:1;
 SD (SD <= 1e11) = 1e11; 
@@ -44,7 +44,9 @@ if strcmp(covariance_type,'full_covariance');
     return
 elseif strcmp(covariance_type,'constant');
     maxvariance = max(SD);
-    Sa = diag(repmat(maxvariance,81,1).*1.5,0).^2; 
+    Sa_temp = repmat(maxvariance,81,1).*2;
+    Sa_temp(extra.atmos.nlayers-45:end,1) = Sa_temp(extra.atmos.nlayers-45:end)./scale_upper2';
+    Sa = diag(Sa_temp,0).^2; 
     return
 end
 

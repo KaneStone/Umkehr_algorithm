@@ -1,8 +1,14 @@
-function [N] = Nvaluezs(atmos,ozonemid,lambda,zs,ozonexs,~,mieswitch,...
-    norm_switch, plot_int,test_model_height,test_cloud_effect)
+function [simulatedNvalues] = Nvaluezs(ozone, atmos, lambda, zs, ozonexs, inputs)
+
+%mieswitch,...
+%    norm_switch, plot_int,test_model_height,test_cloud_effect)
+
 %zs represents the zenith sky paths
 %Part of Radiative transfer. calculating the intensities and the N-values
    
+%recalculate ozone_mid
+ozone_mid = interp1(atmos.Z, ozone, atmos.Zmid, 'linear', 'extrap');
+
 %g is the assymetry factor and = .86 for assumed radius of 6 micrometers
 g = .86;
 
@@ -10,7 +16,6 @@ sz = size(zs);
 intensity = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 intenstar = ones(length(lambda),sz(2),atmos.nlayers-1)*1e7;
 atmos.Apparent (atmos.Apparent == 0) = NaN;
-%atmos.Apparent = permute(atmos.Apparent,[3 1 2]);
 atmos.Apparent = permute(atmos.Apparent,[2 3 1]);
 zs = permute(zs,[2 4 1 3]);
 
@@ -21,12 +26,12 @@ for j = 1:length(lambda);
         cosd(atmos.Apparent(1:atmos.nlayers-1,:,j))).^(3/2));
     for iscat = 1:atmos.nlayers-1;        
         
-        if mieswitch                  
+        if inputs.mieswitch                  
         intensity(j,:,iscat) = (intensity(j,:,iscat).*...
             ((atmos.bRay(j,iscat).*rayphase(iscat,:))+...
             ((atmos.bMie(j,iscat).*miephase(iscat,:))))./(4.*pi))...
             .*exp(-1.*(atmos.bRay(j,:)+atmos.bMie(j,:)+...
-            ozonexs(j,1:end-1).*ozonemid(:)')*...
+            ozonexs(j,1:end-1).*ozone_mid(:)')*...
             zs(:,:,j,iscat)'.*100); 
         
         intenstar(j,:,iscat) = (intenstar(j,:,iscat).*...
@@ -38,7 +43,7 @@ for j = 1:length(lambda);
         else intensity(j,:,iscat) = intensity(j,:,iscat).*...
             (atmos.bRay(j,iscat).*rayphase(iscat,:)./(4.*pi))...
             .*exp(-1.*(atmos.bRay(j,:)+...
-            ozonexs(j,1:end-1).*ozonemid(:)')*...
+            ozonexs(j,1:end-1).*ozone_mid(:)')*...
             zs(:,:,j,iscat)'.*100);
         
         intenstar(j,:,iscat) = intenstar(j,:,iscat).*...
@@ -57,9 +62,9 @@ intenstar = permute(intenstar,[1 3 2]);
 intenstar (isnan(intenstar)) = 0;
 
 %Code for testing the model top height limitations for high SZAs
-if test_model_height
-    [maxa inda] = max(intensity(1,:,:));
-    [maxb indb] = max(intensity(2,:,:));
+if inputs.test_model_height_limit
+    [maxa, inda] = max(intensity(1,:,:));
+    [maxb, indb] = max(intensity(2,:,:));
     figure;
     fig1 = gcf;
     set(fig1,'color','white','Position',[100 100 1000 700]);
@@ -90,14 +95,14 @@ end
 ratio = zeros(sz(1),sz(2));
 
 %To plot intensity curves
-if plot_int
+if inputs.plot_intensities
     plot_inten(intensity, atmos, sz);
     pause;
 end
 
-if test_cloud_effect;
-    cloud_effect(intensity,intenstar,atmos.true_actual,[1,3,10],'all',...
-        lambda,0,norm_switch);
+if inputs.test_cloud_effect;
+    cloud_effect(intensity, intenstar, atmos.true_actual, [1,3,10], 'all',...
+        lambda, 0, inputs.normalise_measurements);
 end
 
 for j = 1:length(lambda);
@@ -110,22 +115,22 @@ for j = 1:length(lambda);
     end
 end
 
-N=zeros(length(lambda)/2,sz(2));
+simulatedNvalues = zeros(length(lambda)/2,sz(2));
 wn = 1;
 for k = 1:length(lambda)/2;
     ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),...
         lambda(wn:wn+1),'linear','extrap');  
     ETSF_ratio = 1; %ETFS is removed by normalising to lowest SZA
-    N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));    
+    simulatedNvalues(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));    
     wn = wn+2;
 end
 
 %normalising simulated N-values to lowest SZA.
-if norm_switch
+if inputs.normalise_measurements
     [~, SZA_min_location] = min(atmos.true_actual,[],2);
     for j = 1:length(SZA_min_location);
-         N_norm = N(j,atmos.normalisationindex(j));
-        N(j,:) = N(j,:) - repmat(N_norm,1,sz(2));   
+         N_norm = simulatedNvalues(j,atmos.normalisationindex(j));
+        simulatedNvalues(j,:) = simulatedNvalues(j,:) - repmat(N_norm,1,sz(2));   
     end
 end
 

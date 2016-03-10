@@ -1,4 +1,4 @@
-function atmos = refractiveindex(atmos,lambda,bandpass,refraction)
+function atmos = refractiveindex(atmos,lambda,dz,refraction)
 % This subroutine calculates the refractive indices for a certain wavelengths,
 % using the given temperature and pressure profiles. The equation is obtained
 % from Bucholtz, App. Optics. 34(15) 1995.
@@ -6,11 +6,11 @@ function atmos = refractiveindex(atmos,lambda,bandpass,refraction)
 % then used for all subsequent path calculations.
 
 %constants
-Ts = 288.15; Ps = 1013.25; Rd = 287; g0 = 9.8066;
+temperature_surface = 288.15; pressure_surface = 1013.25; Rd = 287; g0 = 9.8066;
 
 %radius of Earth
 Re = 6371e3;
-atmos.r = Re + atmos.Z;
+atmos.radius = Re + atmos.Z;
 
 %converting lambda into micrometers for calculations
 lambda = lambda/1000;
@@ -31,27 +31,30 @@ atmos.dndr = zeros(length(lambda),atmos.nlayers);
 % refractive index per kilometer atmos.dndr and height correction for
 % refraction (atmos.Nr)
 if (refraction)
-    atmos.N = 1+(Ns*((Ts./atmos.T.*(atmos.P./Ps))));    
-    atmos.H = Rd./g0.*atmos.T(1,:);
-    atmos.dndz = (Ns*(((Ts./atmos.T).*(atmos.P./Ps))./atmos.H));          
+    atmos.N = 1 + (Ns * ((temperature_surface ./ atmos.temperature .* ...
+        (atmos.pressure ./ pressure_surface))));    
+    atmos.H = Rd ./ g0 .* atmos.temperature(1,:);
+    atmos.dndz = (Ns * (((temperature_surface ./ atmos.temperature) .* ...
+        (atmos.pressure ./ pressure_surface)) ./ atmos.H));          
     for i = 1:length(lambda);
         %The next line matches -dndr
-         atmos.dndz(i,2:end) = ((1+(atmos.Ns(i).*(Ts./atmos.T(1:end-1)).*...
-            (atmos.P(1:end-1)./Ps)))-(1+(atmos.Ns(i)*(Ts./atmos.T(2:end)).*...
-            (atmos.P(2:end)./Ps))))./atmos.dz;
+         atmos.dndz(i,2:end) = ((1 + (atmos.Ns(i) .* (temperature_surface ./ ...
+             atmos.temperature(1:end-1)) .* (atmos.pressure(1:end-1) ./ pressure_surface))) - ...
+             (1 + (atmos.Ns(i) * (temperature_surface ./ atmos.temperature(2:end)) .* ...
+             (atmos.pressure(2:end) ./ pressure_surface)))) ./ dz;
                         
-        atmos.dndr(i,2:end) = (atmos.N(i,2:end)-atmos.N(i,1:end-1))./...
-            (atmos.r(2:end)-atmos.r(1:end-1));        
-        atmos.Nr(i,:) = atmos.N(i,:).*atmos.r;
+        atmos.dndr(i,2:end) = (atmos.N(i,2:end) - atmos.N(i,1:end - 1))./...
+            (atmos.radius(2:end) - atmos.radius(1:end - 1));        
+        atmos.Nr(i,:) = atmos.N(i,:) .* atmos.radius;
     end   
      atmos.dndr(:,1) = -atmos.dndz(:,1);
 else
     atmos.N = ones(length(lambda),length(atmos.Z));
-    atmos.H = Rd/g0*atmos.T;
+    atmos.H = Rd / g0 * atmos.temperature;
     atmos.dndz = zeros(length(lambda),length(atmos.Z));
     atmos.dndr = zeros(length(lambda),length(atmos.Z));    
     for i = 1:length(lambda);          
-        atmos.Nr(i,:) = atmos.N(i,:).*atmos.r;
+        atmos.Nr(i,:) = atmos.N(i,:) .* atmos.radius;
     end    
 end
 end

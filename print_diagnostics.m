@@ -1,25 +1,20 @@
-function [] = print_diagnostics(x,y,z,AK,station,extra,measurement_number,L_ozone,seasonal)%,AK,station,year,test)
+function [] = print_diagnostics(x,y,z,AK,setup,inputs,foldersandnames)
 
-date = extra.atmos.date(measurement_number).date;
+date = setup.atmos.Umkehrdate;
 
-if strcmp(seasonal, 'constant');
+if strcmp(inputs.seasonal, 'constant');
     WLP = 'C_CAP';
-else WLP = extra.atmos.N_values(measurement_number).WLP;
+else WLP = inputs.WLP_to_retrieve;
 end
 
-if L_ozone
-    output_folder = strcat(extra.output_diagnostics,station,'/');
-    file_name = strcat(station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
-        sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),extra.name_ext);
-    file = (strcat(output_folder,file_name));
-    if ~exist(output_folder,'dir');
-        mkdir(output_folder);
-    end
-else
-    file = strcat('/Users/stonek/work/Dobson/OUTPUT/plots/diagnostics/aerosols/',...
-    station,'/',station,'_',WLP,'_',num2str(date(3)),'-',num2str(date(2))...
-    ,'-',num2str(date(1)),'.ps');
+output_folder = strcat(foldersandnames.diagnostics,inputs.station,'/');
+file_name = strcat(inputs.station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
+    sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),foldersandnames.name_ext);
+file = (strcat(output_folder,file_name));
+if ~exist(output_folder,'dir');
+    mkdir(output_folder);
 end
+
 
 %-------------------------
 export_fig(file,x,'-pdf','-nocrop');
@@ -36,7 +31,7 @@ hold on
 set(gca,'fontsize',18);
 ylabel('Altitude (km)','fontsize',20);
 xlabel('AK','fontsize',20);
-title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
 export_fig(file,fig3,'-pdf','-nocrop','-append');
 %-------------------------
@@ -48,7 +43,7 @@ plot(AK.area',1:length(AK.AK),'LineWidth',2);
 hold on
 ylabel('Altitude (km)','fontsize',20);
 xlabel('Area of AK','fontsize',20);
-title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Area of AK'),'fontsize',24);
 export_fig(file,fig4,'-pdf','-nocrop','-append');
 %-------------------------
@@ -69,7 +64,7 @@ annotation('textbox',[.15 .8 .5 .1],...
 ylabel('Altitude (km)','fontsize',20);
 xlabel('1/diag(AK) (km)','fontsize',20);
 set(gca,'fontsize',18);
-title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','resolution'),'fontsize',24);
 export_fig(file,fig5,'-pdf','-nocrop','-append');
 %-------------------------
@@ -83,7 +78,7 @@ xlim([-.2 .9]);
 ylabel('Layer No.','fontsize',20);
 xlabel('AK','fontsize',20);
 set(gca,'fontsize',18);
-title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
 export_fig(file,fig6,'-pdf','-nocrop','-append');
 %-------------------------
@@ -98,7 +93,7 @@ ylabel('Layer No.','fontsize',20);
 xlabel('AK','fontsize',20);
 set(gca,'fontsize',18);
 set(gca,'yticklabel',{'0+1','2+3','4','5','6','7','8','9+'});
-title(strcat(station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
 export_fig(file,fig7,'-pdf','-nocrop','-append');
 end

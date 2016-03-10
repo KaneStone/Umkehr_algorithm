@@ -1,14 +1,14 @@
-function [AK] = AveragingKernel(S,Sa,Se,extra,K,g,g1,station,measurement_number,seasonal)
+function [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1,measurement_number, date)
 
-if strcmp(seasonal,'constant');
+if strcmp(inputs.seasonal,'constant');
     WLP = 'C_CAP';
-else WLP = extra.atmos.N_values(measurement_number).WLP;
+else WLP = inputs.WLP_to_retrieve;
 end
-date = extra.atmos.date(measurement_number).date;
+date = datevec(date(1));
 
 %output_locations and filenames
-output_folder_res = extra.output_resolution;
-output_folder_AK = strcat(extra.output_retrievals,station,'/',WLP,'/AK/',...
+output_folder_res = foldersandnames.resolution;
+output_folder_AK = strcat(foldersandnames.retrievals,inputs.station,'/',WLP,'/AK/',...
     sprintf('%d',date(3)),'/');
 if ~exist(output_folder_res,'dir')
     mkdir(output_folder_res)
@@ -16,31 +16,31 @@ end
 if ~exist(output_folder_AK,'dir')
     mkdir(output_folder_AK)
 end
-file_name_res = strcat(station,'_res_',WLP,'_',...
+file_name_res = strcat(inputs.station,'_res_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt');
-file_name_dof = strcat(station,'_dof_',WLP,'_',...
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+file_name_dof = strcat(inputs.station,'_dof_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt');
-file_name_H = strcat(station,'_H_',WLP,'_',...
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+file_name_H = strcat(inputs.station,'_H_',WLP,'_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt');
-file_name_AK = strcat(station,'_',WLP,'_AK_',...
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+file_name_AK = strcat(inputs.station,'_',WLP,'_AK_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt');
-file_name_AK16 = strcat(station,'_',WLP,'_AK_',...
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+file_name_AK16 = strcat(inputs.station,'_',WLP,'_AK_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'16layers.txt');
-file_name_S = strcat(station,'_',WLP,'_S_',...
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'16layers.txt');
+file_name_S = strcat(inputs.station,'_',WLP,'_S_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),extra.name_ext,'.txt');
+    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
 
-Ss_layers = g1*S.Ss(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g1';
+Ss_layers = g1*S.Ss(1:length(setup.atmos.Zmid),1:length(setup.atmos.Zmid))*g1';
 Ss_layers(:,1:2) = Ss_layers(:,1:2)/10;
 Ss_layers(:,3:7) = Ss_layers(:,3:7)/5;
 Ss_layers(:,8) = Ss_layers(:,8)/35;
 
-S_layers = g1*S.S(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g1';
+S_layers = g1*S.S(1:length(setup.atmos.Zmid),1:length(setup.atmos.Zmid))*g1';
 S_layers(:,1:2) = S_layers(:,1:2)/10;
 S_layers(:,3:7) = S_layers(:,3:7)/5;
 S_layers(:,8) = S_layers(:,8)/35;
@@ -66,8 +66,8 @@ AK.AK = S.S*(K'/Se*K);
 %measurements relative to the a priori information, ideally = 1.0
 AK.area=sum(AK.AK,1);
 
-AK.AK1 = g*AK.AK(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g';
-AK.AK2 = g1*AK.AK(1:length(extra.atmos.Zmid),1:length(extra.atmos.Zmid))*g1';
+AK.AK1 = g*AK.AK(1:length(setup.atmos.Zmid),1:length(setup.atmos.Zmid))*g';
+AK.AK2 = g1*AK.AK(1:length(setup.atmos.Zmid),1:length(setup.atmos.Zmid))*g1';
 AK.AK2(:,1:2) = AK.AK2(:,1:2)/10;
 AK.AK2(:,3:7) = AK.AK2(:,3:7)/5;
 AK.AK2(:,8) = AK.AK2(:,8)/35;

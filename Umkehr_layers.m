@@ -1,4 +1,4 @@
-function [g g1] = Umkehr_layers(extra,xhat,station,measurement_number,L_ozone,S,seasonal)
+function [g, g1] = Umkehr_layers(setup,inputs,xhat,measurement_number,S,date,foldersandnames)
 
 %Irina's layering system.
 %This could get quite complicated
@@ -8,9 +8,9 @@ DU_coeff = 1e5*1.38e-21*1e3*(273.1/10.13);
 
 layers = 5;
 
-g(1,1:length(extra.atmos.Zmid)) = horzcat(ones(1,layers),...
-    zeros(1,length(extra.atmos.Zmid)-layers));
-for k = 1:length(extra.atmos.Zmid)/layers-1;
+g(1,1:length(setup.atmos.Zmid)) = horzcat(ones(1,layers),...
+    zeros(1,length(setup.atmos.Zmid)-layers));
+for k = 1:length(setup.atmos.Zmid)/layers-1;
     g(k+1,:) = circshift(g(1,:),[0 layers*(k)]);
 end
 g1 = zeros(8,80);
@@ -37,29 +37,25 @@ Result_retrieval = vertcat(xhat_layer1,Total_Ozone);
 Error_Result = vertcat(Scolerrors1,Total_column_errors);
 Result = horzcat(Result_retrieval,Error_Result);
 
-date = extra.atmos.date(measurement_number).date;
-if strcmp(seasonal, 'constant');
+date = datevec(date(1));
+if strcmp(inputs.seasonal, 'constant');
     WLP = 'C_CAP';
-else WLP = extra.atmos.N_values(measurement_number).WLP;
+else WLP = inputs.WLP_to_retrieve;
 end
 
 %Saving retrieval
-if L_ozone
-    output_folder = strcat(extra.output_retrievals,station,'/',WLP,'/',...
-        sprintf('%d',date(3)),'/');
 
-    file_name = strcat(station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
-        sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),...
-        extra.name_ext,'.txt');
+output_folder = strcat(foldersandnames.retrievals,inputs.station,'/',WLP,'/',...
+    sprintf('%d',date(3)),'/');
 
-    if ~exist(strcat(output_folder),'dir')
-        mkdir(output_folder);
-    end
-    save(strcat(output_folder,file_name),'Result','-ascii');
-    
-else save(strcat('/Users/stonek/work/Dobson/OUTPUT/retrievals/aerosols/',...  
-    station,'/',num2str(date(1)),'-',num2str(date(2)),'-',num2str(date(3)),...
-    '_',station,'_',WLP,'.txt'),'Result','-ascii');
+file_name = strcat(inputs.station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
+    sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),...
+    foldersandnames.name_ext,'.txt');
+
+if ~exist(strcat(output_folder),'dir')
+    mkdir(output_folder);
 end
+save(strcat(output_folder,file_name),'Result','-ascii');
+
 
 end

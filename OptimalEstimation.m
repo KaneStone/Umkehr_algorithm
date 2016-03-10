@@ -1,4 +1,5 @@
-function [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation(y,yhat,Se,xa,Sa,K,extra,method)
+function [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation(y,yhat,Se,xa,Sa,K,...
+    setup,inputs,method)
 
 %METHOD
 %MAP = Maximum A posterior
@@ -31,7 +32,7 @@ yhat (isnan(yhat)) = [];
 y = reshape(y',1,numel(y));
 y (isnan(y)) = [];
 
-sz = size(extra.atmos.Apparent);
+sz = size(setup.atmos.Apparent);
 yhat2(1).y = yhat;
 xa = xa';
 xi = xa;
@@ -52,7 +53,7 @@ if strcmp(method,'Opt')
         %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
         
         %5.10 - M-form  
-        if extra.logswitch
+        if inputs.logswitch
             xalog = log(xa);
             xilog = log(xi);
             Salog = log(Sa);
@@ -68,10 +69,8 @@ if strcmp(method,'Opt')
         %continue on with next iteration by calling forward model
         xi = xhat;
         xhat = xhat';
-        Kflg = 1;
-        AeroKflg = 0;
-        [K,N]=ForwardModel(xhat,Kflg,AeroKflg,extra);
-        yhat = N.zs;
+        [K,N]=ForwardModel(xhat,setup,inputs);
+        yhat = N;
         %yhat (isnan(yhat)) = [];
         %yhat1(i).a = reshape(yhat',1,numel(yhat));
         yhat1(i+1).y = reshape(yhat',1,numel(yhat));
@@ -95,14 +94,14 @@ elseif strcmp(method,'MAP')
         Kflg=1;
         yhat1 = yhat;
         K1 = 1;
-        [yhat,K,N]=ForwardModel(xhat,Kflg,extra);
+        [yhat,K,N]=ForwardModel(xhat,Kflg,setup);
         yhat = N.zs(2,:);
         K = K(sz(3)+1:2*sz(3),:);
 elseif strcmp(method,'LS');
     xhat = ((K'*K)\K')*y';
     Kflg=1;
     xhat = xhat';
-    [yhat,K,N]=ForwardModel(xhat,Kflg,extra);
+    [yhat,K,N]=ForwardModel(xhat,Kflg,setup);
     yhat = N.zs(2,:);
     yhat1 =1;
     K1 =1;
@@ -111,7 +110,7 @@ end
 S.Ss = ((K'*(Se^-1)*K +Sa^-1)^-1*(Sa\((K'*(Se^-1)*K +Sa^-1)^-1)));
 S.Sm = ((K'*(Se^-1)*K +Sa^-1)^-1)*(K'*(Se\K))*((K'*(Se^-1)*K +Sa^-1)^-1);
 S.Ss_plus_Ss = S.Ss+S.Sm;
-if extra.logswitch
+if inputs.logswitch
     S.S = (K'*(Se^-1)*K+Sa^-1)^-1;%
 else S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
 end

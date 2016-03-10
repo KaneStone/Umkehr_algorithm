@@ -1,267 +1,70 @@
-function [atmos] = profilereader(measurementfilename,ozonefilename,temperaturefilename,...
-    pressurefilename,solarfilename,aerosolfilename,atmos,measurement_number,...
-    WLP,morn_or_even,seasonal,SZA_limit,logswitch)
+function [atmos] = profilereader(atmos, Umkehr,inputs)
 
-%reads in measurements and atmospheric profiles.
-%currently reading in
-% - measurments
+%reads in atmospheric profiles. 
 % - ozone
-% - temperature and pressure
+% - temperature
+% - pressure
 % - aerosol
 
-atmos.next_year = 0;
-% separating measurements morning and evening measuremnets -
-            %maybe not infallable.
-% if max(hour) - min(hour) >=9 
-%     disp(strcat('Both morning and evening measurements were taken at date: ',...
-%         num2str(atmos.date(count).date(1))...
-%         ,'-',num2str(atmos.date(count).date(2))...
-%         ,'-',num2str(atmos.date(count).date(3)),', continuing with specified case.'));                                                 
-%     if strcmp(morn_or_even,'evening');
-%         location (hour <= 12) = []; %This is not infallable 
-%     elseif strcmp(morn_or_even,'morning');
-%         location (hour >= 12) = [];
-%     end
-% end            
-
-%INCOMPLETE CODE
-%retrieving measurement vectors.
-% atmos.initial_SZA(measurement_number).SZA ...
-%     (atmos.initial_SZA(measurement_number).SZA == 0) = NaN; 
-% 
-% difference = diff(atmos.initial_SZA(measurement_number).SZA');
-% for k = 1:size(difference,2)
-%     if length(find((difference(:,k)) > 0)) == length(find(~isnan(difference(:,k))));
-%         monotonic(k) = 1;
-%         vector_break(k) = 0;
-%     elseif length(find((difference(:,k)) < 0)) == find(~isnan(difference(:,k)));
-%         monotonic(k) = 1;
-%         vector_break(k) = 0;
-%     else monotonic(k) = 0;
-%         vector_mult(:,k) = difference(1:end-1,k).*difference(2:end,k);
-%         vector_break(k) = find(vector_mult(:,k) < 0)+1;
-%         
-%     end
-%     
-%     if ~monotonic(k)
-%         SZA_temp_1 = atmos.initial_SZA(measurement_number).SZA(k,1:vector_break(k));
-%         SZA_temp_2 = atmos.initial_SZA(measurement_number).SZA(k,vector_break(k)+1:end);
-%     end
-% end
+%profile filenames
+ozonefilename = ['../input/ForwardModelProfiles/',inputs.station,'/',...
+    inputs.seasonal,'/', inputs.station,'_ozone_',inputs.seasonal,'.dat'];
+ozoneSDfilename = ['../input/ForwardModelProfiles/',inputs.station,'/', ...
+    inputs.seasonal, '/',inputs.station,'_ozone_',inputs.seasonal,'_SD.dat'];
+temperaturefilename = ['../input/ForwardModelProfiles/',inputs.station,'/',...
+    inputs.seasonal, '/',inputs.station,'_temperature_',inputs.seasonal,'.dat'];
+pressurefilename = ['../input/ForwardModelProfiles/',inputs.station,'/', ...
+    inputs.seasonal,'/',inputs.station, '_pressure_',inputs.seasonal,'.dat'];
+aerosolfilename = ['../input/ForwardModelProfiles/','aerosol/AntAero10_9.dat'];
 
 
-N_temp = [];
-WLP_temp = [];
-R_temp = [];
-I_temp = [];
-
-count = 1;
-if ~isempty(strfind(WLP,'A')) 
-    what_WLP.a = strfind(atmos.WLP(measurement_number,:),'A');
-    if isempty(what_WLP.a) == 0
-        N_temp(count,:) = atmos.N_values(measurement_number).N(atmos.N_values(measurement_number).WLP == 'A',:);
-        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'A'),:);
-        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'A'),:);
-        WLP_temp(count) = 'A';
-        count = count+1;
-    end
-end
-if ~isempty(strfind(WLP,'C')) 
-    what_WLP.c = strfind(atmos.WLP(measurement_number,:),'C');
-    if isempty(what_WLP.c) == 0
-        N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'C'),:);
-        WLP_temp(count) = 'C';
-        count = count+1;    
-    end
-end
-if ~isempty(strfind(WLP,'D'))
-    what_WLP.d = strfind(atmos.WLP(measurement_number,:),'D');
-    if isempty(what_WLP.d) == 0
-        N_temp(count,:) = atmos.N_values(measurement_number).N(find(atmos.N_values(measurement_number).WLP == 'D'),:);
-        R_temp(count,:) = atmos.R_values(measurement_number).R(find(atmos.N_values(measurement_number).WLP == 'D'),:);
-        I_temp(count,:) = atmos.initial_SZA(measurement_number).SZA(find(atmos.N_values(measurement_number).WLP == 'D'),:);    
-        WLP_temp(count) = 'D';
+%finding month or season to use
+atmos.Umkehrdate = datevec(Umkehr.data.Time(1));
+atmos.dateindex = atmos.Umkehrdate(2);
+if strcmp(inputs.seasonal, 'seasonal'); 
+    if Umkehrdate(2) == 12 || Umkehrdate(2) == 1 || Umkehrdate(2) == 2
+        atmos.dateindex = 2;
+    elseif Umkehrdate(2) == 3 || Umkehrdate(2) == 4 || Umkehrdate(2) == 5
+        atmos.dateindex = 3;
+    elseif Umkehrdate(2) == 6 || Umkehrdate(2) == 7 || Umkehrdate(2) == 8
+        atmos.dateindex = 4;
+    elseif Umkehrdate(2) == 9 || Umkehrdate(2) == 10 || Umkehrdate(2) == 11
+        atmos.dateindex = 5;
     end
 end
 
-atmos.N_values(measurement_number).N = N_temp;
-atmos.N_values(measurement_number).WLP = WLP_temp;
-atmos.R_values(measurement_number).R = R_temp;
-atmos.initial_SZA(measurement_number).SZA = I_temp;
+%importing data
+%ozone
+ozoneprofile = importdata(ozonefilename);
+atmos.ozone = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex + 1)), ...
+    atmos.Z,'linear','extrap'));
+atmos.ozone_mid = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex + 1)), ...
+    atmos.Zmid,'linear','extrap'));
 
-if measurement_number > length(atmos.date)
-    atmos.next_year = 1;
-    return
-end
+%ozone standard deviation
+ozoneSDprofile = importdata(ozoneSDfilename);
+atmos.ozoneSD = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex + 1)), ...
+    atmos.Z,'linear','extrap'));
+atmos.ozoneSD_mid = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex + 1)), ...
+    atmos.Zmid,'linear','extrap'));
 
-disp(strcat({'Current date being retrieved: '},num2str(atmos.date(measurement_number).date(1))...
-    ,'-',num2str(atmos.date(measurement_number).date(2))...
-    ,'-',num2str(atmos.date(measurement_number).date(3))));
-No_WLP = length(WLP);
+%temperature
+temperatureprofile = importdata(temperaturefilename);
+atmos.temperature = exp(interp1(temperatureprofile(:,1),...
+    log(temperatureprofile(:,atmos.dateindex + 1)),atmos.Z,'linear','extrap'));
+atmos.temperature_mid = interp1(temperatureprofile(:,1),...
+    temperatureprofile(:,atmos.dateindex + 1),atmos.Zmid,'linear','extrap');
 
-existing_WLP = atmos.WLP(measurement_number,:);
-A = ' '; C = ' '; D = ' ';
-if strfind(existing_WLP,'A');
-    A = 'A';
-elseif strfind(existing_WLP,'C');
-    C = 'C';
-elseif strfind(existing_WLP,'D');
-    D = 'D';
-end
+%pressure
+pressureprofile = importdata(pressurefilename);
+atmos.pressure = exp(interp1(pressureprofile(:,1),...
+    log(pressureprofile(:,atmos.dateindex + 1)),atmos.Z,'linear','extrap'));
+atmos.pressure_mid = exp(interp1(pressureprofile(:,1),...
+    log(pressureprofile(:,atmos.dateindex + 1)),atmos.Zmid,'linear','extrap'));
 
-if isempty(atmos.N_values(measurement_number).WLP);
-    display(strcat('No measurements for the wavelengths specified exist for date:',...
-    num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-    ,'-',num2str(atmos.date(measurement_number).date(3)),'.'))
-    display(strcat('Wavelength pairs that exist are: ',A,C,D,'. Proceeding to next date.'));
-    atmos.return = 1;
-    return
-else atmos.return = 0;
-end
+%aerosol
+aerosol = importdata(aerosolfilename);
+atmos.aerosol = aerosol(1:inputs.maximum_altitude / 1000 + 1,2)';
+atmos.aerosol_mid = exp(interp1(aerosol(:,1),log(aerosol(:,2)),atmos.Zmid,'linear','extrap'));
 
-for k = 1:No_WLP
-    if (WLP(k) == atmos.N_values(measurement_number).WLP) == 0
-    display(strcat(WLP(k),{' pair measurement does not exist at this date or was removed.'},...
-        {' please look in atmos_init for available pairs.'}))
-    atmos.return = 1;
-    return
-    else atmos.return = 0;
-    end
-end
-    
-%checking whether vector lengths are the same
-no_zeros = nonzeros(atmos.initial_SZA(measurement_number).SZA');
-sz_SZA = size(atmos.initial_SZA(measurement_number).SZA);
-if length(no_zeros) ~= length(reshape(atmos.initial_SZA(measurement_number).SZA,1,sz_SZA(1)*sz_SZA(2)))
-    disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
-        num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-        ,'-',num2str(atmos.date(measurement_number).date(3))));
-end
-
-%removing padded zeros if wavelength pair data sizes are different.
-atmos.N_values(measurement_number).N (atmos.N_values(measurement_number).N(:,:) == 0) = NaN;
-atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA(:,:) == 0) = NaN;
-
-%removing data that is taken at a SZA that is above 94 degrees.       
-atmos.N_values(measurement_number).N (atmos.initial_SZA(measurement_number).SZA >= SZA_limit) = NaN;
-atmos.initial_SZA(measurement_number).SZA (atmos.initial_SZA(measurement_number).SZA >= SZA_limit) = NaN;
-
-date_to_use = atmos.date(measurement_number).date(2);
-
-%reading in ozone profile
-fid = fopen(ozonefilename);
-%numlayers = fscanf(fid,'%i',1);
-
-if date_to_use == 12 || date_to_use == 1 || date_to_use == 2
-    quarter = 2;
-elseif date_to_use == 3 || date_to_use == 4 || date_to_use == 5
-    quarter = 3;
-elseif date_to_use == 6 || date_to_use == 7 || date_to_use == 8
-    quarter = 4;
-elseif date_to_use == 9 || date_to_use == 10 || date_to_use == 11
-    quarter = 5;
-end
-
-if strcmp(seasonal,'seasonal')
-    prof = fscanf(fid,'%f',[5,inf])';
-    atmos.ozone = interp1(prof(:,1),prof(:,quarter),atmos.Z,'linear','extrap');
-    atmos.ozone (atmos.ozone < 1e8) = 1e8;    
-    atmos.ozonemid = interp1(prof(:,1),prof(:,quarter),atmos.Zmid,'linear','extrap');
-    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
-    fclose (fid);
-elseif strcmp(seasonal,'monthly');
-    prof = fscanf(fid,'%f',[13,inf])';
-    prof(:,2:end) = prof(:,2:end);
-    atmos.ozone = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Z,'linear','extrap');
-    atmos.ozone (atmos.ozone < 1e8) = 1e8;
-    %atmos.ozone = -(atmos.ozone*30/100)+atmos.ozone; %A prioir testing
-    atmos.ozonemid = interp1(prof(:,1),prof(:,date_to_use+1),atmos.Zmid,'linear','extrap');
-    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
-    fclose (fid);
-else prof = fscanf(fid,'%f',[5,inf])';
-    atmos.ozone = interp1(prof(:,1),prof(:,2),atmos.Z,'linear','extrap');
-    atmos.ozone (atmos.ozone < 1e8) = 1e8;
-    %atmos.ozone = -(atmos.ozone*30/100)+atmos.ozone; %A prioir testing
-    atmos.ozonemid = interp1(prof(:,1),prof(:,2),atmos.Zmid,'linear','extrap');
-    atmos.ozonemid (atmos.ozonemid < 1e8) = 1e8;
-    fclose (fid);
-
-end
-
-% if logswitch;
-%     atmos.ozone = log10(atmos.ozone);
-%     atmos.ozonemid = log10(atmos.ozonemid);
-% end
-
-%Reading in temperature.
-
-%for testing temperature and pressure on zenith paths
-% test = importdata('/Users/stonek/work/Dobson/input/not_used/TP23_9Ant.dat');
-% a = open('temp_test.mat');
-% b = open('test_test_height.mat');
-% test2 = interp1(b.b*1000,a.a,atmos.Z,'linear','extrap');
-% test3 = interp1(b.b*1000,a.a,atmos.Zmid,'linear','extrap');
-% c = open('test_pressure.mat');
-% test4 = exp(interp1(0:1000:60000,log(c.c),atmos.Z,'linear','extrap'));
-% test5 = exp(interp1(0:1000:60000,log(c.c),atmos.Zmid,'linear','extrap'));
-% %-----
-%seasonal = 'seasonal';
-
-fid_temp = fopen(temperaturefilename);
-fid_pres = fopen(pressurefilename);
-if strcmp(seasonal,'seasonal')
-    temperature = fscanf(fid_temp,'%f',[5,inf])';
-    atmos.T = interp1(temperature(:,1),temperature(:,quarter),atmos.Z,'linear','extrap');
-    atmos.Tmid = interp1(temperature(:,1),temperature(:,quarter),atmos.Zmid,'linear','extrap');
-    fclose(fid_temp);
-    
-    pressure = fscanf(fid_pres,'%f',[5,inf])';
-    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
-    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
-    fclose(fid_pres);
-elseif strcmp(seasonal,'monthly')
-    temperature = fscanf(fid_temp,'%f',[13,inf])';
-    atmos.T = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Z,'linear','extrap');
-    atmos.Tmid = interp1(temperature(:,1),temperature(:,date_to_use+1),atmos.Zmid,'linear','extrap');
-    fclose(fid_temp);
-    
-    pressure = fscanf(fid_pres,'%f',[13,inf])';
-    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,date_to_use+1)),atmos.Z,'linear','extrap'));
-    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,date_to_use+1)),atmos.Zmid,'linear','extrap'));
-    fclose(fid_pres);
-else temperature = fscanf(fid_temp,'%f',[5,inf])';
-    atmos.T = interp1(temperature(:,1),temperature(:,2),atmos.Z,'linear','extrap');
-    atmos.Tmid = interp1(temperature(:,1),temperature(:,2),atmos.Zmid,'linear','extrap');
-    fclose(fid_temp);
-    
-    pressure = fscanf(fid_pres,'%f',[5,inf])';
-    atmos.P = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Z,'linear','extrap'));
-    atmos.Pmid = exp(interp1(pressure(:,1),log(pressure(:,quarter)),atmos.Zmid,'linear','extrap'));
-    fclose(fid_pres);
-end
-
- %atmos.T = test2;
- %atmos.Tmid = test3;
-
-%Reading in pressure. ##This needs to include monthly and constant option##
-
-
- %atmos.P = test4;
- %atmos.Pmid = test5;
-% atmos.P(1) = 1.025299541562413e+03;
-% atmos.T(1) = 288.5333;
-%Reading in aerosols
-%These aerosols are for extinction at 500nm. To calculate extinction at
-%otehr wavenegths: *(500/lambda)^1.2
-fid = fopen(aerosolfilename);
-aerosol = fscanf(fid,'%f',[2,inf])';
-aerosol = aerosol(2:71,:);
-atmos.Aer = interp1(aerosol(:,1),aerosol(:,2),atmos.Z,'linear','extrap');
-atmos.Aermid = interp1(aerosol(:,1),aerosol(:,2),atmos.Zmid,'linear','extrap');
-fclose (fid);
-
-atmos.quarter = quarter;  
-atmos.date_to_use = date_to_use;
 end

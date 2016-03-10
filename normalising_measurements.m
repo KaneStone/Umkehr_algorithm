@@ -1,38 +1,41 @@
-function [atmos] = normalising_measurements(atmos,designated_SZA,theta,measurement_number)
+function [atmos, Umkehr] = normalising_measurements(atmos,Umkehr,inputs,theta,measurement_number)
 %Normalising measurements to lowest SZA
 
+Umkehrdate = datevec(Umkehr.data.Time);
+hourmin = min(Umkehrdate(:,4));
 
-if atmos.hour_min(measurement_number) < 12
-    atmos.N_values(measurement_number).N = fliplr(atmos.N_values(measurement_number).N);
-    atmos.initial_SZA(measurement_number).SZA = fliplr(atmos.initial_SZA(measurement_number).SZA);
+if hourmin < 12
+    Umkehr.data.Nvalue = fliplr(Umkehr.data.Nvalue);
+    Umkehr.data.SolarZenithAngle  = fliplr(Umkehr.data.SolarZenithAngle);
 end
-for j = 1:size(atmos.initial_SZA(measurement_number).SZA,1);
-    if size(atmos.initial_SZA(measurement_number).SZA,1) > 1 && j == 1
-        [~,b] = min(atmos.initial_SZA(measurement_number).SZA(j,:));
+for j = 1:size(Umkehr.data.SolarZenithAngle,1);
+    if size(Umkehr.data.SolarZenithAngle,1) > 1 && j == 1
+        [~,b] = min(Umkehr.data.SolarZenithAngle(j,:));
         atmos.normalisationindex(j) = b;
-    elseif size(atmos.initial_SZA(measurement_number).SZA,1) > 1 && j == 3
-        [~,b] = min(atmos.initial_SZA(measurement_number).SZA(j,:));
+    elseif size(Umkehr.data.SolarZenithAngle,1) > 1 && j == 3
+        [~,b] = min(Umkehr.data.SolarZenithAngle(j,:));
         atmos.normalisationindex(j) = b;
     else
-        theta1 = min(atmos.initial_SZA(measurement_number).SZA(j,:)):2.5:max(atmos.initial_SZA(measurement_number).SZA(j,:));
+        theta1 = min(Umkehr.data.SolarZenithAngle(j,:)):2.5:max(Umkehr.data.SolarZenithAngle(j,:));
 
-        splfit = splinefit(atmos.initial_SZA(measurement_number).SZA(j,:),atmos.N_values(measurement_number).N(j,:),length(theta1)-1,3,'r');
+        splfit = splinefit(Umkehr.data.SolarZenithAngle(j,:),Umkehr.data.Nvalue(j,:),length(theta1)-1,3,'r');
         spliney = ppval(splfit,theta1);
-        final = interp1(theta1,spliney,atmos.initial_SZA(measurement_number).SZA(j,:),'linear','extrap');
-        [~, atmos.normalisationindex(j)] = min(abs(final(theta1 < theta1(1)+10) - atmos.N_values(measurement_number).N(j,theta1 < theta1(1)+10)));
+        final = interp1(theta1,spliney,Umkehr.data.SolarZenithAngle(j,:),'linear','extrap');
+        [~, atmos.normalisationindex(j)] = min(abs(final(theta1 < theta1(1)+10) - ...
+            Umkehr.data.Nvalue(j,theta1 < theta1(1)+10)));
     end
 
     
-    if designated_SZA
+    if inputs.designated_SZA
     %next two lines only work for C_pair
-    atmos.N_values(measurement_number).N (isnan(atmos.N_values(measurement_number).N)) = [];
-    atmos.initial_SZA(measurement_number).SZA (isnan(atmos.initial_SZA(measurement_number).SZA)) = [];
-    atmos.N_values(measurement_number).N = interp1(atmos.initial_SZA(measurement_number).SZA,...
-        atmos.N_values(measurement_number).N,theta,'linear','extrap');
-    atmos.initial_SZA(measurement_number).SZA = theta;
-    atmos.normalisationindex = 1;
-    atmos.N_values(measurement_number).N = atmos.N_values(measurement_number).N - repmat(atmos.N_values(measurement_number).N(1),1,13);
-    return
+        Umkehr.data.Nvalues (isnan(Umkehr.data.Nvalues)) = [];
+        Umkehr.data.SolarZenithAngle (isnan(Umkehr.data.SolarZenithAngle)) = [];
+        Umkehr.data.Nvalues = interp1(Umkehr.data.SolarZenithAngle,...
+            Umkehr.data.Nvalues,theta,'linear','extrap');
+        Umkehr.data.SolarZenithAngle = theta;
+        atmos.normalisationindex = 1;
+        Umkehr.data.Nvalues = Umkehr.data.Nvalues - repmat(Umkehr.data.Nvalues(1),1,13);
+        return
     end
     
 %     figure;
@@ -50,11 +53,11 @@ for j = 1:size(atmos.initial_SZA(measurement_number).SZA,1);
 %     export_fig('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/splinefitfornormalisation.png','-png');
 %     export_fig('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/splinefitfornormalisation.pdf','-pdf');
     %for i = 1:length(atmos.N_values);
-    sz = size(atmos.N_values(measurement_number).N(j,:));
+    sz = size(Umkehr.data.Nvalue(j,:));
     %[~, SZA_min_location] = min(atmos.initial_SZA(i).SZA,[],2);
 
-    N_norm = atmos.N_values(measurement_number).N(j,atmos.normalisationindex(j));
-    atmos.N_values(measurement_number).N(j,:) = atmos.N_values(measurement_number).N(j,:) - repmat(N_norm,1,sz(2));  
+    N_norm = Umkehr.data.Nvalue(j,atmos.normalisationindex(j));
+    Umkehr.data.Nvalue(j,:) = Umkehr.data.Nvalue(j,:) - repmat(N_norm,1,sz(2));  
     clearvars theta1
 end
 %end

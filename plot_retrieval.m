@@ -1,7 +1,6 @@
-function [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,Umkehr,xhat,Sa,S,...
-    measurement_number,yhat1,Se_for_errors)
+function [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,date,N_val,xhat,Sa,S,...
+    yhat1,Se_for_errors)
 
-date = datevec(Umkehr.data.Time);
 
 addpath('../data_code');
 
@@ -29,7 +28,6 @@ title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2
 profile_lh = legend([herror_handle(2) herror_handle2(2)],'Retrieval','A priori');
 set(profile_lh,'location','NorthEast','box','off','fontsize',24);
 
-N_val = Umkehr(measurement_number).data.Nvalue;
 N_val_error = Se_for_errors;
 N_val_error = reshape(N_val_error,fliplr(size(N_val))).^.5;
 res = N_val - yhat;

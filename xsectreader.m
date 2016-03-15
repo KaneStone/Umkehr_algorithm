@@ -43,12 +43,14 @@ elseif strcmp(inputs.cross_section,'BDM');
 
     xsection.wavelength = xs(1,lowlambda:highlambda)/10;    
 
-elseif strcmp(inputs.cross_section,'G');
-    %Gorshelev
-    Sfiles = dir(strcat(folder,'Serdyuchenko/','*.dat'));
+elseif strcmp(inputs.cross_section,'SG');
+    %Serdyuchenko-Gorshelev
+    
+    SGfolder = '../input/ForwardModelProfiles/ozonexs/Serdyuchenko-Gorshelev/';
+    Sfiles = dir(strcat(SGfolder,'*.dat'));
     Stemp = zeros(1,11);
 
-    fid = fopen(strcat(folder,'Serdyuchenko/',Sfiles(1,1).name));
+    fid = fopen(strcat(SGfolder,Sfiles(1,1).name));
     info = fgetl(fid);
     tic
     a = 1;
@@ -66,9 +68,10 @@ elseif strcmp(inputs.cross_section,'G');
     Ssect = fscanf(fid,'%f',[12,inf]);
     fclose (fid);
 
-    xs.Ssigma = Ssect(2:12,:);
-    xs.Swl = Ssect(1,:);
-    xs.Stemp = Stemp;
+    xsection.wavelength = Ssect(1,:);
+    xsection.temperature = Stemp; 
+    xsection.sigma = Ssect(2:12,:);
+    
 end
 
 temphold = interp1(xsection.temperature,xsection.sigma,atmos.temperature,'linear','extrap'); 

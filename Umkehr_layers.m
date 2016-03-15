@@ -1,4 +1,4 @@
-function [g, g1] = Umkehr_layers(setup,inputs,xhat,measurement_number,S,date,foldersandnames)
+function [g, g1] = Umkehr_layers(setup,inputs,xhat,S,date,foldersandnames)
 
 %Irina's layering system.
 %This could get quite complicated
@@ -37,7 +37,6 @@ Result_retrieval = vertcat(xhat_layer1,Total_Ozone);
 Error_Result = vertcat(Scolerrors1,Total_column_errors);
 Result = horzcat(Result_retrieval,Error_Result);
 
-date = datevec(date(1));
 if strcmp(inputs.seasonal, 'constant');
     WLP = 'C_CAP';
 else WLP = inputs.WLP_to_retrieve;

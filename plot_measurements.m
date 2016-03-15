@@ -1,4 +1,4 @@
-function [] = plot_measurements(atmos_init,theta,station,measurement_number,Just_C);
+function [] = plot_measurements(atmos_init,theta,station,Just_C);
 
 atmos = atmos_init;
 

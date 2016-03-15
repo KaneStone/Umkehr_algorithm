@@ -1,14 +1,16 @@
-function [] = logfile(Umkehr)
+function [] = logfile(foldersandnames,to_append)
 
-% %checking whether vector lengths are the same
-% for i = 1:length(Umkehr.data)
-%     no_zeros = nonzeros(Umkehr.data(i).SolarZenithAngle);
-%     sz_SZA = size(Umkehr.data(i).SolarZenithAngle);
-% end
-% 
-% if length(no_zeros) ~= length(reshape(atmos.initial_SZA(measurement_number).SZA,1,sz_SZA(1)*sz_SZA(2)))
-%     disp(strcat('Inconsistent vector lengths of different wavelength pairs for date:',...
-%         num2str(atmos.date(measurement_number).date(1)),'-',num2str(atmos.date(measurement_number).date(2))...
-%         ,'-',num2str(atmos.date(measurement_number).date(3))));
-% end
+%creating log file
+output_folder = strcat(foldersandnames.retrievals,inputs.station,'/',WLP,'/',...
+    sprintf('%d',date(3)),'/');
+filename = strcat(inputs.station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
+        sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),...
+        foldersandnames.name_ext,'.txt');
+if ~exist(strcat(output_folder,filename),'file')
+    mkdir(output_folder);        
+    save(strcat(output_folder,filename),'to_append','-ascii');
+end
+save(strcat(output_folder,filename),'to_append','-ascii','-append');
+save(strcat(output_folder,filename),'/n','-ascii','-append');
+
 end

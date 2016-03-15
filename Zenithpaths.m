@@ -1,5 +1,4 @@
-function [zs, atmos] = Zenithpaths(atmos, Umkehr, lambda, measurement_number, theta,...
-    designated_SZA,dz, plot_pathlength)
+function [zs, atmos] = Zenithpaths(atmos,Umkehr,lambda,,dz,plot_pathlength)
  
 %This function calculates the zenith ray paths. The SZAs that are given in
 %the measurements are calculated from time, and are thus are the true SZAs. To
@@ -8,10 +7,7 @@ function [zs, atmos] = Zenithpaths(atmos, Umkehr, lambda, measurement_number, th
 %to calculate initial true SZAs. Then through interpolation, actual 
 %apparent SZAs are calculated. 
 
-if designated_SZA
-    a = theta;
-else a = Umkehr.data.SolarZenithAngle;
-end
+a = Umkehr.data.SolarZenithAngle;
 
 %setting up initial apparent SZA.
 mx = ceil(max(a(:)));
@@ -37,10 +33,11 @@ for iteration = 1:2;
             if iteration == 2            
                 True.actual = a;
                 True_I = reshape(True.Initial(i,iscat,:),1,al);
-                True_I (True_I == 0) = [];
+                True_I (True_I == 0) = [];                
                 Apparent = interp1(squeeze(True_I)...
                     ,squeeze(Apparent_Initial(i,iscat,1:length(True_I)))...
                     ,True.actual(cwlp,:),'linear','extrap');
+              
             end        
             for j = 1:length(Apparent) 
                 if Apparent(j) > 90                 

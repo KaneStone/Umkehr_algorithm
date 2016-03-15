@@ -1,4 +1,4 @@
-function [atmos] = profilereader(atmos, Umkehr,inputs)
+function [atmos] = profilereader(atmos,Umkehr,inputs)
 
 %reads in atmospheric profiles. 
 % - ozone
@@ -16,7 +16,6 @@ temperaturefilename = ['../input/ForwardModelProfiles/',inputs.station,'/',...
 pressurefilename = ['../input/ForwardModelProfiles/',inputs.station,'/', ...
     inputs.seasonal,'/',inputs.station, '_pressure_',inputs.seasonal,'.dat'];
 aerosolfilename = ['../input/ForwardModelProfiles/','aerosol/AntAero10_9.dat'];
-
 
 %finding month or season to use
 atmos.Umkehrdate = datevec(Umkehr.data.Time(1));
@@ -36,31 +35,31 @@ end
 %importing data
 %ozone
 ozoneprofile = importdata(ozonefilename);
-atmos.ozone = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex + 1)), ...
+atmos.ozone = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex+1)), ...
     atmos.Z,'linear','extrap'));
-atmos.ozone_mid = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex + 1)), ...
+atmos.ozone_mid = exp(interp1(ozoneprofile(:,1),log(ozoneprofile(:,atmos.dateindex+1)), ...
     atmos.Zmid,'linear','extrap'));
 
 %ozone standard deviation
 ozoneSDprofile = importdata(ozoneSDfilename);
-atmos.ozoneSD = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex + 1)), ...
+atmos.ozoneSD = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex+1)), ...
     atmos.Z,'linear','extrap'));
-atmos.ozoneSD_mid = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex + 1)), ...
+atmos.ozoneSD_mid = exp(interp1(ozoneSDprofile(:,1),log(ozoneSDprofile(:,atmos.dateindex+1)), ...
     atmos.Zmid,'linear','extrap'));
 
 %temperature
 temperatureprofile = importdata(temperaturefilename);
 atmos.temperature = exp(interp1(temperatureprofile(:,1),...
-    log(temperatureprofile(:,atmos.dateindex + 1)),atmos.Z,'linear','extrap'));
+    log(temperatureprofile(:,atmos.dateindex+1)),atmos.Z,'linear','extrap'));
 atmos.temperature_mid = interp1(temperatureprofile(:,1),...
-    temperatureprofile(:,atmos.dateindex + 1),atmos.Zmid,'linear','extrap');
+    temperatureprofile(:,atmos.dateindex+1),atmos.Zmid,'linear','extrap');
 
 %pressure
 pressureprofile = importdata(pressurefilename);
 atmos.pressure = exp(interp1(pressureprofile(:,1),...
-    log(pressureprofile(:,atmos.dateindex + 1)),atmos.Z,'linear','extrap'));
+    log(pressureprofile(:,atmos.dateindex+1)),atmos.Z,'linear','extrap'));
 atmos.pressure_mid = exp(interp1(pressureprofile(:,1),...
-    log(pressureprofile(:,atmos.dateindex + 1)),atmos.Zmid,'linear','extrap'));
+    log(pressureprofile(:,atmos.dateindex+1)),atmos.Zmid,'linear','extrap'));
 
 %aerosol
 aerosol = importdata(aerosolfilename);

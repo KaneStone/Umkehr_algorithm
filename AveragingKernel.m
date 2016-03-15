@@ -1,4 +1,4 @@
-function [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1,measurement_number, date)
+function [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1, date)
 
 if strcmp(inputs.seasonal,'constant');
     WLP = 'C_CAP';

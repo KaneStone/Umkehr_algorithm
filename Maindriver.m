@@ -1,39 +1,34 @@
 tic;
 
-%inputs for files to retrieve
-
 inputs = userinputs;
-
-addpath('/Users/kanestone/work/supportCode/splineFit/')
-addpath('/Users/kanestone/work/supportCode/exportFig/')
-addpath('/Users/kanestone/work/supportCode/herrorbar/')
 
 Umkehr = readUmkehr(inputs);
 
-for measurement_number = 1:length(Umkehr.data)
+for measurement_number = 1:length(Umkehr)
     
     %[log] = logfile();
+    currentUmkehr = Umkehr(measurement_number);
     
-    [setup, userinputs, Umkehr, foldersandnames] = retrievalsetup(Umkehr(measurement_number),...
-        measurement_number,inputs);
+    [setup, userinputs, currentUmkehr, foldersandnames] = retrievalsetup(currentUmkehr,...
+        inputs);
     
-    if userinputs.plot_measurements
-        plot_measurements(extra.atmos,extra.theta,station,measurement_number,1);
-        return
-    end
+%     if userinputs.plot_measurements
+%         plot_measurements(extra.atmos,extra.theta,station,1);
+%         return
+%     end
     
     [K,N] = ForwardModel(setup.atmos.ozone, setup, inputs);
     sz = size(setup.atmos.Apparent);
     
     %Setup Measurement covariance matrix
-    [Se, Se_for_errors] = createSe(setup.atmos.true_actual);
+    [Se, Se_for_errors] = createSe(setup.atmos.true_actual,inputs.Se_scale_factor);
     
     RMS = [];
     j = 1;
             
     Sa = createSa(setup, inputs);
     %scale_factor = scale_factor+4;
-    y = Umkehr(measurement_number).data.Nvalue;
+    y = currentUmkehr.data.Nvalue;
     [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation...
     (y,N,Se,setup.atmos.ozone,Sa,K,setup,inputs,'Opt');
     
@@ -42,19 +37,18 @@ for measurement_number = 1:length(Umkehr.data)
     end
     
     %printing diagnostics
-    [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,Umkehr,xhat,Sa,S,measurement_number, ...
-        yhat1,Se_for_errors);
+    [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,setup.atmos.Umkehrdate,...
+        currentUmkehr.data.Nvalue,xhat,Sa,S,yhat1,Se_for_errors);
     
-    [g, g1] = Umkehr_layers(setup,inputs,xhat,measurement_number,S,...
-        Umkehr(measurement_number).data.Time, foldersandnames);    
-    [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1,measurement_number, ...
-        Umkehr(measurement_number).data.Time);
+    [g, g1] = Umkehr_layers(setup,inputs,xhat,S,...
+        setup.atmos.Umkehrdate, foldersandnames);    
+    [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1, ...
+        setup.atmos.Umkehrdate);
     if inputs.print_diagnostics
         print_diagnostics(fig1,fig2,fig3,AK,setup,inputs,foldersandnames);   
     end    
     close all hidden
-    clearvars -except measurement_number station year i sf...
-        number_of_measurements L_Ozone L_Aerosol atmos_init measurement_length Umkehr_path
+    clearvars -except inputs Umkehr
 end
 fclose('all'); 
 time = toc;

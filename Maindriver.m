@@ -40,12 +40,11 @@ for measurement_number = 1:length(Umkehr)
     [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,setup.atmos.Umkehrdate,...
         currentUmkehr.data.Nvalue,xhat,Sa,S,yhat1,Se_for_errors);
     
-    [g, g1] = Umkehr_layers(setup,inputs,xhat,S,...
-        setup.atmos.Umkehrdate, foldersandnames);    
-    [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1, ...
-        setup.atmos.Umkehrdate);
+    [g, g1] = Umkehr_layers(setup,Umkehr.data.WLP,inputs,xhat,S,setup.atmos.Umkehrdate,...
+        foldersandnames);    
+    [AK] = AveragingKernel(S,Sa,Se,setup,Umkehr.data.WLP,inputs,foldersandnames,K,g,g1);
     if inputs.print_diagnostics
-        print_diagnostics(fig1,fig2,fig3,AK,setup,inputs,foldersandnames);   
+        print_diagnostics(fig1,fig2,fig3,AK,setup,Umkehr.data.WLP,inputs,foldersandnames);   
     end    
     close all hidden
     clearvars -except inputs Umkehr

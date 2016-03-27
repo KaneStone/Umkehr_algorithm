@@ -1,9 +1,8 @@
-function [g, g1] = Umkehr_layers(setup,inputs,xhat,S,date,foldersandnames)
+function [g, g1] = Umkehr_layers(setup,WLP,inputs,xhat,S,date,foldersandnames)
 
 %Irina's layering system.
-%This could get quite complicated
-Lower_limits = [1;6;11;16;21;26;31;36;41;46;51;56;61;66;71;76];
-Upper_limits = [5;10;15;20;25;30;35;40;45;50;55;60;65;70;75;80];
+WLP = char(WLP');
+
 DU_coeff = 1e5*1.38e-21*1e3*(273.1/10.13);
 
 layers = 5;
@@ -39,7 +38,6 @@ Result = horzcat(Result_retrieval,Error_Result);
 
 if strcmp(inputs.seasonal, 'constant');
     WLP = 'C_CAP';
-else WLP = inputs.WLP_to_retrieve;
 end
 
 %Saving retrieval

@@ -1,36 +1,55 @@
-function [AK] = AveragingKernel(S,Sa,Se,setup,inputs,foldersandnames,K,g,g1, date)
+function [AK] = AveragingKernel(S,Sa,Se,setup,WLP,inputs,foldersandnames,K,g,g1)
 
 if strcmp(inputs.seasonal,'constant');
     WLP = 'C_CAP';
-else WLP = inputs.WLP_to_retrieve;
 end
-date = datevec(date(1));
+
+WLP = char(WLP');
+date = setup.atmos.Umkehrdate;
+datetoprint = [num2str(date(1)),sprintf('%02d',date(2)),sprintf('%02d',date(3))];
 
 %output_locations and filenames
-output_folder_res = foldersandnames.resolution;
-output_folder_AK = strcat(foldersandnames.retrievals,inputs.station,'/',WLP,'/AK/',...
-    sprintf('%d',date(3)),'/');
-if ~exist(output_folder_res,'dir')
-    mkdir(output_folder_res)
+output_folder_dof = [foldersandnames.resolution,inputs.station,'/DOF/'];
+if ~exist(output_folder_dof,'dir')
+    mkdir(output_folder_dof)
 end
+
+output_folder_information = [foldersandnames.resolution,inputs.station,'/information_content/'];
+if ~exist(output_folder_information,'dir')
+    mkdir(output_folder_information)
+end
+
+output_folder_resolution = [foldersandnames.resolution,inputs.station,'/resolution/'];
+if ~exist(output_folder_resolution,'dir')
+    mkdir(output_folder_resolution)
+end
+
+output_folder_AK = [foldersandnames.resolution,inputs.station,'/AK/'];
 if ~exist(output_folder_AK,'dir')
     mkdir(output_folder_AK)
 end
-file_name_res = strcat(inputs.station,'_res_',WLP,'_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
-file_name_dof = strcat(inputs.station,'_dof_',WLP,'_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
-file_name_H = strcat(inputs.station,'_H_',WLP,'_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
-file_name_AK = strcat(inputs.station,'_',WLP,'_AK_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
-file_name_AK16 = strcat(inputs.station,'_',WLP,'_AK_',...
-    sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
-    sprintf('%02d',date(1)),foldersandnames.name_ext,'16layers.txt');
+
+file_name_resolution = strcat(inputs.station,'_',datetoprint,'_',WLP,'pair_','resolution',...
+    foldersandnames.name_ext,'.txt');
+file_name_dof = strcat(inputs.station,'_',datetoprint,'_',WLP,'pair_','DOF',...
+    foldersandnames.name_ext,'.txt');
+file_name_information = strcat(inputs.station,'_',datetoprint,'_',WLP,'pair_','information',...
+    foldersandnames.name_ext,'.txt');
+file_name_AK = strcat(inputs.station,'_',datetoprint,'_',WLP,'pair_','AK',...
+    foldersandnames.name_ext,'.txt');
+
+% file_name_dof = strcat(inputs.station,'_dof_',WLP,'_',...
+%     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+%     sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+% file_name_H = strcat(inputs.station,'_H_',WLP,'_',...
+%     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+%     sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+% file_name_AK = strcat(inputs.station,'_',WLP,'_AK_',...
+%     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+%     sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
+% file_name_AK16 = strcat(inputs.station,'_',WLP,'_AK_',...
+%     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
+%     sprintf('%02d',date(1)),foldersandnames.name_ext,'16layers.txt');
 file_name_S = strcat(inputs.station,'_',WLP,'_S_',...
     sprintf('%d',date(3)),'-',sprintf('%02d',date(2)),'-',...
     sprintf('%02d',date(1)),foldersandnames.name_ext,'.txt');
@@ -47,8 +66,9 @@ S_layers(:,8) = S_layers(:,8)/35;
 
 S_to_print = S_layers;
 S_to_print2 = S.S;
-save(strcat(output_folder_res, file_name_S),'S_to_print','-ascii');
-save(strcat('../OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
+%save(strcat(output_folder_res, file_name_S),'S_to_print','-ascii');
+
+%save(strcat('../OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
 % %diagnostic code - remove after
 % figure;
 % fig = gcf;
@@ -75,7 +95,7 @@ AK.AK2(:,8) = AK.AK2(:,8)/35;
 %Resolution
 AK.resolution=1./diag(AK.AK);
 res = AK.resolution;
-save(strcat(output_folder_res,file_name_res),'res','-ascii');
+save(strcat(output_folder_resolution,file_name_resolution),'res','-ascii');
 
 %Degrees of Freedom for signal in Umkehr layers
 AK.dof = sum(diag(AK.AK));
@@ -84,7 +104,7 @@ AK.dof_all = diag(AK.AK(1:80,1:80));
 
 dof = vertcat(AK.dof1,AK.dof);
 %dof = vertcat(AK.dof_all,AK.dof);
-save(strcat(output_folder_res, file_name_dof),'dof','-ascii');
+save(strcat(output_folder_dof, file_name_dof),'dof','-ascii');
 
 %Information content - 3D reduction in the error covariance volumes - how
 %much information from measurements versus a priori
@@ -117,7 +137,7 @@ for i = 1:8;
 end
 
 H_print = horzcat(H_layer,H);
-save(strcat(output_folder_res, file_name_H),'H_print','-ascii');
+save(strcat(output_folder_information, file_name_information),'H_print','-ascii');
 
 %AK_to_print = AK.AK1; Outputting full AK as all information can be
 %obtained from it directly.

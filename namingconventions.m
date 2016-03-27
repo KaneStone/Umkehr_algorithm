@@ -2,9 +2,25 @@ function [foldersandnames] = namingconventions(inputs,foldersandnames)
 
 %OUTPUT folders are not complete
 foldersandnames.retrievals = '../OUTPUT/retrievals/';
+if ~exist(foldersandnames.retrievals)
+    mkdir('../output/retrievals/')
+end
+
 foldersandnames.resolution = '../OUTPUT/resolution/';
+if ~exist(foldersandnames.retrievals)
+    mkdir('../output/resolution/')
+end
+
 foldersandnames.diagnostics = '../OUTPUT/diagnostics/';
+if ~exist(foldersandnames.retrievals)
+    mkdir('../output/diagnostics/')
+end
+
 foldersandnames.logfiles = '../OUTPUT/logfiles/';
+if ~exist(foldersandnames.retrievals)
+    mkdir('../output/logfiles/')
+end
+
 %adding paths for support code
 addpath('SupportCode/splineFit/')
 addpath('SupportCode/exportFig/')

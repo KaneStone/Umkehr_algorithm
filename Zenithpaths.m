@@ -1,4 +1,4 @@
-function [zs, atmos] = Zenithpaths(atmos,Umkehr,lambda,,dz,plot_pathlength)
+function [zs, atmos] = Zenithpaths(atmos,Umkehr,lambda,dz,plot_pathlength)
  
 %This function calculates the zenith ray paths. The SZAs that are given in
 %the measurements are calculated from time, and are thus are the true SZAs. To

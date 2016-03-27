@@ -1,9 +1,6 @@
 function [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,date,N_val,xhat,Sa,S,...
     yhat1,Se_for_errors)
 
-
-addpath('../data_code');
-
 %plotting ozone profile
 figure;
 set(gcf, 'Visible', 'off')

@@ -14,7 +14,7 @@ atmos.Zmid = ((atmos.Z(2:atmos.nlayers) - atmos.Z(1:atmos.nlayers-1)) / 2) + ...
 
 atmos = profilereader(atmos,Umkehr,inputs);
 
-lambda = defineLambda(Umkehr);
+lambda = definelambda(Umkehr);
 
 ozonexs = xsectreader(inputs,atmos,lambda);
 

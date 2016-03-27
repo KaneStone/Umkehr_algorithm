@@ -126,9 +126,8 @@ for k = 1:length(lambda)/2;
 end
 
 %normalising simulated N-values to lowest SZA.
-if ~strcmp(inputs.normalise,'no') 
-    [~, SZA_min_location] = min(atmos.true_actual,[],2);
-    for j = 1:length(SZA_min_location);
+if ~strcmp(inputs.normalise,'no')     
+    for j = 1:length(atmos.normalisationindex);
          N_norm = simulatedNvalues(j,atmos.normalisationindex(j));
         simulatedNvalues(j,:) = simulatedNvalues(j,:) - repmat(N_norm,1,sz(2));   
     end

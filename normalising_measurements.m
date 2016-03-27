@@ -24,7 +24,7 @@ if inputs.designated_SZA
         atmos.normalisationindex(j) = 1;        
     end
     Umkehr.data.Nvalue = splineNvalue;
-    Umkehr.data.SolarZenithAngles = repmat(theta,3,1);
+    Umkehr.data.SolarZenithAngle = repmat(theta,length(Umkehr.data.WLP),1);
     if strcmp(inputs.normalise,'no') 
         return
     else

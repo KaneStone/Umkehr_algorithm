@@ -1,20 +1,18 @@
-function [] = print_diagnostics(x,y,z,AK,setup,inputs,foldersandnames)
+function [] = print_diagnostics(x,y,z,AK,setup,WLP,inputs,foldersandnames)
 
+WLP = char(WLP');
 date = setup.atmos.Umkehrdate;
-
+datetoprint = [num2str(date(1)),sprintf('%02d',date(2)),sprintf('%02d',date(3))];
 if strcmp(inputs.seasonal, 'constant');
     WLP = 'C_CAP';
-else WLP = inputs.WLP_to_retrieve;
 end
 
 output_folder = strcat(foldersandnames.diagnostics,inputs.station,'/');
-file_name = strcat(inputs.station,'_',WLP,'_',sprintf('%d',date(3)),'-',...
-    sprintf('%02d',date(2)),'-',sprintf('%02d',date(1)),foldersandnames.name_ext);
-file = (strcat(output_folder,file_name));
+filename = strcat(inputs.station,'_',WLP,'pair_',datetoprint,foldersandnames.name_ext);
+file = (strcat(output_folder,filename));
 if ~exist(output_folder,'dir');
     mkdir(output_folder);
 end
-
 
 %-------------------------
 export_fig(file,x,'-pdf','-nocrop');

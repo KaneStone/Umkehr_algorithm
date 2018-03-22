@@ -4,7 +4,7 @@ function [lambda,bandpass] = definelambda(Umkehr)
 
 lambda = zeros(length(Umkehr.data.WaveLengthPair) * 2,1);
 count = 1;
-for i = 1:length(Umkehr.data.WaveLengthPair);
+for i = 1:length(Umkehr.data.WaveLengthPair)
     switch char(Umkehr.data.WaveLengthPair(i))
         case 'A'
             lambda(count) = str2double(Umkehr.attributes.WaveLengthPair.APair_wavelengths(1:5));

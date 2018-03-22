@@ -7,7 +7,7 @@ function [ozonexs,ozonexs2] = xsectreader(inputs,atmos,lambda,bandpass)
 %Brion-Daumont-Malicet (Daumont et al. 1992)
 %Serdyuchenko-Gorshelev (Gorshelev et al., 2014)
     
-if strcmp(inputs.cross_section,'BP');
+if strcmp(inputs.cross_section,'BP')
    
     %Bass-Paur
     

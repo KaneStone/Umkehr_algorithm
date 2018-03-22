@@ -55,7 +55,7 @@ end
 %morning or evening
 moe = {'Morning','_M';'Evening','_E';'Both','_B'};
 for i = 1:size(moe,1)
-    if strcmp(inputs.morn_or_even,moe{i,1});
+    if strcmp(inputs.morn_or_even,moe{i,1})
         namelength = length(moe{i,2});
         foldersandnames.name_ext(ext_start:ext_start+namelength-1) = moe{i,2};        
         ext_start = ext_start+namelength;
@@ -63,7 +63,7 @@ for i = 1:size(moe,1)
 end
 
 % upper limit of solar zenith angle
-if ~inputs.designated_SZA;
+if ~inputs.designated_SZA
     foldersandnames.name_ext(ext_start:ext_start+2) = strcat('_',num2str(inputs.SZA_limit));
     ext_start = ext_start+length(num2str(inputs.SZA_limit))+1;
 end

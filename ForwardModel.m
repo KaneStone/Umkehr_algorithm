@@ -28,6 +28,4 @@ for i = 1:setup.atmos.nlayers
     K(:,i) = (ypert-yhat)./pert(i);
 end
 
-%plotWfunc(K,setup.atmos.Apparent);
-
 end

@@ -11,7 +11,7 @@ end
 
 if inputs.designated_SZA
     splineNvalue = zeros(length(Umkehr.data.WLP),length(theta));
-    for j = 1:size(Umkehr.data.SolarZenithAngle,1);
+    for j = 1:size(Umkehr.data.SolarZenithAngle,1)
         minSZA = min(Umkehr.data.SolarZenithAngle(j,:));
         if minSZA > 75
             error(['designated N-values have not been calculated from ',...
@@ -39,7 +39,7 @@ end
 
 splinestep = 1;
 
-for j = 1:size(Umkehr.data.SolarZenithAngle,1);
+for j = 1:size(Umkehr.data.SolarZenithAngle,1)
     switch inputs.normalise
         case 'lowest'            
             [~,lowest_index] = min(Umkehr.data.SolarZenithAngle(j,:));
@@ -58,8 +58,7 @@ for j = 1:size(Umkehr.data.SolarZenithAngle,1);
             realindex = find(Umkehr.data.SolarZenithAngle(j,:) < ...
                 min(Umkehr.data.SolarZenithAngle(j,:)) + normalisation_range);        
             [~,subindex] = min(abs(final(realindex) - Umkehr.data.Nvalue(j,realindex)));                
-            atmos.normalisationindex(j) = realindex(subindex);
-            [~,subindex2] = min(abs(final(realindex) - Umkehr.data.Nvalue(j,realindex)));                
+            atmos.normalisationindex(j) = realindex(subindex);            
             atmos.normalisationindex(j) = realindex(subindex);            
     end        
     

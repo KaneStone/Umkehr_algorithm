@@ -1,6 +1,6 @@
 function [AK] = AveragingKernel(S,Sa,Se,setup,WLP,inputs,foldersandnames,K,g,g1)
 
-if strcmp(inputs.seasonal,'constant');
+if strcmp(inputs.seasonal,'constant')
     WLP = 'C_CAP';
 end
 
@@ -55,20 +55,6 @@ S_layers(:,8) = S_layers(:,8)/35;
 
 S_to_print = S_layers;
 S_to_print2 = S.S;
-%save(strcat(output_folder_res, file_name_S),'S_to_print','-ascii');
-
-%save(strcat('../OUTPUT/retrievals/AK_for_testing_dof/S/',file_name_S),'S_to_print2','-ascii');
-% %diagnostic code - remove after
-% figure;
-% fig = gcf;
-% set(fig,'color','white','position',[100 100 1000 700]);
-% ag = plot(Ss_layers,1:8,'LineWidth',2);
-% title('Ss','fontsize',22);
-% set(gca,'yticklabel',{'0+1';'2+3';'4';'5';'6';'7';'8';'9+'},'fontsize',18);
-% ylabel('Umkehr layer','fontsize', 20);
-% xlabel('Ss','fontsize', 20);
-% hj = legend(ag,'0+1','2+3','4','5','6','7','8','9+');
-% export_fig(fig,'-eps','-nocrop');
 
 AK.AK = S.S*(K'/Se*K);
 AK.area=sum(AK.AK,1);
@@ -93,53 +79,33 @@ H = -.5*log(det(eye(setup.atmos.nlayers)-AK.AK(1:setup.atmos.nlayers,1:setup.atm
 
 count_start = 1;
 count_end = 0;
-for i = 1:8;
+for i = 1:8
     eye_size = length(find(g1(i,:) == 1));
     if i ~= 8
         count_end = count_end + eye_size;
     else
         count_end = setup.atmos.nlayers;
     end
-%     if i == 1 || i == 2
-%         eye_size = 10;
-%     elseif i == 8;
-%         eye_size = 35;
-%     else eye_size = 5;
-%     end
     H_layer(i) = -.5*log(det(eye(eye_size)-AK.AK(count_start:count_end,count_start:count_end)));
     
     count_start = count_start+eye_size;
-%     if i == 1
-%         count_start = count_start+10;
-%         count_end = count_end+10; 
-%     elseif i == 2
-%         count_start = count_start+10;
-%         count_end = count_end+5; 
-%     elseif i == 7;
-%         count_start = count_start+5;
-%         count_end = 80;
-%     else count_start = count_start+5;
-%         count_end = count_end+5;        
-%     end
 end
-
-%save(strcat(output_folder_dof, file_name_dof),'dof','-ascii');
 
 H_print = [date(1),date(2),date(3),date(4),H_layer,H];
 res_print = [date(1),date(2),date(3),date(4),res'];
 
 %backup data before printing
-if exist([output_folder_dof,file_name_dof],'file');
+if exist([output_folder_dof,file_name_dof],'file')
     copyfile([output_folder_dof,file_name_dof],[foldersandnames.backup,file_name_dof,'_',...
         foldersandnames.currenttime]);
 end
 
-if exist([output_folder_resolution,file_name_resolution],'file');
+if exist([output_folder_resolution,file_name_resolution],'file')
     copyfile([output_folder_resolution,file_name_resolution],[foldersandnames.backup,...
         file_name_resolution,'_',foldersandnames.currenttime]);
 end
 
-if exist([output_folder_information,file_name_information],'file');
+if exist([output_folder_information,file_name_information],'file')
     copyfile([output_folder_information,file_name_information],[foldersandnames.backup,...
         file_name_information,'_',foldersandnames.currenttime]);
 end

@@ -39,7 +39,7 @@ if refraction
     atmos.H = Rd ./ g0 .* atmos.temperature(1,:);
     atmos.dndz = (Ns * (((temperature_surface ./ atmos.temperature) .* ...
         (atmos.pressure ./ pressure_surface)) ./ atmos.H));          
-    for i = 1:length(lambda);        
+    for i = 1:length(lambda)       
         atmos.dndz(i,2:end) = ((1 + (atmos.Ns(i) .* (temperature_surface ./ ...
             atmos.temperature(1:end-1)) .* (atmos.pressure(1:end-1) ./ pressure_surface))) - ...
             (1 + (atmos.Ns(i) * (temperature_surface ./ atmos.temperature(2:end)) .* ...
@@ -55,7 +55,7 @@ else
     atmos.H = Rd / g0 * atmos.temperature;
     atmos.dndz = zeros(length(lambda),length(atmos.Z));
     atmos.dndr = zeros(length(lambda),length(atmos.Z));    
-    for i = 1:length(lambda);          
+    for i = 1:length(lambda)         
         atmos.Nr(i,:) = atmos.N(i,:) .* atmos.radius;
     end    
 end

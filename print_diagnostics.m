@@ -1,23 +1,29 @@
-function [] = print_diagnostics(x,y,z,AK,setup,WLP,inputs,foldersandnames)
+function [] = print_diagnostics(figs,AK,setup,WLP,inputs,foldersandnames)
 
 WLP = char(WLP');
 date = setup.atmos.Umkehrdate;
 datetoprint = [num2str(date(1)),sprintf('%02d',date(2)),sprintf('%02d',date(3))];
-if strcmp(inputs.seasonal, 'constant');
+if strcmp(inputs.seasonal, 'constant')
     WLP = 'C_CAP';
 end
 
 output_folder = strcat(foldersandnames.diagnostics,inputs.station,'/');
 filename = strcat(inputs.station,'_',WLP,'pair_',datetoprint,foldersandnames.name_ext);
 file = (strcat(output_folder,filename));
-if ~exist(output_folder,'dir');
+if ~exist(output_folder,'dir')
     mkdir(output_folder);
 end
 
 %-------------------------
-export_fig(file,x,'-pdf','-nocrop');
-export_fig(file,z,'-pdf','-nocrop','-append');
-export_fig(file,y,'-pdf','-nocrop','-append');
+export_fig(file,figs.fig1,'-pdf','-nocrop');
+export_fig(file,figs.fig4,'-pdf','-nocrop','-append');
+export_fig(file,figs.fig2,'-pdf','-nocrop','-append');
+export_fig(file,figs.fig3,'-pdf','-nocrop','-append');
+
+
+% print(file,x,'-dpsc','-bestfit');
+% print(file,z,'-dpsc','-bestfit','-append');
+% print(file,y,'-dpsc','-bestfit','-append');
 
 %-------------------------
 figure;
@@ -29,9 +35,10 @@ hold on
 set(gca,'fontsize',18);
 ylabel('Altitude (km)','fontsize',20);
 xlabel('AK','fontsize',20);
-title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',sprintf('%02d',date(2)),'/',sprintf('%02d',date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
 export_fig(file,fig3,'-pdf','-nocrop','-append');
+%print(file,fig3,'-dpsc','-bestfit','-append');
 %-------------------------
 figure;
 set(gcf, 'Visible', 'off')
@@ -41,9 +48,10 @@ plot(AK.area',1:length(AK.AK),'LineWidth',2);
 hold on
 ylabel('Altitude (km)','fontsize',20);
 xlabel('Area of AK','fontsize',20);
-title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',sprintf('%02d',date(2)),'/',sprintf('%02d',date(3))...
     ,'{ }','Area of AK'),'fontsize',24);
 export_fig(file,fig4,'-pdf','-nocrop','-append');
+%print(file,fig4,'-dpsc','-bestfit','-append');
 %-------------------------
 AK.resolution (AK.resolution > 100) = 100;
 AK.resolution (AK.resolution < 0) = 100;
@@ -62,23 +70,25 @@ annotation('textbox',[.15 .8 .5 .1],...
 ylabel('Altitude (km)','fontsize',20);
 xlabel('1/diag(AK) (km)','fontsize',20);
 set(gca,'fontsize',18);
-title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',sprintf('%02d',date(2)),'/',sprintf('%02d',date(3))...
     ,'{ }','resolution'),'fontsize',24);
 export_fig(file,fig5,'-pdf','-nocrop','-append');
+%print(file,fig5,'-dpsc','-bestfit','-append');
 %-------------------------
-figure;
-set(gcf, 'Visible', 'off')
-fig6 = gcf;
-set(fig6,'color','white','Position',[100 100 1000 700]);
-plot(AK.AK1(:,1:16)'/5,1:length(AK.AK1),'LineWidth',2);
-hold on
-xlim([-.2 .9]);
-ylabel('Layer No.','fontsize',20);
-xlabel('AK','fontsize',20);
-set(gca,'fontsize',18);
-title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
-    ,'{ }','Averaging Kernel'),'fontsize',24);
-export_fig(file,fig6,'-pdf','-nocrop','-append');
+% figure;
+% set(gcf, 'Visible', 'off')
+% fig6 = gcf;
+% set(fig6,'color','white','Position',[100 100 1000 700]);
+% plot(AK.AK1(:,1:16)'/5,1:length(AK.AK1),'LineWidth',2);
+% hold on
+% xlim([-.2 .9]);
+% ylabel('Layer No.','fontsize',20);
+% xlabel('AK','fontsize',20);
+% set(gca,'fontsize',18);
+% title(strcat(inputs.station,'{ }',num2str(date(1)),'/',sprintf('%02d',date(2)),'/',sprintf('%02d',date(3))...
+%     ,'{ }','Averaging Kernel'),'fontsize',24);
+% export_fig(file,fig6,'-pdf','-nocrop','-append');
+% %print(file,fig6,'-dpsc','-bestfit','-append');
 %-------------------------
 figure;
 set(gcf, 'Visible', 'off')
@@ -91,7 +101,8 @@ ylabel('Layer No.','fontsize',20);
 xlabel('AK','fontsize',20);
 set(gca,'fontsize',18);
 set(gca,'yticklabel',{'0+1','2+3','4','5','6','7','8','9+'});
-title(strcat(inputs.station,'{ }',num2str(date(1)),'/',num2str(date(2)),'/',num2str(date(3))...
+title(strcat(inputs.station,'{ }',num2str(date(1)),'/',sprintf('%02d',date(2)),'/',sprintf('%02d',date(3))...
     ,'{ }','Averaging Kernel'),'fontsize',24);
 export_fig(file,fig7,'-pdf','-nocrop','-append');
+%print(file,fig7,'-dpsc','-bestfit','-append');
 end

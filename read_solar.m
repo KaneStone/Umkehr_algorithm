@@ -1,4 +1,4 @@
-function atmos = read_solar(atmos)
+function solar = read_solar(atmos)
 
 %reading in solar spectrum
 % micro-watts/(cm^2*nm)
@@ -14,6 +14,6 @@ for i = 1:NF;
     fclose(fid);
 end
 
-atmos.solar = horzcat(solar.s)';
+solar = horzcat(solar.s)';
 
 end

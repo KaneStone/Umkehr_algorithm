@@ -1,56 +1,93 @@
 function Sa = createSa(setup, inputs)
+%Setup for different types of covariance matrices.
+    
+%predefining Sa size
 
-%quarter,date_to_use,seasonal,logswitch,extra,i,...
-%    L_curve_diag,station,covariance_type,scale_factor)
+Sa = zeros(setup.atmos.nlayers, setup.atmos.nlayers);
 
-SD = setup.atmos.ozoneSD;
+[~, ozonemaxindex] = max(setup.atmos.ozone);
 
-scale_upper2 = 1:.1:5.5;
-scale_lower2 = 6:-.2:1;
-%scale_lower2 = 4:-.2:1;
-SD (SD <= 1e11) = 1e11; 
-%SD (SD >= 6e11) = 6e11; 
-Sa_temp = SD * inputs.Sa_scalefactor;    
-%Sa_temp (Sa_temp >= 6e11) = 6e11; 
-%Sa_temp(35:end) = 1e11; 
-Sa_temp(1,setup.atmos.nlayers-45:end) = Sa_temp(setup.atmos.nlayers-45:end)./scale_upper2;
-Sa_temp(1,1:26) = Sa_temp(1,1:26)./scale_lower2;
-%Sa_temp(1,1:16) = Sa_temp(1,1:16)./scale_lower2;
- 
-if strcmp(inputs.covariance_type,'full_covariance');
-    %Roger's a priori covariance equation
-%     SD(1,extra.atmos.nlayers-45:end) = SD(1,extra.atmos.nlayers-45:end)./scale_upper2;
-    C = 1; %.05, .1, .2, .8
+%scale upper altitudes
+scale = ones(1,setup.atmos.nlayers);
+scaleupperindex = find(setup.atmos.Z == (ozonemaxindex * (inputs.dz / 1000) + 10) * 1000);
+scaleupperindex2 = find(setup.atmos.Z == setup.atmos.Z(end));
+scaleupperlayers = scaleupperindex2 - scaleupperindex;
+scaleupper = 1:9 / scaleupperlayers:10;
+
+%scale lower altitudes    
+scalelowerindex = find(setup.atmos.Z == (ozonemaxindex * (inputs.dz / 1000) - 10) * 1000);    
+scalelower = 15:-14 / (scalelowerindex-1):1;
+scale(scaleupperindex:end) = [scaleupper,repmat(scaleupper(end),1,...
+    setup.atmos.nlayers - scaleupperindex2)];
+scale(1:scalelowerindex) = scalelower;
+    
+if strcmp(inputs.covariance_type,'full_covariance_constant')
+    %Uses constant values in the region of largest ozone and scales
+    %elsewhere (user defined version of "full_covariance")
+    
+    C = .1;
+    Sa_temp = 5e11 ./ scale * inputs.Sa_scalefactor;
     for k = 1:length(setup.atmos.Z)
-        for j = 1:length(setup.atmos.Z);
-            %COV(k,j) = C*extra.atmos.ozone(k)*extra.atmos.ozone(j)*exp(-(abs(k-j))*1/4);            
-            COV(k,j) = C*Sa_temp(k)*Sa_temp(j)*exp(-(abs(k-j))/7);
-            %COV(k,j) = C*1e11*1e11*exp(-(abs(k-j))/7);
+        for j = 1:length(setup.atmos.Z)                     
+            Sa(k,j) = C * Sa_temp(k) * Sa_temp(j) * exp(-(abs(k - j)) / 5);
+        end
+    end            
+    
+elseif strcmp(inputs.covariance_type,'full_covariance')
+    % Scales values based on ozone concentration
+    
+    C = .1;   
+    Sa_temp = setup.atmos.ozone;
+    [~,minindex] = min(Sa_temp(1:20));
+    %Sa_temp (Sa_temp <= 3e11) = 3e11;
+    Sa_temp = Sa_temp+3e11;
+    Sa_temp(1:minindex) = Sa_temp(minindex);
+    Sa_temp = Sa_temp.*2;
+    for k = 1:length(setup.atmos.Z)        
+        for j = 1:length(setup.atmos.Z)         
+            Sa(k,j) = C * Sa_temp(k) * Sa_temp(j) * exp( - (abs(k - j)) / 7);           
         end
     end    
-    Sa = COV; %To use Roger's definition with Irina's constants        
-    %Sa = diag(diag(COV),0);
-    return
-elseif strcmp(inputs.covariance_type,'diagonal');
-    maxvariance = max(SD);
-    Sa_temp = repmat(maxvariance,81,1).*2;
-    Sa_temp(setup.atmos.nlayers-45:end,1) = Sa_temp(setup.atmos.nlayers-45:end)./scale_upper2';
-    Sa = diag(Sa_temp,0).^2; 
-    return
+    
+elseif strcmp(inputs.covariance_type,'full_covarianceSD')
+    % Scales values based on ozone standard deviations.
+    
+    C = .1;   
+    Sa_temp = setup.atmos.ozoneSD;        
+    for k = 1:length(setup.atmos.Z)        
+        for j = 1:length(setup.atmos.Z)            
+            Sa(k,j) = C * Sa_temp(k) * Sa_temp(j) * exp( - (abs(k - j)) / 5);           
+        end
+    end    
+    
+elseif strcmp(inputs.covariance_type,'diagonal_constant')    
+    % Diagonal covariance (no covariance) matrix 
+    % Uses constant values in the region of largest ozone  
+    
+    C = .1;
+    Sa_temp = 5e11 ./ scale * inputs.Sa_scalefactor;    
+    Sa = diag(C * Sa_temp .* Sa_temp);    
+    
+elseif strcmp(inputs.covariance_type,'diagonal')    
+    % Diagonal covariance (no covariance) matrix 
+    % Uses constant values in the region of largest ozone  
+    
+    C = .1;
+    Sa_temp = setup.atmos.ozone;
+    [~,minindex] = min(Sa_temp(1:20));
+    Sa_temp (Sa_temp <= 3e11) = 3e11;
+    Sa_temp(1:minindex) = Sa_temp(minindex);    
+    Sa = diag(C * Sa_temp .* Sa_temp);    
+
+elseif strcmp(inputs.covariance_type,'diagonalSD')
+    % Diagonal covariance (no covariance) using input standard deviations
+    
+    SD = setup.atmos.ozoneSD;
+    Sa_temp = SD*inputs.Sa_scalefactor;
+    Sa_temp (Sa_temp <= 1e11) = 1e11;
+    Sa = diag(Sa_temp,0).^2;
+    
 end
-
-%SD (SD <= 1e11) = 1e11;
-%Sa_temp = interp1(data(:,1)',SD,extra.atmos.Z,'linear','extrap');
-%scale_factor = 8; %was 8; 
-
-Sa_temp = Sa_temp.^2;
-Sa = diag(Sa_temp,0);
-
-% if logswitch
-%     Sa = diag(log10(Sa_temp));
-% else Sa = diag(Sa_temp);
-% end
-%Sa = diag(Sa_temp);
 
 end
 

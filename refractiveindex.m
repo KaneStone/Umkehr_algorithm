@@ -6,7 +6,10 @@ function atmos = refractiveindex(atmos,lambda,dz,refraction)
 % then used for all subsequent path calculations.
 
 %constants
-temperature_surface = 288.15; pressure_surface = 1013.25; Rd = 287; g0 = 9.8066;
+temperature_surface = 288.15; 
+pressure_surface = 1013.25; 
+Rd = 287; 
+g0 = 9.8066;
 
 %radius of Earth
 Re = 6371e3;

@@ -22,13 +22,13 @@ zs = ones(length(lambda), length(a), atmos.nlayers-1, atmos.nlayers-1)*1000;
 True.Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 Apparent_Initial = zeros(length(lambda), atmos.nlayers-1, length(Apparent));
 
-sz_a = size(a);
-
 for iteration = 1:2;
     for i = 1:length(lambda)  
         cwlp = ceil(.5*i);
-        gamma = (atmos.radius./atmos.N(i,:)).*(atmos.dndz(i,:)); %dndz is defined as negative dndr
-        %gamma = (atmos.r./atmos.N(i,:)).*(atmos.dndr(i,:));
+        
+        %dndz is defined as negative dndr        
+        gamma = (atmos.radius./atmos.N(i,:)).*(atmos.dndz(i,:)); 
+
         for iscat = 1:atmos.nlayers-1
             if iteration == 2            
                 True.actual = a;
@@ -36,8 +36,7 @@ for iteration = 1:2;
                 True_I (True_I == 0) = [];                
                 Apparent = interp1(squeeze(True_I)...
                     ,squeeze(Apparent_Initial(i,iscat,1:length(True_I)))...
-                    ,True.actual(cwlp,:),'linear','extrap');
-              
+                    ,True.actual(cwlp,:),'linear','extrap');              
             end        
             for j = 1:length(Apparent) 
                 if Apparent(j) > 90                 
@@ -58,17 +57,20 @@ atmos.true_actual = True.actual;
 
 %plotting path length 
 if plot_pathlength
-    SZAnumber = 1;
+    if ~exist('../output/diagnostics/other/','dir')
+        mkdir('../output/diagnostics/other/');
+    end    
+    SZAnumber = 10;
     figure
     set(gcf,'color','white','position',[100 100 1000 700]);
     plot(squeeze(zs(1,SZAnumber ,1,:)));
     title(strcat('SZA =','{ }', num2str(Apparent(SZAnumber))),'fontsize',20);
     ylabel('layer path (m)','fontsize',20);
     xlabel('layer no.','fontsize',20);
-    export_fig(strcat('/Users/stonek/Dropbox/Work_Share/Dobson_Umkehr/Figures/'...
-        ,num2str(Apparent(SZAnumber)),'.png'),'-png');
+    export_fig(['../output/diagnostics/other/',num2str(Apparent(SZAnumber)),'.pdf'],'-pdf');
     close gcf
 end
+
 end
 
 function [True, Apparent_Initial, Apparent_Final, zs, atmos] = ...
@@ -76,7 +78,6 @@ function [True, Apparent_Initial, Apparent_Final, zs, atmos] = ...
     Apparent,iscat,gamma,zs,dz,iteration)                    
 %Calculates zenith paths when theta is greater than 90
 
-%Rg(iscat) = atmos.Nr(i,iscat)*sind(Apparent(j));
 Rg = ones(1,length(atmos.N(i,1:atmos.nlayers-1))).*...
     atmos.Nr(i,iscat)*sind(Apparent(j)); 
 atmos.ztan = interp1(atmos.Nr(i,:),atmos.radius,Rg(iscat),'linear','extrap');
@@ -85,9 +86,9 @@ tanlayer = ceil(((atmos.ztan-atmos.radius(1))/dz));
 
 if tanlayer < 1
     %Setting zenith path to zero if tangent point is below Earth's surface
-     if iteration == 2
-         zs(i,j,iscat,:) = 0;
-     end
+    if iteration == 2
+        zs(i,j,iscat,:) = 0;
+    end
     return
 end    
 
@@ -113,10 +114,7 @@ if iteration == 2
        (b.^2)-(gamma(tanlayer+1:iscat-1).*(Rg(tanlayer+1:iscat-1).^2)));
     ds1 = ((atmos.N(i,tanlayer+2:iscat).^2).*(a.^2))./...
        ((atmos.N(i,tanlayer+2:iscat).^2).*...
-       (a.^2)-(gamma(tanlayer+2:iscat).*Rg(tanlayer+2:iscat).^2));       
-    
-    %ds1 = ones(1,length(tanlayer+1:iscat-1))./(1-(gamma(tanlayer+1:iscat-1).*sind(Apparent(j)).*2));
-    %ds2 = ones(1,length(tanlayer+1:iscat-1))./(1-(gamma(tanlayer+1:iscat-1).*sind(Apparent(j)).*2));
+       (a.^2)-(gamma(tanlayer+2:iscat).*Rg(tanlayer+2:iscat).^2));               
     
     zs(i,j,iscat,tanlayer+1:iscat-1) = dz+(dx.*(ds1+ds2));
 end
@@ -171,11 +169,7 @@ if iteration == 2
        (a.^2)-(gamma(iscat:atmos.nlayers-1).*(Rg(iscat:atmos.nlayers-1).^2)));
     ds2 = ((atmos.N(i,iscat+1:atmos.nlayers).^2).*(b.^2))./...
        ((atmos.N(i,iscat+1:atmos.nlayers).^2).*...
-       (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg(iscat:atmos.nlayers-1).^2)));       
-    
-    %ds1 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat:atmos.nlayers-1).*sind(Apparent(j)).*2));
-    %ds2 = ones(1,length(iscat:atmos.nlayers-1))./(1-(gamma(iscat+1:atmos.nlayers).*sind(Apparent(j)).*2));
-    
+       (b.^2)-(gamma(iscat+1:atmos.nlayers).*(Rg(iscat:atmos.nlayers-1).^2)));                   
     zs(i,j,iscat,iscat:atmos.nlayers-1) = dx.*(ds1+ds2)/2;
 end
 
@@ -196,7 +190,6 @@ function [True, Apparent_Initial, Apparent_Final, zs] = ...
 
 Rg = ones(1,length(atmos.N(i,iscat:atmos.nlayers-1))).*...
     atmos.Nr(i,iscat)*sind(Apparent(j)); 
-
 
 %layers above the scattering height which are the slant paths  
 a = atmos.radius(iscat:atmos.nlayers-1);
@@ -236,4 +229,5 @@ if iteration == 1
 else
     Apparent_Final(i,iscat,j) = Apparent(j);
 end    
+
 end            

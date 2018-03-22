@@ -1,22 +1,25 @@
-#Dobson Umkehr code things to fix before it can be published
+# Dobson Umkehr code things to fix before it can be published
 
 ## Not in order - update each when fixed.
-
-1. Retrieve profiles in log space needs to be fixed.
-2. L curve diagnostics needs to be coded in correctly.
-3. Evening and morning measurements needs to be coded in properly.
-4. Needs netcdf format functionality, as well as original text format.
-5. Code in extra output - all layers, as well as Umkehr layers.
-6. Speed up nvaluezs. - Fixed: [more efficient code can be found here](https://bitbucket.org/kstone4/umkehr_algorithm/commits/c04cc59768e944cfbcfc8402cb52889dd72499a9)
-7. Try to speed up zenithpaths - Think this is done.
-8. Cloudy flag switch needs to be implemented.
-9. Potential for multiple scattering needs to be coded in.
-10. Potential for stray light needs to be coded in.
-11. Zenith path ray lengths near the surface for short SZA are going haywire!
-12. Convergence is working put seems to be taking a while. Look into
-13. Include monthly and constant option for reading in pressure.
 14. Include option to retrieve entire month as one retrieval vector
+15. naming convention script needs to be updated <span style="color:red">DONE (but maybe not needed)</span>
+16. Need to make sure that read Umkehr accounts for all year range input possibilities <span style="color:red">DONE</span>
+17. properly define output covariance error matrices in Optimal Estimation script
+18. Need to make sure that changing altitude and layer width does not crash anything <span style="color:red">DONE</span>
+19. May need to look at g (in Nvaluezs) for Mie scattering. <span style="color:red">DONE</span>
+20. Need to fix covariance error output.
+21. Fix AK
+22. Need to make sure plot retrieval is working properly for all versions on matlab
+23. Decide whether or not to create a common plotting function for print diagnostics.
+24. Maybe I can also combine plot retrieval and print diagnostics
+25. Need to go through all user inputs to make sure they are working properly.
+26. Then put it on Github
+27. Send to colleagues 
+27. Write the paper
+28. I need to code in the band passes and solar flux at the top of the atmosphere constants as I do not believe they are removed through  my normalisation process.
 
+Information content - 3D reduction in the error covariance volumes - how
+% much information from measurements versus a priori
 
 
 

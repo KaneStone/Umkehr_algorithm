@@ -1,11 +1,17 @@
 function [] = cloud_effect(I,intenstar,SZA,alts_to_perturb,SZA_to_perturb...
-    ,lambda,rand_pert,norm_switch)
-%Function to test cloud effects on the N-value curves
+    ,lambda,norm_switch,nindex)
+%Function to test cloud effects on the N-value curves - only works on 1
+%wavelength pair at a time.
+
 %cloud_effect(intensity_array,1:2,[lower_limit upper_limit])
+
+if ~exist('../output/diagnostics/other/','dir')
+    mkdir('../output/diagnostics/other/');
+end
 
 figure;
 fig = gcf;
-set(fig,'color','white','position',[100 100 1000 700]);
+set(fig,'color','white','position',[100 100 1000 700],'Visible','off');
 
 col = [[0 0 0];[0 0 1];[1 0 0];[0 .7 0];[.7 0 .7]];
 
@@ -45,17 +51,14 @@ for i = 1:length(alts_to_perturb);
     %Calculating N-value
     N=zeros(length(lambda)/2,sz(2));
     wn = 1;
-    for k = 1:length(lambda)/2;
-        %ETSF = interp1(atmos.solar(:,1),atmos.solar(:,2),...
-        %    lambda(wn:wn+1),'linear','extrap');  
+    for k = 1:length(lambda)/2;        
         ETSF_ratio = 1; %ETFS is removed by normalising to lowest SZA
-        N(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));    
+        simulatedNvalues(k,:) = 100*log10(ETSF_ratio*ratio(wn+1,:)./ratio(wn,:));    
         wn = wn+2;
     end
 
-    %plotting effect before normalisation
-    %set(gcf,'color','white','position',[100 100 1000 700]);
-    ph(i) = plot(SZA,N,'color',col(i,:),'LineWidth',2');    
+    %plotting effect before normalisation    
+    ph(i) = plot(SZA,simulatedNvalues,'color',col(i,:),'LineWidth',2');    
     hold on
     if i == 1
         ylabel('N-value','fontsize',20);
@@ -65,22 +68,20 @@ for i = 1:length(alts_to_perturb);
     end
 
     %normalising simulated N-values to lowest SZA.
-    if norm_switch
-        [~, SZA_min_location] = min(SZA,[],2);
-        for j = 1:length(SZA_min_location);
-             N_min = N(j,SZA_min_location(j));
-            N(j,:) = N(j,:) - repmat(N_min,1,sz(2));   
+    if ~strcmp(norm_switch,'no')
+        for j = 1:length(nindex);
+            N_norm = simulatedNvalues(j,nindex(j));
+            simulatedNvalues(j,:) = simulatedNvalues(j,:) - repmat(N_norm,1,sz(2));   
         end
     end
-    ph2(i) = plot(SZA,N,'--','color',col(i,:),'LineWidth',2);    
+    ph2(i) = plot(SZA,simulatedNvalues,'--','color',col(i,:),'LineWidth',2);    
     clearvars ratio N intensity
 end
 
-
 lh = legend([ph(1) ph2(1) ph(2) ph(3) ph(4)],'Before Normalisation - no pert'...
     ,'After Normalisation - no pert','1km pert','1-3km pert','1-10km pert');
-set(lh,'location','NorthWest','fontsize',18);
-file = '/Users/stonek/work/Dobson/OUTPUT/test_cloud.eps';
-export_fig(file,'-eps');
-
+set(lh,'location','NorthWest','fontsize',18,'box','off');
+file = '../output/diagnostics/other/cloud_effect.pdf';
+export_fig(file,'-pdf');
+close all
 end

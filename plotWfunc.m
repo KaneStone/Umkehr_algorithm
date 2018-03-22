@@ -17,7 +17,7 @@ elseif sz(1) == 2;
 end
 
 subplot(1,i,i/i);
-plot(K(:,1:sz(3)),1:61);
+plot(K(1:20,:),1:81);
 set(gca,'fontsize',18);
 xlabel('Jacobian dN/dX','fontsize',18);
 ylabel('Altitude (km)','fontsize',18);
@@ -27,7 +27,7 @@ if sz(1) == 2
     return
 end
 subplot(1,i,i/i+1);
-plot(K(sz(3)+1:2*sz(3),:),1:61);
+plot(K(sz(3)+1:2*sz(3),:),1:81);
 set(gca,'fontsize',18);
 xlabel('Jacobian dN/dlogX','fontsize',18);
 ylabel('Altitude (km)','fontsize',18);
@@ -37,7 +37,7 @@ if sz(1) == 4;
     return
 end
 subplot(1,i,i/i+2);
-plot(K(2*sz(3)+1:end,:),1:61);
+plot(K(2*sz(3)+1:end,:),1:81);
 set(gca,'fontsize',18);
 xlabel('Jacobian dN/dlogX','fontsize',18);
 ylabel('Altitude (km)','fontsize',18);

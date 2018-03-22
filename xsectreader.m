@@ -1,19 +1,20 @@
-function [ozonexs] = xsectreader(inputs,atmos,lambda)
+function [ozonexs,ozonexs2] = xsectreader(inputs,atmos,lambda,bandpass)
 
 %Reads in the ozone cross sections for three different cross section
 %studies:
 
 %Bass-Paur (Bass et al., 1985) 
 %Brion-Daumont-Malicet (Daumont et al. 1992)
-%Gorshelev (Gorshelev et al., 2014)
+%Serdyuchenko-Gorshelev (Gorshelev et al., 2014)
     
 if strcmp(inputs.cross_section,'BP');
+   
     %Bass-Paur
     
     BPfolder = '../input/ForwardModelProfiles/ozonexs/BassPaur/';
     BPfiles = dir([BPfolder,'*.dat']);
     xsection.sigma = [];
-    for i = 1:length(BPfiles);
+    for i = 1:length(BPfiles)
         fid = fopen(strcat(BPfolder,BPfiles(i,1).name));
         xsection.temperature(i) = fscanf(fid,'%f',1);
         xs = fscanf(fid,'%f',[2,inf]);
@@ -23,14 +24,14 @@ if strcmp(inputs.cross_section,'BP');
     
     xsection.wavelength = xs(1,:);    
     
-elseif strcmp(inputs.cross_section,'BDM');
+elseif strcmp(inputs.cross_section,'BDM')
     %Brion-Daumont-Malicet
     
     BDMfolder = '../input/ForwardModelProfiles/ozonexs/BrionDaumontMalicet/';
     BDMfiles = dir([BDMfolder,'*.dat']);
     xsection.sigma = [];
   
-    for i = 1:length(BDMfiles);
+    for i = 1:length(BDMfiles)
         fid = fopen(strcat(BDMfolder,BDMfiles(i,1).name));
         info = fscanf(fid,'%s',[1,12]);
         xsection.temperature(i) = fscanf(fid,'%f',1);
@@ -43,7 +44,7 @@ elseif strcmp(inputs.cross_section,'BDM');
 
     xsection.wavelength = xs(1,lowlambda:highlambda)/10;    
 
-elseif strcmp(inputs.cross_section,'SG');
+elseif strcmp(inputs.cross_section,'SG')
     %Serdyuchenko-Gorshelev
     
     SGfolder = '../input/ForwardModelProfiles/ozonexs/Serdyuchenko-Gorshelev/';
@@ -56,7 +57,7 @@ elseif strcmp(inputs.cross_section,'SG');
     a = 1;
     b = 1;
     
-    while a <= 44;
+    while a <= 44
         info = fgetl(fid);
         if a >= 28 && a <= 38
             Stemp(1,b) = str2double(info(50:52));
@@ -74,7 +75,13 @@ elseif strcmp(inputs.cross_section,'SG');
     
 end
 
+% interpolating to temperature profile.
 temphold = interp1(xsection.temperature,xsection.sigma,atmos.temperature,'linear','extrap'); 
+for i = 1:length(lambda)
+    lambdabandpass(i).l = (lambda(i)-bandpass(i)/2):.4:(lambda(i)+bandpass(i)/2);        
+    ozonexs2(i).o = interp1(xsection.wavelength,temphold',lambdabandpass(i).l,'linear','extrap');        
+end
+
 ozonexs = interp1(xsection.wavelength,temphold',lambda,'linear','extrap');    
 
 end

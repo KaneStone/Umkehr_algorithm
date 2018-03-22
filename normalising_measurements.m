@@ -37,6 +37,8 @@ if strcmp(inputs.normalise,'no')
     return
 end
 
+splinestep = 1;
+
 for j = 1:size(Umkehr.data.SolarZenithAngle,1);
     switch inputs.normalise
         case 'lowest'            
@@ -44,19 +46,21 @@ for j = 1:size(Umkehr.data.SolarZenithAngle,1);
             atmos.normalisationindex(j) = lowest_index;
         case 'cloudflag'
             %construct spline and calculate closest fit within range
-            splinetheta = min(Umkehr.data.SolarZenithAngle(j,:)):2.5:...
-                max(Umkehr.data.SolarZenithAngle(j,:));
+            splinetheta = min(Umkehr.data.SolarZenithAngle(j,2:end-1)):splinestep:...
+                max(Umkehr.data.SolarZenithAngle(j,2:end-1));            
             spline = splinefit(Umkehr.data.SolarZenithAngle(j,:),Umkehr.data.Nvalue(j,:),...
-                length(splinetheta),3,'r');
-            splineNvalue = ppval(spline,splinetheta);
+                length(splinetheta),3);
+            splineNvalue = ppval(spline,splinetheta);                                                
             final = interp1(splinetheta,splineNvalue,Umkehr.data.SolarZenithAngle(j,:),...
-                'linear','extrap');       
+                'linear','extrap');                               
             normalisation_range = (max(Umkehr.data.SolarZenithAngle(j,:)) - ...
                 min(Umkehr.data.SolarZenithAngle(j,:))) / 3;                       
             realindex = find(Umkehr.data.SolarZenithAngle(j,:) < ...
-                min(Umkehr.data.SolarZenithAngle(j,:))+normalisation_range);        
+                min(Umkehr.data.SolarZenithAngle(j,:)) + normalisation_range);        
             [~,subindex] = min(abs(final(realindex) - Umkehr.data.Nvalue(j,realindex)));                
             atmos.normalisationindex(j) = realindex(subindex);
+            [~,subindex2] = min(abs(final(realindex) - Umkehr.data.Nvalue(j,realindex)));                
+            atmos.normalisationindex(j) = realindex(subindex);            
     end        
     
     Nvaluesize = size(Umkehr.data.Nvalue(j,:));    

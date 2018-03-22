@@ -1,10 +1,8 @@
 function [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation(y,yhat,Se,xa,Sa,K,...
-    setup,inputs,method)
+    setup,inputs)
 
 %METHOD
-%MAP = Maximum A posterior
-%Opt = Optimal non-linear Gauss newton method
-%LS = Least Squares
+%Optimal non-linear Gauss newton method
 
 %OptimalEstimation function that solves the inversion of measurements given
 %their errors, an a priori and associated error using a forward model 
@@ -32,90 +30,46 @@ yhat (isnan(yhat)) = [];
 y = reshape(y',1,numel(y));
 y (isnan(y)) = [];
 
-sz = size(setup.atmos.Apparent);
 yhat2(1).y = yhat;
 xa = xa';
 xi = xa;
 di2 = length(y);
-if strcmp(method,'Opt')
-    %for i = 1:3; %Number of iterations
-    i = 1;
-    while di2 >= length(y) && i < 8 %Stops due to convergence test.
-        K1(i).K = K;
-        %reshaping into one vector for all wavelengths               
-        yhat = reshape(yhat',1,numel(yhat));
-        yhat (isnan(yhat)) = [];
-        
-        %5.8
-        %xhat = xi + (inv(inv(Sa)+(K'/Se*K))\(K'/Se*(y'-yhat') - (Sa\(xi-xa))));
-        
-        %5.9 - N-form
-        %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));        
-        
-        %5.10 - M-form  
-        if inputs.logswitch
-            xalog = log(xa);
-            xilog = log(xi);
-            Salog = log(Sa);
-            %xhatlog = xalog+log(Sa)*K'*((K*log(Sa)*K'+Se)\(y'-yhat'+K*(xilog-xalog)));                        
-            xhatlog = xalog+Salog*K'*((K*Salog*K'+Se)\(y'-yhat'+K*(xilog-xalog)));                        
-            
-            xhat = exp(xhatlog);
-            %xhat2 = exp(xhatlog2);
-        else       
-            xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));            
-        end
-        
-        %continue on with next iteration by calling forward model
-        xi = xhat;
-        xhat = xhat';
-        [K,N]=ForwardModel(xhat,setup,inputs);
-        yhat = N;
-        %yhat (isnan(yhat)) = [];
-        %yhat1(i).a = reshape(yhat',1,numel(yhat));
-        yhat1(i+1).y = reshape(yhat',1,numel(yhat));
-        yhat2(i+1).y = reshape(yhat',1,numel(yhat));
-        yhat2(i+1).y (isnan(yhat2(i+1).y)) = [];
-        
-        %%%TESTING FOR CONVERGENCE%%%
-        Sdayy = Se*(K*Sa*K'+Se)\Se;
-        di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
-        di3(i) = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                            
-        i = i+1;
-    end
-elseif strcmp(method,'MAP')
-    %Maximum A Posterior solution
-        Gy=(Sa*K')/((K*Sa*K')+Se);
-        y_xa=K*xa';
-        xhat=xa'+Gy*(y'-y_xa);
-        %xhat = abs(xhat);       
-        xi = xhat;
-        xhat = xhat';
-        Kflg=1;
-        yhat1 = yhat;
-        K1 = 1;
-        [yhat,K,N]=ForwardModel(xhat,Kflg,setup);
-        yhat = N.zs(2,:);
-        K = K(sz(3)+1:2*sz(3),:);
-elseif strcmp(method,'LS');
-    xhat = ((K'*K)\K')*y';
-    Kflg=1;
+
+i = 1;
+while di2 >= length(y) && i < 8 %Stops due to convergence test.
+    K1(i).K = K;
+    %reshaping into one vector for all wavelengths               
+    yhat = reshape(yhat',1,numel(yhat));
+    yhat (isnan(yhat)) = [];
+    
+    %Rodger's equation 5.9 - N-form  
+    %xhat = xa + ((inv(Sa)+(K'/Se*K))\(K'/Se)*((y'-yhat')+K*(xi-xa)));  
+    
+    %Rodger's equation 5.10 - M-form  
+    xhat = xa + Sa*K'*((K*Sa*K'+Se)\(y'-yhat'+K*(xi-xa)));                
+
+    %continue on with next iteration by calling forward model
+    xi = xhat;
     xhat = xhat';
-    [yhat,K,N]=ForwardModel(xhat,Kflg,setup);
-    yhat = N.zs(2,:);
-    yhat1 =1;
-    K1 =1;
-    K = K(sz(3)+1:2*sz(3),:);
+    [K,simulatedNvalues]=ForwardModel(xhat,setup,inputs,0);
+    yhat = simulatedNvalues;  
+    
+    %output for plotting
+    yhat1(i+1).y = reshape(yhat',1,numel(yhat));    
+
+    %testing for convergence
+    yhat2(i+1).y = reshape(yhat',1,numel(yhat));
+    yhat2(i+1).y (isnan(yhat2(i+1).y)) = [];
+    Sdayy = Se*(K*Sa*K'+Se)\Se;
+    di2 = (yhat2(i+1).y-yhat2(i).y)*(Sdayy\(yhat2(i+1).y-yhat2(i).y)');                                
+    
+    i = i+1;
 end
 S.Ss = ((K'*(Se^-1)*K +Sa^-1)^-1*(Sa\((K'*(Se^-1)*K +Sa^-1)^-1)));
 S.Sm = ((K'*(Se^-1)*K +Sa^-1)^-1)*(K'*(Se\K))*((K'*(Se^-1)*K +Sa^-1)^-1);
-S.Ss_plus_Ss = S.Ss+S.Sm;
-if inputs.logswitch
-    S.S = (K'*(Se^-1)*K+Sa^-1)^-1;%
-else S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
-end
-number_of_iterations = i;
-% pass through Ss and times by g to obtain layer four smoothing errors.
+S.Ss_plus_Sm = S.Ss+S.Sm;
+S.S = (K'*(Se^-1)*K +Sa^-1)^-1;
+
 end
 
 

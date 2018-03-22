@@ -1,54 +1,69 @@
 tic;
 
 inputs = userinputs;
+    
+foldersandnames = namingconventions(inputs);
 
 Umkehr = readUmkehr(inputs);
 
+%only plot measurements
+if inputs.plot_measurements
+    return
+end
+
 for measurement_number = 1:length(Umkehr)
-    
-    %[log] = logfile();
+        
     currentUmkehr = Umkehr(measurement_number);
     
-    [setup, userinputs, currentUmkehr, foldersandnames] = retrievalsetup(currentUmkehr,...
+    %backing up data
+    foldersandnames.currenttime = sprintf('%.4f',calculatedate);
+    backupdata(inputs,foldersandnames);   
+    
+    %setting up retrieval inputs
+    [setup,inputs,currentUmkehr] = retrievalsetup(currentUmkehr,...
         inputs);
     
-%     if userinputs.plot_measurements
-%         plot_measurements(extra.atmos,extra.theta,station,1);
-%         return
-%     end
-    
-    [K,N] = ForwardModel(setup.atmos.ozone, setup, inputs);
+    %initialise the forward model
+    [K,simulatedNvalues] = ForwardModel(setup.atmos.ozone,setup,inputs,1);
     sz = size(setup.atmos.Apparent);
     
-    %Setup Measurement covariance matrix
-    [Se, Se_for_errors] = createSe(setup.atmos.true_actual,inputs.Se_scale_factor);
-    
-    RMS = [];
-    j = 1;
-            
-    Sa = createSa(setup, inputs);
-    %scale_factor = scale_factor+4;
+    %Setting up measurement covariance matrix
+    [Se,Se_for_errors] = createSe(setup.atmos.true_actual,inputs.Se_scale_factor);    
+         
     y = currentUmkehr.data.Nvalue;
-    [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation...
-    (y,N,Se,setup.atmos.ozone,Sa,K,setup,inputs,'Opt');
     
+    %For performing L-curve diagnostic
     if inputs.L_curve_diag
-        RMS = createRMS(y,yhat,j,RMS);        
+        RMS = createRMS(simulatedNvalues,Se,K,inputs,y,setup);   
+        return
     end
     
-    %printing diagnostics
-    [fig1, fig2, fig3] = plot_retrieval(N,yhat,setup,inputs,setup.atmos.Umkehrdate,...
-        currentUmkehr.data.Nvalue,xhat,Sa,S,yhat1,Se_for_errors);
+    %Setting up a priori covariance matrix
+    Sa = createSa(setup,inputs);  
     
-    [g, g1] = Umkehr_layers(setup,Umkehr.data.WLP,inputs,xhat,S,setup.atmos.Umkehrdate,...
+    %Running the optimal estimation retrieval
+    [xhat, yhat, K, yhat1, K1, S, Sdayy] = OptimalEstimation...
+    (y,simulatedNvalues,Se,setup.atmos.ozone,Sa,K,setup,inputs);        
+        
+    %Converting retrieval to Umkehr output and saving data
+    [g,g1,saveResult,saveErrorResult] = Umkehr_layers(setup,...
+        currentUmkehr.data.WaveLengthPair,inputs,xhat,S,setup.atmos.Umkehrdate,...
         foldersandnames);    
-    [AK] = AveragingKernel(S,Sa,Se,setup,Umkehr.data.WLP,inputs,foldersandnames,K,g,g1);
-    if inputs.print_diagnostics
-        print_diagnostics(fig1,fig2,fig3,AK,setup,Umkehr.data.WLP,inputs,foldersandnames);   
+    
+    %Calculating averaging kernels and saving data
+    [AK] = AveragingKernel(S,Sa,Se,setup,currentUmkehr.data.WaveLengthPair,...
+        inputs,foldersandnames,K,g,g1);
+    
+    %printing diagnostics
+    if inputs.print_diagnostics        
+        [figs] = plot_retrieval(simulatedNvalues,yhat,setup,inputs,...
+            setup.atmos.Umkehrdate,currentUmkehr.data.Nvalue,xhat,Sa,S,yhat1,...
+            Se_for_errors,saveResult,saveErrorResult,g1);    
+        print_diagnostics(figs,AK,setup,currentUmkehr.data.WaveLengthPair,...
+            inputs,foldersandnames);   
     end    
+    
     close all hidden
-    clearvars -except inputs Umkehr
+    clearvars -except inputs Umkehr foldersandnames
+    toc;
 end
-fclose('all'); 
-time = toc;
-display(time);

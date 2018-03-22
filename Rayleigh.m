@@ -4,26 +4,34 @@ function [Ray, atmos] = Rayleigh(atmos, wavelength)
 % using the given temperature and pressure profiles. The equation is obtained
 % from Bucholtz, App. Optics. 34(15) 1995.
 
+boltz = 1.38066e-23;
+
 %converting lambda to micrometers for calculations
 lambda = wavelength/1000;
 
 %setting up array size
 Ray.Bs = zeros(size(lambda));
+Ray.Bs2 = zeros(size(lambda));
+
 
 %calculating rayleigh cross sections for standard air
 a = lambda > 0.2 & lambda <= 0.5;    
 	A = 7.68246e-4;
+    A1 = 3.01577e-28;
 	B = 3.55212;
 	C = 1.35579;
 	D = 0.11563;
-	Ray.Bs(a) = A.*lambda(a).^(-1.*(B+C.*lambda(a)+D./lambda(a)));
+	Ray.Bs(a) = A.*lambda(a).^(-1.*(B+C.*lambda(a)+D./lambda(a)));   
+    Ray.Bs2(a) = A1.*lambda(a).^(-1.*(B+C.*lambda(a)+D./lambda(a)));   
     
 b = lambda > 0.5;    
-	A = 10.21675-4;
-	B = 3.99668;
+	A = 10.21675e-4;
+	A1 = 4.01061e-28;
+    B = 3.99668;
 	C = 1.10298e-3;
 	D = 2.71393e-2;
 	Ray.Bs(b) = A.*lambda(b).^(-1.*(B+C.*lambda(b)+D./lambda(b)));
+    Ray.Bs2(b) = A1.*lambda(b).^(-1.*(B+C.*lambda(b)+D./lambda(b)));
 
 c = (lambda<0.2);
 
@@ -32,8 +40,11 @@ if any(c)>0
 end
 
 %calculating total rayleigh volume scattering coefficient with refraction
-atmos.bRay = Ray.Bs.*(atmos.Ns+1)*((atmos.pressure_mid./1013.25).*(288.15./atmos.temperature_mid))*1e-5;
-atmos.bRaypt = Ray.Bs.*(atmos.Ns+1)*((atmos.pressure./1013.25).*(288.15./atmos.temperature))*1e-5;
+atmos.bRay = Ray.Bs*((atmos.pressure_mid./1013.25).*(288.15./atmos.temperature_mid))*1e-5;
+atmos.bRaypt = Ray.Bs*((atmos.pressure./1013.25).*(288.15./atmos.temperature))*1e-5;
+
+atmos.bRay2 = Ray.Bs2*((atmos.pressure_mid)./(atmos.temperature_mid*boltz))*.7e-4;
+atmos.bRaypt2 = Ray.Bs2*((atmos.pressure)./(atmos.temperature*boltz))*.7e-4;
 
 %wavelengths for pgamma interpolation
 WLGTH = [200, 205, 210, 215, 220, 225, 230, 240, 250, 260, 270, 280, 290, 300, 310, ...
@@ -52,7 +63,7 @@ atmos.pgamma = interp1(WLGTH, GAM, lambda*1000);
 
 %Calculating Mie extinction. %Aerosols are for extinction at 500nm. 
 %other wavenegths: *(500/lambda)^1.2
-atmos.bMiept = (500 ./ wavelength) .^ 1.2 * atmos.aerosol;
-atmos.bMie = (500 ./ wavelength) .^ 1.2 * atmos.aerosol_mid;
+atmos.bMiept = (525 ./ wavelength) .^ 2.27 * atmos.aerosol;
+atmos.bMie = (525 ./ wavelength) .^ 2.27 * atmos.aerosol_mid;
 
 end

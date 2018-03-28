@@ -7,10 +7,10 @@ function [atmos] = profilereader(atmos,Umkehr,inputs)
 % - aerosol
 
 %% profile filenames
-ozonefilename = ['../input/ForwardModelProfiles/ozone','/','Ozone_monthly.nc'];    
-temperaturefilename = ['../input/ForwardModelProfiles/temperature','/','Temperature_monthly.nc'];    
-pressurefilename = ['../input/ForwardModelProfiles/pressure','/','Pressure_monthly.nc'];    
-aerosolfilename = ['../input/ForwardModelProfiles/','aerosol/netcdf/AerosolYearlyAverage.nc'];
+ozonefilename = ['../input/forwardModelProfiles/ozone','/','ozone_monthly.nc'];    
+temperaturefilename = ['../input/forwardModelProfiles/temperature','/','temperature_monthly.nc'];    
+pressurefilename = ['../input/forwardModelProfiles/pressure','/','pressure_monthly.nc'];    
+aerosolfilename = ['../input/forwardModelProfiles/','aerosol/aerosolYearlyAverage.nc'];
 
 %% finding month or season to use
 atmos.Umkehrdate = datevec(Umkehr.data.Time(1));

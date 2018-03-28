@@ -11,7 +11,7 @@ if strcmp(inputs.cross_section,'BP')
    
     %Bass-Paur
     
-    BPfolder = '../input/ForwardModelProfiles/ozonexs/BassPaur/';
+    BPfolder = '../input/forwardModelProfiles/ozonexs/BassPaur/';
     BPfiles = dir([BPfolder,'*.dat']);
     xsection.sigma = [];
     for i = 1:length(BPfiles)
@@ -27,7 +27,7 @@ if strcmp(inputs.cross_section,'BP')
 elseif strcmp(inputs.cross_section,'BDM')
     %Brion-Daumont-Malicet
     
-    BDMfolder = '../input/ForwardModelProfiles/ozonexs/BrionDaumontMalicet/';
+    BDMfolder = '../input/forwardModelProfiles/ozonexs/BrionDaumontMalicet/';
     BDMfiles = dir([BDMfolder,'*.dat']);
     xsection.sigma = [];
   
@@ -47,7 +47,7 @@ elseif strcmp(inputs.cross_section,'BDM')
 elseif strcmp(inputs.cross_section,'SG')
     %Serdyuchenko-Gorshelev
     
-    SGfolder = '../input/ForwardModelProfiles/ozonexs/Serdyuchenko-Gorshelev/';
+    SGfolder = '../input/forwardModelProfiles/ozonexs/Serdyuchenko-Gorshelev/';
     Sfiles = dir(strcat(SGfolder,'*.dat'));
     Stemp = zeros(1,11);
 

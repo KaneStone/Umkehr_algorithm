@@ -4,7 +4,7 @@ function inputs = userinputs
 
 %measurement inputs
 inputs.station = 'Melbourne';       % Dobson station
-inputs.daterange = [199307 199310];      % Specific date/s to retrieve as number (e.g. yyyymmdd (19940119)) or range of dates within months (e.g. [199301,199405])
+inputs.daterange = [199401 199404];      % Specific date/s to retrieve as number (e.g. yyyymmdd (19940119)) or range of dates within months (e.g. [199301,199405])
 inputs.WLP_to_retrieve = 'C';       % Define wavelength pairs to retrieve (alphabetical order)
 inputs.SZA_limit = 94;              % upper SZA limit
 inputs.morn_or_even = 'Both';       % 'both', 'Evening' or 'Morning'. -  

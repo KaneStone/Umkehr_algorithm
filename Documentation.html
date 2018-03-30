@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>UmkehrDocumetation</title><style>/*By https://github.com/olvlvl at https://github.com/olvlvl/macdown/blob/8305c6d967c024f8dea6439db3d83121410e02bf/MacDown/Resources/Styles/GitHub3.css*/
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>UmkehrDocumetation2</title><style>/*By https://github.com/olvlvl at https://github.com/olvlvl/macdown/blob/8305c6d967c024f8dea6439db3d83121410e02bf/MacDown/Resources/Styles/GitHub3.css*/
 body {
     color: #333;
     font: 16px/1.6 "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
@@ -491,6 +491,10 @@ pre tt:after {
 
 <h3>1. Measurement data format <a name="C1"></a></h3>
 
+<p>Test data from Melbourne is supplied in <strong>ModelInputs.tar.gz</strong>. This data needs to be in the directory, as seen from the Umkehr algorithm model directory: <strong>../input/umkehr/Melbourne/1994/</strong></p>
+
+<p>Any other umkehr input data to be used in the aglorithm needs to be in a similar directory structure: <strong>../input/umkehr/[station]/[year]/</strong></p>
+
 <p>Measurement data is required to adhere to the following NetCDF data standards to be used in the algorithm in the current form.</p>
 
 <ul>
@@ -574,7 +578,7 @@ Example: Brisbane_20120101_Morning_ACDPair_Umkehr.nc
 
 <h3>2. Forward model data format <a name="C2"></a></h3>
 
-<p>All forward model data are provided as NetCDF files </p>
+<p>All forward model data are provided as NetCDF files. These netcdf files are supplied in the release as <strong>ModelInputs.tar.gz</strong>. Once extracted, each profile input variable directory needs to be moved to the following directory path, as seen from the Umkehr algorithm path: <strong>../inputs/forwardModelProfiles/[variable]</strong></p>
 
 <ul>
 <li><p>The NetCDF files have 3 dimensions with the exception of the aerosol file, which does not have a month component: </p>

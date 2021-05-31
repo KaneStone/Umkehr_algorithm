@@ -23,6 +23,9 @@ for measurement_number = 1:length(Umkehr)
     [setup,inputs,currentUmkehr] = retrievalsetup(currentUmkehr,...
         inputs);
     
+    %trying to pinpoint problem
+    %setup.atmos.ozone(:) = circshift(setup.atmos.ozone,5);
+    
     %initialise the forward model
     [K,simulatedNvalues] = ForwardModel(setup.atmos.ozone,setup,inputs,1);
     sz = size(setup.atmos.Apparent);

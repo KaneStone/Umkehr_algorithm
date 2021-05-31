@@ -15,11 +15,11 @@ scaleupperlayers = scaleupperindex2 - scaleupperindex;
 scaleupper = 1:9 / scaleupperlayers:10;
 
 %scale lower altitudes    
-scalelowerindex = find(setup.atmos.Z == (ozonemaxindex * (inputs.dz / 1000) - 10) * 1000);    
-scalelower = 15:-14 / (scalelowerindex-1):1;
-scale(scaleupperindex:end) = [scaleupper,repmat(scaleupper(end),1,...
-    setup.atmos.nlayers - scaleupperindex2)];
-scale(1:scalelowerindex) = scalelower;
+% scalelowerindex = find(setup.atmos.Z == (ozonemaxindex * (inputs.dz / 1000) - 10) * 1000);    
+% scalelower = 15:-14 / (scalelowerindex+1-1):1;
+% scale(scaleupperindex:end) = [scaleupper,repmat(scaleupper(end),1,...
+%     setup.atmos.nlayers - scaleupperindex2)];
+% scale(1:scalelowerindex) = scalelower;
     
 if strcmp(inputs.covariance_type,'full_covariance_constant')
     %Uses constant values in the region of largest ozone and scales
@@ -37,12 +37,12 @@ elseif strcmp(inputs.covariance_type,'full_covariance')
     % Scales values based on ozone concentration
     
     C = .1;   
-    Sa_temp = setup.atmos.ozone;
+    Sa_temp = setup.atmos.ozone.*inputs.Sa_scalefactor;
     [~,minindex] = min(Sa_temp(1:20));
     %Sa_temp (Sa_temp <= 3e11) = 3e11;
-    Sa_temp = Sa_temp+3e11;
+    Sa_temp = Sa_temp+1e11;
     Sa_temp(1:minindex) = Sa_temp(minindex);
-    Sa_temp = Sa_temp.*2;
+    %Sa_temp = Sa_temp.*2;
     for k = 1:length(setup.atmos.Z)        
         for j = 1:length(setup.atmos.Z)         
             Sa(k,j) = C * Sa_temp(k) * Sa_temp(j) * exp( - (abs(k - j)) / 7);           
